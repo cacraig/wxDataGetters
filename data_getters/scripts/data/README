@@ -1,0 +1,5 @@
+All of the data will default to here
+  YYYYMMDDHH_${model}
+    - image.gif
+  YYYYMMDDHH_${model2}
+    - image.gif
