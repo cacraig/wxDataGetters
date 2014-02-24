@@ -12,9 +12,23 @@ if( $1 == "" || $2 == "" || $3 == "") then
     exit( 1 )
 endif
 
+
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
 set inFile = $3 
+
+set timeStamp = `echo $3 | sed 's/_/ /g'`
+# Get run timeStamp YYYYMMDDHH
+set timeStamp = ${timeStamp[1]}
+
+#Set output Directory = Timestamp_model
+set outDir = ${timeStamp}_${model}
+
+# Make our run directory.
+if !(-e ${outDir}) then
+  echo "Making Dir..."
+  mkdir ${outDir}
+endif
 
 foreach TIME ($times:q)
 
@@ -64,7 +78,7 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert ${model}_avor_${level}mb_init_f${TIME}.gif -transparent white ${model}_avor_${level}mb_f${TIME}.gif
+ convert ${model}_avor_${level}mb_init_f${TIME}.gif -transparent white ${outDir}/${model}_avor_${level}mb_f${TIME}.gif
  rm ${model}_avor_${level}mb_init_f${TIME}.gif
 
  end
