@@ -26,7 +26,7 @@ class Constants:
     
     # Get all current run files!
     self.modelGems = {'gfs'  : self.getRun(self.baseDataHttp,'gfs'), \
-                      'ecmwf': self.getRun(self.baseDataHttp,'ecmwf'), \
+    #                  'ecmwf': self.getRun(self.baseDataHttp,'ecmwf'), \
                       'ruc'  : self.getRun(self.baseDataHttp,'ruc'), \
                       'nam'  : self.getRun(self.baseDataHttp,'nam'), \
                       'ukmet': self.getRun(self.baseDataHttp,'ukmet')}

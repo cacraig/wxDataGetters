@@ -1,6 +1,5 @@
 import urllib2
 import time
-import os
 from constants import Constants
 
 # Get all of our constants for the data getting script.
