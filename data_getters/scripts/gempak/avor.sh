@@ -12,7 +12,6 @@ if( $1 == "" || $2 == "" || $3 == "") then
     exit( 1 )
 endif
 
-
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
 set inFile = $3 
@@ -22,7 +21,9 @@ set timeStamp = `echo $3 | sed 's/_/ /g'`
 set timeStamp = ${timeStamp[1]}
 
 #Set output Directory = Timestamp_model
-set outDir = ${timeStamp}_${model}
+set outDir = data/${timeStamp}_${model}
+
+
 
 # Make our run directory.
 if !(-e ${outDir}) then

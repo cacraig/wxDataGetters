@@ -2,6 +2,7 @@
 
 # usage perl gempak.pl <gfs=gfsfile.gem> <nam=namfile.gem>
 use Data::Dumper;
+use Cwd;
 
 # Initialize env vars.
 $res = `. /home/cacraig/gempak/GEMPAK7/Gemenviron.profile`;
@@ -10,7 +11,6 @@ $modelDataPath = $ENV{'MODEL'};
 
 # All valid models.
 %validModels = ('nam'=> '', 'gfs'=>'', 'ukmet'=>'', 'ruc'=>'', 'ecmwf' =>'');
-
 # Set $models[model] = (fileName)
 foreach(@ARGV)
 {
@@ -18,6 +18,7 @@ foreach(@ARGV)
   # Check if we passed a valid model, else skip.
   if(exists $validModels{$splitArg[0]})
   {
+    print "exists";
     $validModels{$splitArg[0]} = $splitArg[1];
   }
   else
@@ -26,15 +27,14 @@ foreach(@ARGV)
   }
 }
 
-print Dumper(%validModels);
 
 # Get all scripts from gempak dir.
-@files = <./gempak/*.sh>;
+#@files = <gempak/*.sh>;
 
 $rucTimes    = '00,01,02,03';
-$gfsTimes    = '00,03,06,12';
-$namTimes    = '00,03,06,12';
-$ukmentTimes = '00,03,06,12';
+$gfsTimes    = '00,06,12,18';
+$namTimes    = '00,06,12,18';
+$ukmetTimes = '00,06,12,18';
 $ecmwfTimes  = '';
 
 %modelForecastTimes = (
@@ -46,18 +46,31 @@ $ecmwfTimes  = '';
 
 );
 
-#Iterate through each script requiring level.
+# If we are in the parent directory, lets see if we can get into scripts, and execute.
+print $#files;
+if(!@files)
+{
+  chdir('scripts');
+  @files = <gempak/*.sh>;
+  print $#files;
+  if($#files < 0)
+  {
+    print "No gempak scripts can be located in /scripts. Assure that there are scripts to be had!\n";
+  }
+}
+
+
+#Iterate through each script, and times. Execute gempak scripts foreach model, and times.
 foreach $key (keys \%modelForecastTimes)
 {
   foreach $file (@files) 
   {
     $outfile = '';
-    print $key."!!!\n";
-    print $validModels{$key}."\n";
     if($validModels{$key})
     {
       $cmd =  $file." ".$key." ".$modelForecastTimes{$key}." ".$validModels{$key}."\n";
-      print $cmd;
+      print "\n".$cmd;
+      `$cmd`;
     }
   }
 }

@@ -2,6 +2,7 @@ from gemData import GemData
 from batchGenerateImages import BatchGenerateImages
 from optparse import OptionParser
 from argparse import ArgumentParser
+from subprocess import call
 
 def main():
   parser = ArgumentParser()
@@ -19,14 +20,14 @@ def main():
   dataGetter = GemData()
   
   # Retrieve and save data.
-  #dataGetter.getData()
+  dataGetter.getData()
   
   # Image Generation Block.
   if args.batch:
     imageGenerator = BatchGenerateImages(dataGetter)
     cmd = imageGenerator.getCommand()
     print "Performing Batch Image generation with command: " + cmd
-    #Call(cmd)
+    call(cmd, shell=True)
 
 if __name__ == "__main__":
   main()
