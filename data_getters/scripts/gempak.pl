@@ -7,10 +7,12 @@ use Cwd;
 # Initialize env vars.
 $res = `. /home/cacraig/gempak/GEMPAK7/Gemenviron.profile`;
 
-$modelDataPath = $ENV{'MODEL'};
+$modelDataPath = shift(@ARGV);
 
 # All valid models.
 %validModels = ('nam'=> '', 'gfs'=>'', 'ukmet'=>'', 'ruc'=>'', 'ecmwf' =>'');
+
+
 # Set $models[model] = (fileName)
 foreach(@ARGV)
 {
@@ -31,14 +33,14 @@ foreach(@ARGV)
 # Get all scripts from gempak dir.
 #@files = <gempak/*.sh>;
 
-$rucTimes    = '00,01,02,03';
-$gfsTimes    = '00,06,12,18';
-$namTimes    = '00,06,12,18';
-$ukmetTimes = '00,06,12,18';
+# $rucTimes    = '00,01,02,03';
+$gfsTimes    = '00,06,12,18,24,30,36,42,48,54,60,66,72,78,84,90,96,102,108,114,120,126,132,138,144,150,156,162,168,174,180,192,204,216,228,240';
+$namTimes    = '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84';
+$ukmetTimes  = '00,06,12,18,24,30,36,42,48,54,60';
 $ecmwfTimes  = '';
 
 %modelForecastTimes = (
-  'ruc'   => $rucTimes,
+  #'ruc'   => $rucTimes,
   'gfs'   => $gfsTimes,
   'nam'   => $namTimes,
   #'ecmwf' => @ecmwfTimes,
@@ -47,7 +49,6 @@ $ecmwfTimes  = '';
 );
 
 # If we are in the parent directory, lets see if we can get into scripts, and execute.
-print $#files;
 if(!@files)
 {
   chdir('scripts');

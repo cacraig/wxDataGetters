@@ -6,7 +6,7 @@ class BatchGenerateImages:
     return
 
   def getCommand(self):
-    cmd = "perl scripts/gempak.pl "
+    cmd = "perl scripts/gempak.pl " + self.dataGetter.constants.dataDirEnv + " "
     for key,http in self.dataGetter.constants.modelGems.items():
       fileArgString = key + "=" + http['file']
       cmd += fileArgString + " "

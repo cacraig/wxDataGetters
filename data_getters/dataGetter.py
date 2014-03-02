@@ -26,7 +26,6 @@ def main():
   if args.batch:
     imageGenerator = BatchGenerateImages(dataGetter)
     cmd = imageGenerator.getCommand()
-    print "Performing Batch Image generation with command: " + cmd
     call(cmd, shell=True)
 
 if __name__ == "__main__":
