@@ -59,7 +59,7 @@ foreach level (500 850)
   GVECT    =  
   WIND     = "0"
   REFVEC   =  
-  TITLE    = "31/-2/GFS ~"
+  TITLE    = 
   TEXT     = "1/2//hw"
   GAREA    = "us"  
   IJSKIP   = "0"
