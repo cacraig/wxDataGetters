@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import urllib2
 import datetime, re, os
 from subprocess import call
+import ConfigParser
 
 '''''
 This Class defines everything we need to obtain the model gem files.
@@ -16,11 +17,15 @@ class Constants:
   '''''
   def __init__(self):
 
-    # DATA STORAGE DIRECTORIES.
-    self.baseDir   = "/home/cacraig/"
-    self.gempakDir = "gempak/GEMPAK7/gempak/"
-    self.dataDir   = "data/model/"
+    # Open our parameters.ini file, and get defined constants.
+    config = ConfigParser.SafeConfigParser()
+    config.read('conf/parameters.ini')
 
+    # DATA STORAGE DIRECTORIES.
+    self.baseDir   = config.get('DEFAULT','BASE_DIR')
+    self.gempakDir = config.get('DEFAULT','GEMPAK_DIR')
+    self.dataDir   = config.get('DEFAULT','DATA_DIR')
+    
     # Full path of data directory.
     self.dataDirEnv = self.baseDir + self.gempakDir + self.dataDir
 

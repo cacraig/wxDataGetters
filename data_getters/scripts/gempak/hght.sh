@@ -13,17 +13,16 @@ set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
 set inFile = $3 
 
-set variable = "avor"
-
 set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
 #Set output Directory = Timestamp_model
 set outDir = data/${timeStamp}_${model}
+
+set variable = "hght"
+
 set MODEL_PATH  = $4 
-
-
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -42,30 +41,26 @@ foreach level (500 850)
   GLEVEL   = "${level}"
   GVCORD   = "PRES"
   PANEL    = "0"
-  GFUNC    =  "abs(avor(wnd))"
+  SKIP     =  
+  SCALE    = "-1"
+  GFUNC    = "hght"
+  CTYPE    = "c"
+  CONTUR   = 
+  CINT     = "8"
+  LINE     = "3/1/2/1"
   HILO     =  
   HLSYM    =  
-  CLEAR  = yes
-  PANEL  = 0
-  SCALE  = 5
-  GVECT= 
-  CLRBAR = 
-  CONTUR = 1
-  SKIP  =  0
-  TITLE = 
-  FINT   = 16;20;24;28;32;36;40;44
-  FLINE  = 0;23-15
-  CTYPE  = c/f
-  WIND     = "0"
+  CLRBAR   = 
+  GVECT    =  
+  WIND     = 
   REFVEC   =  
-  TEXT     = 
-  GAREA    = "us"  
+  TITLE    = 
+  TEXT     = "1/21//hw"
+  GAREA    = "us" 
   IJSKIP   = "0"
   PROJ     = 
   MAP      = "0"
-  MSCALE   = "0"
-  LATLON   = 
-  STNPLT   =  
+  STNPLT   =
   DEVICE = "gif|${model}_${variable}_${level}mb_init_f${TIME}.gif|1280;1024| C"
   run
  exit

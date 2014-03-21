@@ -2,6 +2,7 @@
 
 # Usage ./avor.sh  <model>  <time1,time2,...>  <inFile>
 
+
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 3 paremeters must be defined!"
@@ -13,17 +14,16 @@ set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
 set inFile = $3 
 
-set variable = "avor"
-
 set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
 #Set output Directory = Timestamp_model
 set outDir = data/${timeStamp}_${model}
+
 set MODEL_PATH  = $4 
 
-
+set variable = "wind"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -42,30 +42,25 @@ foreach level (500 850)
   GLEVEL   = "${level}"
   GVCORD   = "PRES"
   PANEL    = "0"
-  GFUNC    =  "abs(avor(wnd))"
-  HILO     =  
-  HLSYM    =  
-  CLEAR  = yes
-  PANEL  = 0
-  SCALE  = 5
-  GVECT= 
-  CLRBAR = 
-  CONTUR = 1
-  SKIP  =  0
-  TITLE = 
-  FINT   = 16;20;24;28;32;36;40;44
-  FLINE  = 0;23-15
-  CTYPE  = c/f
-  WIND     = "0"
-  REFVEC   =  
-  TEXT     = 
-  GAREA    = "us"  
+  SKIP  =  "1/2"   
+  SCALE =  "0"                                                               
+  GFUNC =  "knts((mag(wnd)))"                                               
+  CTYPE =  "c/f"                                                                  
+  CONTUR = "1"                                                                    
+  CINT   = "30;50;70;90;110;130;150"                                      
+  LINE   = "27/5/2/1"                                                    
+  FINT   = "70;90;110;130;150"                                                  
+  FLINE  = "0;25;24;29;7;15"   
+  HILO   =                                                                        
+  HLSYM  =                                                                        
+  REFVEC =       
+  TITLE =                                                                       
+  CLEAR =  "yes"    
+  GAREA    = "us" 
   IJSKIP   = "0"
   PROJ     = 
   MAP      = "0"
-  MSCALE   = "0"
-  LATLON   = 
-  STNPLT   =  
+  STNPLT   =
   DEVICE = "gif|${model}_${variable}_${level}mb_init_f${TIME}.gif|1280;1024| C"
   run
  exit

@@ -4,9 +4,6 @@
 use Data::Dumper;
 use Cwd;
 
-# Initialize env vars.
-$res = `. /home/cacraig/gempak/GEMPAK7/Gemenviron.profile`;
-
 $modelDataPath = shift(@ARGV);
 
 # All valid models.
@@ -69,7 +66,7 @@ foreach $key (keys \%modelForecastTimes)
     $outfile = '';
     if($validModels{$key})
     {
-      $cmd =  $file." ".$key." ".$modelForecastTimes{$key}." ".$validModels{$key}."\n";
+      $cmd =  $file." ".$key." ".$modelForecastTimes{$key}." ".$validModels{$key}." ".$modelDataPath."\n";
       print "\n".$cmd;
       `$cmd`;
     }
