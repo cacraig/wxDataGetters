@@ -1,6 +1,6 @@
 #!/bin/csh
 
-# Usage ./avor.sh  <model>  <time1,time2,...>  <inFile>
+# Usage ./wind.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>
 
 
 echo "checking for params..."

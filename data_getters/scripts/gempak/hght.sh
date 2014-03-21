@@ -1,6 +1,6 @@
 #!/bin/csh
 
-# Usage ./avor.sh  <model>  <time1,time2,...>  <inFile>
+# Usage ./avor.sh  <model>  <time1,time2,...>  <inFile>  <MODEL path>
 
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
