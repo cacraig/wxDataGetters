@@ -1,6 +1,6 @@
 #!/bin/csh
 
-# Usage ./wind.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>
+# Usage ./isotachs.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>
 
 
 echo "checking for params..."
@@ -23,7 +23,7 @@ set outDir = data/${timeStamp}_${model}
 
 set MODEL_PATH  = $4 
 
-set variable = "wind"
+set variable = "isotachs"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -50,7 +50,9 @@ foreach level (500 850)
   CINT   = "30;50;70;90;110;130;150"                                      
   LINE   = "27/5/2/1"                                                    
   FINT   = "70;90;110;130;150"                                                  
-  FLINE  = "0;25;24;29;7;15"   
+  FLINE  = "0;25;24;29;7;15"
+  WIND   =    
+  GVECT  = 
   HILO   =                                                                        
   HLSYM  =                                                                        
   REFVEC =       
