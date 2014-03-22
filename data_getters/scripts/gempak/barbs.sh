@@ -18,25 +18,30 @@ set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
-#Set output Directory = Timestamp_model
-set outDir = data/${timeStamp}_${model}
+set baseDir = "data"
 
+#Set output Directory = Timestamp_model
+set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
+
+
+# Make our run directory.
+if !(-e ${outDir}) then
+  mkdir -p ${baseDir}/${model}/${timeStamp}
+endif
 
 #Default barb/color width
 set barbColor = "bm31//2"
 
 set variable = "barbs"
 
-# Make our run directory.
-if !(-e ${outDir}) then
-  echo "Making Dir..."
-  mkdir ${outDir}
-endif
 
 foreach TIME ($times:q)
 
 foreach level (500 850)
+
+ set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+ mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  
  if (${level} == 250) then
    set barbColor = "bm2//2"
@@ -83,7 +88,7 @@ foreach level (500 850)
   PROJ     = 
   MAP      = "0"
   STNPLT   =
-  DEVICE = "gif|${model}_${variable}_${level}mb_init_f${TIME}.gif|1280;1024| C"
+  DEVICE = "gif|init_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -92,8 +97,8 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert ${model}_${variable}_${level}mb_init_f${TIME}.gif -transparent white ${outDir}/${model}_${variable}_${level}mb_f${TIME}.gif
- rm ${model}_${variable}_${level}mb_init_f${TIME}.gif
+ convert init_f${TIME}.gif -transparent white ${imgDir}/f${TIME}.gif
+ rm init_f${TIME}.gif
 
  end
 
