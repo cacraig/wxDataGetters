@@ -17,6 +17,8 @@ set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
+set lineColor = "2"
+
 set baseDir = "data"
 set variable = "hght"
 
@@ -32,7 +34,23 @@ endif
 
 foreach TIME ($times:q)
 
-foreach level (500 850)
+foreach level (250 500 850 1000)
+
+ if (${level} == 250) then
+   set lineColor = "29"
+ endif
+
+ if (${level} == 500) then
+   set lineColor = "21"
+ endif
+
+ if (${level} == 850) then
+   set lineColor = "17"
+ endif
+
+ if (${level} == 1000) then
+   set lineColor = "2"
+ endif
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
@@ -51,7 +69,7 @@ foreach level (500 850)
   CTYPE    = "c"
   CONTUR   = 
   CINT     = "8"
-  LINE     = "3/1/2/1"
+  LINE     = "${lineColor}/1/2/1"
   HILO     =  
   HLSYM    =  
   CLRBAR   = 
@@ -74,7 +92,7 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_f${TIME}.gif -transparent white ${imgDir}/f${TIME}.gif
+ convert init_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
  rm init_f${TIME}.gif
 
  end

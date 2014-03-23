@@ -38,25 +38,25 @@ set variable = "barbs"
 
 foreach TIME ($times:q)
 
-foreach level (500 850)
+foreach level (250 500 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  
  if (${level} == 250) then
-   set barbColor = "bm2//2"
+   set barbColor = "bm29//2"
  endif
 
  if (${level} == 500) then
-   set barbColor = "bm6//2"
- endif
-
- if (${level} == 850) then
    set barbColor = "bm21//2"
  endif
 
+ if (${level} == 850) then
+   set barbColor = "bm17//2"
+ endif
+
  if (${level} == 1000) then
-   set barbColor = "bm31//2"
+   set barbColor = "bm2//2"
  endif
 
  gdplot << EOF 
@@ -97,7 +97,7 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_f${TIME}.gif -transparent white ${imgDir}/f${TIME}.gif
+ convert init_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
  rm init_f${TIME}.gif
 
  end

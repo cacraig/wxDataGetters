@@ -36,7 +36,7 @@ endif
 
 foreach TIME ($times:q)
 
-foreach level (500 850)
+foreach level (250 500 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
@@ -79,7 +79,7 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_f${TIME}.gif -transparent white ${imgDir}/f${TIME}.gif
+ convert init_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
  rm init_f${TIME}.gif
 
  end
