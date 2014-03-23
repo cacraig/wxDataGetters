@@ -31,7 +31,7 @@ if !(-e ${outDir}) then
 endif
 
 #Default barb/color width
-set barbColor = "bm31//2"
+set barbColor = 31
 
 set variable = "barbs"
 
@@ -44,20 +44,39 @@ foreach level (250 500 850 1000)
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  
  if (${level} == 250) then
-   set barbColor = "bm29//2"
+   set barbColor = 28
  endif
 
  if (${level} == 500) then
-   set barbColor = "bm21//2"
+   set barbColor = 21
  endif
 
  if (${level} == 850) then
-   set barbColor = "bm17//2"
+   set barbColor = 17
  endif
 
  if (${level} == 1000) then
-   set barbColor = "bm2//2"
+   set barbColor = 13
  endif
+
+ if (${model} == "ecmwf") then
+  @ barbColor = $barbColor
+ endif
+
+ if (${model} == "nam") then
+   @ barbColor = $barbColor + 1
+ endif
+
+
+ if (${model} == "gfs") then
+  @ barbColor = $barbColor + 2
+ endif
+
+ if (${model} == "ruc") then
+  @ barbColor = $barbColor + 3
+ endif
+
+ 
 
  gdplot << EOF 
          
@@ -73,7 +92,7 @@ foreach level (250 500 850 1000)
   CTYPE =                                                                    
   CONTUR =      
   GVECT = "WND"
-  WIND = "${barbColor}"                                                         
+  WIND = "bm${barbColor}//2"                                                         
   CINT   =                                       
   LINE   =                                                
   FINT   =                                                   

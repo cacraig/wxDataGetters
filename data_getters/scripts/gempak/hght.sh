@@ -17,7 +17,7 @@ set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
-set lineColor = "2"
+set lineColor = 2
 
 set baseDir = "data"
 set variable = "hght"
@@ -37,20 +37,40 @@ foreach TIME ($times:q)
 foreach level (250 500 850 1000)
 
  if (${level} == 250) then
-   set lineColor = "29"
+   set lineColor = 28
  endif
 
  if (${level} == 500) then
-   set lineColor = "21"
+   set lineColor = 21
  endif
 
  if (${level} == 850) then
-   set lineColor = "17"
+   set lineColor = 17
  endif
 
  if (${level} == 1000) then
-   set lineColor = "2"
+   set lineColor = 13
  endif
+
+ if (${model} == "ecmwf") then
+  @ lineColor = $lineColor
+ endif
+
+ if (${model} == "nam") then
+   echo "True"
+   @ lineColor = $lineColor + 1
+ endif
+
+
+ if (${model} == "gfs") then
+  echo "GFS"
+  @ lineColor = $lineColor + 2
+ endif
+
+ if (${model} == "ruc") then
+  @ lineColor = $lineColor + 3
+ endif
+
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
