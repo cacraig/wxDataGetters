@@ -11,8 +11,8 @@ Dependencies:
 - BeautifulSoup
 
 To execute: 
- - python dataGetter.py [-b]
-----------------------------
+   ### python dataGetter.py [-b]
+
      optional arguments:
 
        -h, --help   show this help message and exit
