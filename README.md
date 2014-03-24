@@ -11,7 +11,8 @@ Dependencies:
 - BeautifulSoup
 
 To execute: 
-   ### H3 python dataGetter.py [-b]
+    python dataGetter.py [-b]
+    ### H3
 
      optional arguments:
 
