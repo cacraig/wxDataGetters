@@ -71,6 +71,10 @@ foreach level (250 500 850 1000)
   @ lineColor = $lineColor + 3
  endif
 
+ if (${model} == "ukmet") then
+  @ lineColor = $lineColor + 3
+ endif
+
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}

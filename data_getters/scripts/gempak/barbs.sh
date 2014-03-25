@@ -76,6 +76,10 @@ foreach level (250 500 850 1000)
   @ barbColor = $barbColor + 3
  endif
 
+if (${model} == "ukmet") then
+  @ barbColor = $barbColor + 3
+ endif
+
  
 
  gdplot << EOF 
