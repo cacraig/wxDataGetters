@@ -65,9 +65,9 @@ foreach level (250 500 850 1000)
   REFVEC =       
   TITLE =                                                                       
   CLEAR =  "yes"    
-  GAREA    = "us" 
   IJSKIP   = "0"
-  PROJ     = 
+  GAREA = "19.00;-119.00;50.00;-56.00"
+  PROJ = "STR/90;-100;0"
   MAP      = "0"
   STNPLT   =
   DEVICE = "gif|init_f${TIME}.gif|1280;1024| C"

@@ -62,10 +62,10 @@ foreach level (250 500 850 1000)
   CTYPE  = c/f
   WIND     = "0"
   REFVEC   =  
-  TEXT     = 
-  GAREA    = "us"  
+  TEXT     =  
   IJSKIP   = "0"
-  PROJ     = 
+  GAREA = "19.00;-119.00;50.00;-56.00"
+  PROJ = "STR/90;-100;0"
   MAP      = "0"
   MSCALE   = "0"
   LATLON   = 
