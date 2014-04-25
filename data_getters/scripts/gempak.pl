@@ -66,7 +66,7 @@ foreach $key (keys \%modelForecastTimes)
     $outfile = '';
     if($validModels{$key})
     {
-      $cmd =  $file." ".$key." ".$modelForecastTimes{$key}." ".$validModels{$key}." ".$modelDataPath."\n";
+      $cmd =  "tcsh ".$file." ".$key." ".$modelForecastTimes{$key}." ".$validModels{$key}." ".$modelDataPath."\n";
       print "\n".$cmd;
       `$cmd`;
     }
