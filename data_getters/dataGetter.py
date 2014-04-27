@@ -21,7 +21,7 @@ def main():
   dataGetter = GemData()
   
   # Retrieve and save data.
-  #dataGetter.getData()
+  dataGetter.getData()
   
   # Image Generation Block.
   if args.batch:
