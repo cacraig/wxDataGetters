@@ -34,7 +34,7 @@ endif
 
 foreach TIME ($times:q)
 
-foreach level (250 500 850 1000)
+foreach level (250 500 850)
 
  if (${level} == 250) then
    set lineColor = 28
