@@ -59,7 +59,7 @@ foreach level (250 500 850 1000)
    set barbColor = 13
  endif
 
- if (${model} == "ecmwf") then
+ if (${model} == "ecmf1") then
   @ barbColor = $barbColor
  endif
 
@@ -111,7 +111,7 @@ if (${model} == "ukmet") then
   PROJ = "STR/90;-100;0"
   MAP      = "0"
   STNPLT   =
-  DEVICE = "gif|init_f${TIME}.gif|1280;1024| C"
+  DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -120,8 +120,8 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_f${TIME}.gif
+ convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
+ rm init_${model}_${level}_${variable}_f${TIME}.gif
 
  end
 

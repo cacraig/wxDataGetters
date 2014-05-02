@@ -1,31 +1,38 @@
 #!/bin/csh
 
-# Usage ./avor.sh  <model>  <time1,time2,...>  <inFile>  <MODEL path>
+# Usage ./pmsl.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>
+
 
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
-    echo "All 4 paremeters must be defined!"
+    echo "All 3 paremeters must be defined!"
     echo "Usage ./pmsl.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>"
     exit( 1 )
 endif
 
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
-set inFile = $3 
+set runTime = $3 
 
-set variable = "pmsl"
+
 
 set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
+set MODEL_PATH  = $4 
+
+set variable = "pmsl"
+
 set baseDir = "data"
-set lineColor = 13
 
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 
+if (${model} == 'nam12km') then
+  set extension = "_nam218.gem"
+endif
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -33,20 +40,22 @@ if !(-e ${outDir}) then
 endif
 
 foreach TIME ($times:q)
-
  # Reset line color!
  set lineColor = 13
  set level = 1000
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
- echo imgDir
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+
+ if (${model} == "nam12km") then
+   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ endif 
 
 
  if (${model} == "ecmwf") then
   @ lineColor = $lineColor
  endif
 
- if (${model} == "nam") then
+ if (${model} == "nam12km") then
    @ lineColor = $lineColor + 1
  endif
 
@@ -65,7 +74,7 @@ if (${model} == "ukmet") then
 
  gdplot2 << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
+  GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"
   GLEVEL   = "0"
   GVCORD   = "none"
@@ -100,7 +109,7 @@ if (${model} == "ukmet") then
   MSCALE   = "0"
   LATLON   = 
   STNPLT   =  
-  DEVICE   = "gif|init_${model}_1000_${variable}_f${TIME}.gif|1280;1024| C"
+  DEVICE   = "gif|init_${model}_1000_${variable}_f${shortTime}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -109,7 +118,8 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_${model}_1000_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_1000_${variable}_f${TIME}.gif
+ convert init_${model}_1000_${variable}_f${shortTime}.gif -transparent black ${imgDir}/f${shortTime}.gif
+ rm init_${model}_1000_${variable}_f${shortTime}.gif
+
 
 end

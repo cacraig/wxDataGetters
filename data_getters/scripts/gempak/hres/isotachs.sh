@@ -1,28 +1,22 @@
-#!/bin/csh
-
-# Usage ./isotachs.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>
-
-
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 3 paremeters must be defined!"
-    echo "Usage ./avor.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>"
+    echo "Usage ./isotachs.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
     exit( 1 )
 endif
 
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
-set inFile = $3 
+set runTime = $3 
 
 set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
 set timeStamp = ${timeStamp[1]}
 
-set MODEL_PATH  = $4 
-
-set variable = "isotachs"
+set lineColor = 2
 
 set baseDir = "data"
+set variable = "isotachs"
 
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
@@ -34,17 +28,26 @@ if !(-e ${outDir}) then
   mkdir -p ${baseDir}/${model}/${timeStamp}
 endif
 
+if (${model} == 'nam12km') then
+  set extension = "_nam218.gem"
+endif
+
 foreach TIME ($times:q)
 
 foreach level (250 500 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
- #cd ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+ 
+ set shortTime = ${TIME}
+
+ if (${model} == "nam12km") then
+   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ endif 
 
  gdplot << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
+  GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"
   CLEAR    = "n"
   GLEVEL   = "${level}"
@@ -71,7 +74,7 @@ foreach level (250 500 850 1000)
   PROJ = "STR/90;-100;0"
   MAP      = "0"
   STNPLT   =
-  DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
+  DEVICE = "gif|init_${model}_${level}_${variable}_f${shortTime}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -81,8 +84,8 @@ EOF
  rm gemglb.nts
 
  # convert to a transparent image layer.
- convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_${level}_${variable}_f${TIME}.gif
+ convert init_${model}_${level}_${variable}_f${shortTime}.gif -transparent black ${imgDir}/f${shortTime}.gif
+ rm init_${model}_${level}_${variable}_f${shortTime}.gif
 
  end
 

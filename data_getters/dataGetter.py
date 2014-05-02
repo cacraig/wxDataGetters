@@ -1,8 +1,8 @@
 from gemData import GemData
 from batchGenerateImages import BatchGenerateImages
+from gempak import Gempak
 from optparse import OptionParser
 from argparse import ArgumentParser
-from subprocess import call
 
 def main():
 
@@ -25,9 +25,11 @@ def main():
   
   # Image Generation Block.
   if args.batch:
-    imageGenerator = BatchGenerateImages(dataGetter)
-    cmd = imageGenerator.getCommand()
-    call(cmd, shell=True)
+    gempak = Gempak(dataGetter)
+    gempak.runGempakScripts()
+    #imageGenerator = BatchGenerateImages(dataGetter)
+    #cmd = imageGenerator.getCommand()
+    #call(cmd, shell=True)
 
 if __name__ == "__main__":
   main()

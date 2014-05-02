@@ -68,7 +68,7 @@ foreach TIME ($times:q)
   CLEAR   = yes 
   MAP     = 0
   TITLE   = 
-  DEVICE  = "gif|init_f${TIME}.gif|1280;1024| C"
+  DEVICE  = "gif|init_${model}_sfc_${variable}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -77,8 +77,8 @@ EOF
  rm last.nts
  rm gemglb.nts
  # convert to a transparent image layer.
- convert init_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_f${TIME}.gif
+ convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
+ rm init_${model}_sfc_${variable}_f${TIME}.gif
 
 
 end
