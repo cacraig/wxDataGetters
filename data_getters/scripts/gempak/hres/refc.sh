@@ -1,7 +1,7 @@
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 3 paremeters must be defined!"
-    echo "Usage ./hght.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
+    echo "Usage ./refc.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
     exit( 1 )
 endif
 
@@ -16,7 +16,7 @@ set timeStamp = ${timeStamp[1]}
 set lineColor = 2
 
 set baseDir = "data"
-set variable = "tmpf"
+set variable = "refc"
 
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
@@ -38,8 +38,8 @@ endif
 
 foreach TIME ($times:q)
 
- set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
- mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
+ set imgDir = ${baseDir}/${model}/${timeStamp}/comp/${variable}
+ mkdir -p ${baseDir}/${model}/${timeStamp}/comp/${variable}
  
  set shortTime = ${TIME}
 
@@ -55,21 +55,19 @@ foreach TIME ($times:q)
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"
-  GLEVEL = 2
-  GVCORD = HGHT
+  GLEVEL = 0
+  GVCORD = NONE
   PANEL  = 0                                                                       
   SKIP   = 0
   SCALE  = 0
-  GDPFUN = ADD( MUL( SUB( TMPK , 273.15 ), QUO( 9 , 5 ) ) , 32 )
+  GDPFUN = REFC
   TYPE   = f
-  CONTUR = 0                                                                      
-  CINT   = -20;-10;0;10;20;30;40;50;60;70;80;90;100;110
-  LINE   = 32/1/2/2
-  FINT   = -20;-10;0;10;20;30;40;50;60;70;80;90;100;110
-  FLINE  = 30;29;28;27;26;25;24;23;20;17;16;15;14;7
+  CONTUR = 0                                         
   HILO   =                                                                          
-  HLSYM  =                                                                        
-  WIND   = 18/1/1
+  HLSYM  =      
+  FINT   = 5;10;15;20;25;30;35;40;45;50;55;60;65;70;75;80
+  FLINE  = 0;26;24;4;21;22;23;20;18;17;15;14;28;29;7;31                                   
+  WIND   = 
   REFVEC =                                                                                                                                   
   CLEAR  = yes                                                                     
   STNPLT =                                                                         
@@ -79,11 +77,12 @@ foreach TIME ($times:q)
   STREAM =        
   GAREA  = 19.00;-119.00;50.00;-56.00
   PROJ   = STR/90;-100;0                                                                 
-  POSN   =  4                                                                       
-  COLORS = 2 
-  MAP    = 0                                                                      
-  MARKER = 2                                                                       
-  GRDLBL = 5                                                                       
+  POSN   =                                                                         
+  COLORS = 1 
+  MAP    = 1                                                                      
+  MARKER =                                                                        
+  GRDLBL =   
+  CLRBAR = 1                                                                     
   LUTFIL = none
   FILTER = yes
   DEVICE = "gif|${imgDir}/f${shortTime}.gif|1280;1024| C"

@@ -27,9 +27,9 @@ def main():
   if args.batch:
     gempak = Gempak(dataGetter)
     gempak.runGempakScripts()
-    #imageGenerator = BatchGenerateImages(dataGetter)
-    #cmd = imageGenerator.getCommand()
-    #call(cmd, shell=True)
+
+  # Scrub all of our model data.
+  dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
 
 if __name__ == "__main__":
   main()

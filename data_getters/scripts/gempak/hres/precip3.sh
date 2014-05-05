@@ -32,6 +32,10 @@ if (${model} == 'nam12km') then
   set extension = "_nam218.gem"
 endif
 
+if (${model} == 'nam4km') then
+  set extension = "_nam4km.gem"
+endif
+
 foreach TIME ($times:q)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
@@ -43,6 +47,10 @@ foreach TIME ($times:q)
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
 
+ if (${model} == "nam4km") then
+   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ endif 
+ 
  gdplot << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"

@@ -34,6 +34,10 @@ if (${model} == 'nam12km') then
   set extension = "_nam218.gem"
 endif
 
+if (${model} == 'nam4km') then
+  set extension = "_nam4km.gem"
+endif
+
 # Make our run directory.
 if !(-e ${outDir}) then
   mkdir -p ${baseDir}/${model}/${timeStamp}
@@ -47,6 +51,10 @@ foreach TIME ($times:q)
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
  if (${model} == "nam12km") then
+   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ endif 
+
+  if (${model} == "nam4km") then
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
 

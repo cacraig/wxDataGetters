@@ -32,6 +32,10 @@ if (${model} == 'nam12km') then
   set extension = "_nam218.gem"
 endif
 
+if (${model} == 'nam4km') then
+  set extension = "_nam4km.gem"
+endif
+
 foreach TIME ($times:q)
 
 foreach level (250 500 850 1000)
@@ -42,6 +46,10 @@ foreach level (250 500 850 1000)
  set shortTime = ${TIME}
 
  if (${model} == "nam12km") then
+   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ endif 
+
+  if (${model} == "nam4km") then
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
 

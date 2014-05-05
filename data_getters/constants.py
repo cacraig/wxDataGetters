@@ -26,13 +26,22 @@ class Constants:
     self.gempakDir = config.get('DEFAULT','GEMPAK_DIR')
     self.dataDir   = config.get('DEFAULT','DATA_DIR')
 
+
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
     #          ?file=gfs.t12z.pgrbf12.grib2&lev_500_mb=on&var_TMP=on
     #          &leftlon=0&rightlon=360&toplat=90&bottomlat=-90&showurl=&dir=%2Fgfs.2009020612"
     #         -o my_file
+    # Each value contains a url to obtain a specific subset of the grib2 data.
+    # This is done to reduce file size and processing/download time.
     self.highResScriptUrls = {
-      'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl" \
+      'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?lev_0C_isotherm=on&lev_1000-0_m_above_ground=on"+ \
+                "&lev_2_m_above_ground=on&lev_1_hybrid_level=on&lev_3000-0_m_above_ground=on&lev_5000-2000_m_above_ground=on&lev_6000-0_m_above_ground=on"+ \
+                "&lev_850_mb=on&lev_cloud_base=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on&"+ \
+                "lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on&"+ \
+                "lev_surface=on&var_ACPCP=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
+                "var_MXUPHL=on&var_PWAT=on&var_REFD=on&var_RH=on&var_TMP=on&var_UPHL=on&var_USTM=on&var_VSTM=on&var_WEASD=on&var_WTMP=on&leftlon=0&"+ \
+                "rightlon=360&toplat=90&bottomlat=-90&" \
     }
     
     # Full path of data directory.
@@ -45,7 +54,7 @@ class Constants:
      'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
      'ukmet' : '00,06,12,18,24,30,36,42,48,54,60', \
      'ecmf1': '00,24,48,72,96,120,144,168,240', \
-     'nam4km': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60'\
+     'nam4km': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023,024,025,026,027,028,029,030,031,032,033,034,035,036,039,042,045,048,051,054,057,060'\
     }
 
     # Define domain/resolution to obtain.
@@ -59,16 +68,28 @@ class Constants:
     self.getDataHttp = "http://motherlode.ucar.edu/repository/entry/get/RAMADDA/Data/IDD+Data/decoded/gempak/model/"
 
     self.highResDataHttp = "http://www.ftp.ncep.noaa.gov/data/nccf/com/"
+
+    # Dict to store model => runTime
+    self.runTimes = {
+      'gfs'  : "", \
+      'ecmf1': "", \
+      'ruc'  : "", \
+      'nam'  : "", \
+      'ukmet': "", \
+      'nam12km' : "", \
+      'nam4km' : "" \
+    }
     
     # Get all current run files!
-    self.modelGems = {'gfs'  : self.getRun('gfs'), \
-                      'ecmf1': self.getRun('ecmf1'), \
-                      'ruc'  : self.getRun('ruc'), \
-                      'nam'  : self.getRun('nam'), \
-                      'ukmet': self.getRun('ukmet'),
-                      'nam12km' : self.getNam218('nam12km'),
-                      #'nam4km' : self.getHighResRun('nam4km')
-                      }
+    self.modelGems = {
+      'gfs'  : self.getRun('gfs'), \
+      'ecmf1': self.getRun('ecmf1'), \
+      'ruc'  : self.getRun('ruc'), \
+      'nam'  : self.getRun('nam'), \
+      'ukmet': self.getRun('ukmet'), \
+      'nam12km' : self.getNam218('nam12km'), \
+      'nam4km' : self.getHighResRun('nam4km') \
+    }
 
     return;
   
@@ -76,8 +97,8 @@ class Constants:
   This method parses the soup, and gets all model links with extension _[model][type].gem
   ie. /*_gfs211.gem .
   
-  @param soup   - BS object containing HTML content
-  @param String - String containing model type. 
+  @param list html   - List containing HTML content
+  @param String type - String containing model type. 
   @return list
   '''''
   def getModelLinks(self, html, type):
@@ -98,6 +119,14 @@ class Constants:
 
     return fileList
 
+  '''''
+  This method gets all conusnest High-Resolution model paths. These model paths are an array
+  of download paths for grib2 data (one for each time stamp).
+
+  @param list html   - List containing HTML content
+  @param String type - String containing model type. 
+  @return list
+  '''''
   def getLatestHiresFiles(self, html, type):
     soup = BeautifulSoup(html)
 
@@ -142,13 +171,13 @@ class Constants:
       else:
         runFileList.append(file)
 
-    #TODO!!
-    # http://nomads.ncep.noaa.gov/txt_descriptions/fast_downloading_grib.shtml
-    # http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
-    # This may be more useful... download only grids we need...
-    # Package them all into one grib, and convert to gem.
+    # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
+    if modelType == 'nam':
+      # Get full name of our run. This is hacky, but I'm lazy.
+      modelType = 'nam4km'
 
-    # When downloading Temp data, select : 2 hybrid level  &  2 m above ground
+    self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
+
     return (latestRunDir[:-1],runFileList)
 
   '''''
@@ -191,14 +220,15 @@ class Constants:
 
     # Return a URL to the current model run .gem file.
     dataDict = {}
-    print modelGetUrl
-    print currentRun
-    # Skip ecmwf for now.
+
     dataDict['url']  = modelGetUrl + currentRun
     dataDict['file'] = currentRun
 
     return dataDict
 
+  '''''
+  Get the *.gem data for the 12km NAM model.
+  '''''
   def getNam218(self, type):
 
     model = type
@@ -224,6 +254,8 @@ class Constants:
       if file[0:10] == run:
         runDict[file] = modelGetUrl + file
 
+    self.runTimes['nam12km'] = run
+
     # Return a URL to the current model run .gem file.
     dataDict = {}
     # Skip ecmwf for now.
@@ -231,6 +263,11 @@ class Constants:
 
     return dataDict
 
+  '''''
+  Get model data for NAM 4km, HRRR, WRF ARW, GFS .5 degree... etc.
+  These must be downloaded as subsets of .grib2 files (due to their massive size)
+  We must specify certain paramaters/levels to grab, rather than pulling the entire model run's data.
+  '''''
   def getHighResRun(self, type):
     model = type
     if type == "nam12km" or type == "nam4km":
@@ -247,16 +284,16 @@ class Constants:
     scriptUrl = self.highResScriptUrls[type]
     runDict = {}
 
-    # TODO! Add desired parameters/levels to script d/l urls
+    # Set file download paths, along with desired vars/levels.
     for file in files:
-      runDict[file] = scriptUrl + "?dir=/" + latestRun + "&file=" + file
+      runDict[file] = scriptUrl + "&dir=/" + latestRun + "&file=" + file
 
     dataDict = {}
 
     # A list of all Download urls.
     dataDict['files'] = runDict
 
-    print runDict
+    #print runDict
 
-    return
+    return dataDict
 
