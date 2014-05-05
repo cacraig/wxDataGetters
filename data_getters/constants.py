@@ -82,13 +82,13 @@ class Constants:
     
     # Get all current run files!
     self.modelGems = {
-      'gfs'  : self.getRun('gfs'), \
-      'ecmf1': self.getRun('ecmf1'), \
-      'ruc'  : self.getRun('ruc'), \
-      'nam'  : self.getRun('nam'), \
-      'ukmet': self.getRun('ukmet'), \
-      'nam12km' : self.getNam218('nam12km'), \
-      'nam4km' : self.getHighResRun('nam4km') \
+       'gfs'  : self.getRun('gfs'), \
+       'ecmf1': self.getRun('ecmf1'), \
+       'ruc'  : self.getRun('ruc'), \
+       'nam'  : self.getRun('nam'), \
+       'ukmet': self.getRun('ukmet'), \
+       'nam12km' : self.getNam218('nam12km'), \
+       'nam4km' : self.getHighResRun('nam4km') \
     }
 
     return;
