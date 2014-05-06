@@ -24,12 +24,12 @@ def main():
   dataGetter = GemData()
   
   # # Retrieve and save data.
-  # dataGetter.getData()
+  dataGetter.getData()
   
   # # Image Generation Block.
-  # if args.batch:
-  #    gempak = Gempak(dataGetter)
-  #    gempak.runGempakScripts()
+  if args.batch:
+      gempak = Gempak(dataGetter)
+      gempak.runGempakScripts()
 
   # # Scrub all of our model data.
   dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
