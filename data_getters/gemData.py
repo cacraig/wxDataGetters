@@ -106,6 +106,16 @@ class GemData:
       print e
     return
 
+  def mvAssets(self):
+    assetsDir = self.constants.webDir + "/src/assets/"
+    cleanWebDirCmd = "sudo rm -r " + assetsDir + "*/"
+    self.runCmd(cleanWebDirCmd)
+    self.runCmd("sudo mv " + os.getcwd() +"/scripts/data/* " + assetsDir)
+
+  def rebuild(self, env):
+    os.chdir(self.constants.webDir)
+    self.runCmd("sudo grunt build-" + env)
+
   def runCmd(self, cmd):
     return call(cmd, shell=True)
 

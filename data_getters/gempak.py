@@ -11,6 +11,7 @@ class Gempak:
     return
 
   def runGempakScripts(self):
+    prevWd = os.getcwd()
     os.chdir("scripts")
     for key,http in self.constants.modelGems.items():
       if 'files' in http:
@@ -30,6 +31,7 @@ class Gempak:
           cmd = "tcsh "+ file + " " + key + " " + self.constants.modelTimes[key] + " " + http['file'] + " " + self.constants.dataDirEnv
           print cmd
           self.runCmd(cmd)
+    os.chdir(prevWd)
     return
 
   def runCmd(self, cmd):

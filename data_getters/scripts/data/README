@@ -1,8 +1,0 @@
-All of the data will default to here
-
-RUN/model/LEVEL/VARIABLE/fxx.gif
-
-Example: 2014031000/gfs/500/avor/f12.gif
-
-This image would be Absolute Vorticity plot for the 500mb for the GFS model initialized on 2014-03-10:00Z.
-The image would be the 12th forecast hour in this case. 

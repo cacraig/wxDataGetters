@@ -1,0 +1,8 @@
+This script needs to have passwordless sudo access.
+
+
+visudo -f /etc/sudoers.d/gempak
+
+Add the following:
+
+user ALL=(ALL) NOPASSWD:ALL

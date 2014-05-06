@@ -25,7 +25,8 @@ class Constants:
     self.baseDir   = config.get('DEFAULT','BASE_DIR')
     self.gempakDir = config.get('DEFAULT','GEMPAK_DIR')
     self.dataDir   = config.get('DEFAULT','DATA_DIR')
-
+    self.webDir    = config.get('DEFAULT','WEB_DIR')
+    self.distDir    = config.get('DEFAULT','DIST_DIR')
 
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
