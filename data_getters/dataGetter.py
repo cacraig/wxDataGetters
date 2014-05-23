@@ -18,11 +18,21 @@ def main():
   parser.add_argument("-dev", "--dev", action='store_true',
                   help="Optional build command for dev env ngwips.")
 
-  args = parser.parse_args()
+  parser.add_argument("-c", "--clean", action='store_true',
+                help="Optional command to clean all of the data directories.")
 
-  # Initialize data getter
-  dataGetter = GemData()
+  parser.add_argument("-m", "--model", required=False,
+                help="Only process one model.")
+
+  args = parser.parse_args()
   
+  if args.model:
+    # initalize for only one model.
+    dataGetter = GemData(args.model)
+  else:
+    # Initialize data getter
+    dataGetter = GemData()
+
   # # Retrieve and save data.
   dataGetter.getData()
   
@@ -31,13 +41,15 @@ def main():
       gempak = Gempak(dataGetter)
       gempak.runGempakScripts()
 
-  # # Scrub all of our model data.
-  dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
-  dataGetter.mvAssets()
+  # Scrub all of our model data.
+  if args.clean:
+    dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
 
   if args.prod:
+    dataGetter.mvAssets()
     dataGetter.rebuild('prod')
   elif args.dev:
+    dataGetter.mvAssets()
     dataGetter.rebuild('dev')
 
 if __name__ == "__main__":

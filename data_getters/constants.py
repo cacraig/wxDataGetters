@@ -15,7 +15,7 @@ class Constants:
 
   @return void
   '''''
-  def __init__(self):
+  def __init__(self, modelsOverride=None):
 
     # Open our parameters.ini file, and get defined constants.
     config = ConfigParser.SafeConfigParser()
@@ -26,7 +26,8 @@ class Constants:
     self.gempakDir = config.get('DEFAULT','GEMPAK_DIR')
     self.dataDir   = config.get('DEFAULT','DATA_DIR')
     self.webDir    = config.get('DEFAULT','WEB_DIR')
-    self.distDir    = config.get('DEFAULT','DIST_DIR')
+    self.distDir   = config.get('DEFAULT','DIST_DIR')
+    self.dbConnStr = config.get('DEFAULT','DB_CONN')
 
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
@@ -71,26 +72,22 @@ class Constants:
     self.highResDataHttp = "http://www.ftp.ncep.noaa.gov/data/nccf/com/"
 
     # Dict to store model => runTime
-    self.runTimes = {
-      'gfs'  : "", \
-      'ecmf1': "", \
-      'ruc'  : "", \
-      'nam'  : "", \
-      'ukmet': "", \
-      'nam12km' : "", \
-      'nam4km' : "" \
-    }
-    
-    # Get all current run files!
-    self.modelGems = {
-       'gfs'  : self.getRun('gfs'), \
-       'ecmf1': self.getRun('ecmf1'), \
-       'ruc'  : self.getRun('ruc'), \
-       'nam'  : self.getRun('nam'), \
-       'ukmet': self.getRun('ukmet'), \
-       'nam12km' : self.getNam218('nam12km'), \
-       'nam4km' : self.getHighResRun('nam4km') \
-    }
+    self.runTimes = {}
+
+    if modelsOverride:
+      self.modelGems = { modelsOverride: self.getRun(modelsOverride) }
+      print self.modelGems
+    else:
+      # Get all current run files!
+      self.modelGems = {
+         'gfs'  : self.getRun('gfs'), \
+         'ecmf1': self.getRun('ecmf1'), \
+         'ruc'  : self.getRun('ruc'), \
+         'nam'  : self.getRun('nam'), \
+         'ukmet': self.getRun('ukmet'), \
+         'nam12km' : self.getRun('nam12km'), \
+         'nam4km' : self.getRun('nam4km') \
+      }
 
     return;
   
@@ -190,6 +187,12 @@ class Constants:
   '''''
   def getRun(self, type):
 
+    if type == 'nam12km':
+      return self.getNam218(type)
+
+    if type == 'nam4km':
+      return self.getHighResRun(type)
+
     model = type
 
     if model == 'ecmf1':
@@ -224,6 +227,8 @@ class Constants:
 
     dataDict['url']  = modelGetUrl + currentRun
     dataDict['file'] = currentRun
+
+    self.runTimes[type] = currentRun.split('_')[0]
 
     return dataDict
 
@@ -293,8 +298,6 @@ class Constants:
 
     # A list of all Download urls.
     dataDict['files'] = runDict
-
-    #print runDict
 
     return dataDict
 

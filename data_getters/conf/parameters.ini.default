@@ -7,3 +7,4 @@ GEMPAK_DIR = gempak/GEMPAK7/gempak/
 DATA_DIR = data/model/
 WEB_DIR = /var/www/ngwips/client
 DIST_DIR = /var/www/ngwips/client/dist
+DB_CONN = dbname=xxx user=xxx password=xxx host=xxx port=xxx
