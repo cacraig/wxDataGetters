@@ -4,6 +4,9 @@ from gempak import Gempak
 from optparse import OptionParser
 from argparse import ArgumentParser
 
+
+# Usage : python dataGetter.py -dev -b --clean
+# [ONE MODEL] : python dataGetter.py -b -dev --model gfs 
 def main():
 
   parser = ArgumentParser()
@@ -51,6 +54,8 @@ def main():
   elif args.dev:
     dataGetter.mvAssets()
     dataGetter.rebuild('dev')
+
+  dataGetter.transferFilesToProd()
 
 if __name__ == "__main__":
   main()

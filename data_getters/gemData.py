@@ -140,7 +140,13 @@ class GemData:
 
   def rebuild(self, env):
     os.chdir(self.constants.webDir)
+    self.runCmd("sudo rm -rf dist/src/assets")
     self.runCmd("sudo grunt build-" + env)
+    self.runCmd("git add src/assets")
+
+  def transferFilesToProd(self):
+    # scp -r /var/www/ngwips/client/dist/src/assets ubuntu@54.186.9.28:/var/www/ngwips/client/dist/src
+    self.runCmd("scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
 
   def runCmd(self, cmd):
     return call(cmd, shell=True)

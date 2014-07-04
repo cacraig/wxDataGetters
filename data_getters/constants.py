@@ -22,12 +22,15 @@ class Constants:
     config.read('conf/parameters.ini')
 
     # DATA STORAGE DIRECTORIES.
-    self.baseDir   = config.get('DEFAULT','BASE_DIR')
-    self.gempakDir = config.get('DEFAULT','GEMPAK_DIR')
-    self.dataDir   = config.get('DEFAULT','DATA_DIR')
-    self.webDir    = config.get('DEFAULT','WEB_DIR')
-    self.distDir   = config.get('DEFAULT','DIST_DIR')
-    self.dbConnStr = config.get('DEFAULT','DB_CONN')
+    self.baseDir   = config.get('DEFAULT', 'BASE_DIR')
+    self.gempakDir = config.get('DEFAULT', 'GEMPAK_DIR')
+    self.dataDir   = config.get('DEFAULT', 'DATA_DIR')
+    self.webDir    = config.get('DEFAULT', 'WEB_DIR')
+    self.distDir   = config.get('DEFAULT', 'DIST_DIR')
+    self.dbConnStr = config.get('DEFAULT', 'DB_CONN')
+    self.imageHost = config.get('DEFAULT', 'IMAGE_HOST')
+    self.imageDir  = config.get('DEFAULT', 'IMAGE_DIR')
+    self.prodBaseDir  = config.get('DEFAULT', 'PRODUCTION_DIR')
 
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
