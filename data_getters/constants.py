@@ -32,6 +32,10 @@ class Constants:
     self.imageDir  = config.get('DEFAULT', 'IMAGE_DIR')
     self.prodBaseDir  = config.get('DEFAULT', 'PRODUCTION_DIR')
 
+    self.expectedNumberOfFiles = {
+      "nam4km" : 42
+    }
+
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
     #          ?file=gfs.t12z.pgrbf12.grib2&lev_500_mb=on&var_TMP=on
@@ -289,6 +293,11 @@ class Constants:
 
     latestRun = files[0]
     files = files[1]
+    
+    # Skip if this run has not finished updating yet.
+    if len(files) < self.expectedNumberOfFiles[type]:
+      print " SHIT "
+      return {}
     
     scriptUrl = self.highResScriptUrls[type]
     runDict = {}

@@ -51,7 +51,7 @@ foreach TIME ($times:q)
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
  
- gdplot << EOF 
+ gdplot3 << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"
@@ -60,7 +60,7 @@ foreach TIME ($times:q)
   PANEL   = 0 
   SKIP    = 
   SCALE   = 0 
-  GFUNC   = QUO(p03m, 25.4)
+  GDPFUN   = QUO(p03m, 25.4)
   CTYPE   = c/f
   CONTUR  = 1
   CINT    = 0.25;0.5;0.75;1;1.5;2.0;3.0

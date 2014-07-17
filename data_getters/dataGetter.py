@@ -1,8 +1,8 @@
 from gemData import GemData
-from batchGenerateImages import BatchGenerateImages
 from gempak import Gempak
 from optparse import OptionParser
 from argparse import ArgumentParser
+import redis
 
 
 # Usage : python dataGetter.py -dev -b --clean
@@ -28,7 +28,14 @@ def main():
                 help="Only process one model.")
 
   args = parser.parse_args()
-  
+
+  # If job pulled from Redis key [model] = 1
+  #   bury/delete job. 
+  #redisConn = redis.Redis('192.168.33.10')
+  #if redisConn.get(model) == "1":
+    # Delete Job, and return.
+  #  return
+
   if args.model:
     # initalize for only one model.
     dataGetter = GemData(args.model)
@@ -56,6 +63,10 @@ def main():
     dataGetter.rebuild('dev')
 
   dataGetter.transferFilesToProd()
+
+  #redisConn.set(model, "0")
+
+
 
 if __name__ == "__main__":
   main()

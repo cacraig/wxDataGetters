@@ -29,7 +29,7 @@ class GemData:
       # If it is empty for any reason, skip!
       if not http:
         del self.constants.runTimes[key]
-        print "Skipping: " + key + "..."
+        print "Skipping: " + key + "... Model not updated."
         continue
 
       if key in self.dbRunTimes:
