@@ -31,6 +31,8 @@ class Constants:
     self.imageHost = config.get('DEFAULT', 'IMAGE_HOST')
     self.imageDir  = config.get('DEFAULT', 'IMAGE_DIR')
     self.prodBaseDir  = config.get('DEFAULT', 'PRODUCTION_DIR')
+    self.beanstalkdHost = config.get('DEFAULT', 'BEANSTALKD_HOST')
+    self.redisHost = config.get('DEFAULT', 'REDIS_HOST')
 
     self.expectedNumberOfFiles = {
       "nam4km" : 42

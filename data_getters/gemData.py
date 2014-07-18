@@ -6,6 +6,8 @@ from timeout import timeout
 import errno
 import psycopg2
 
+# TODO: Speed up download, and require less RAM. 
+#         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
 # Class for downloading data, and cleaning data directories.
 class GemData:
 

@@ -53,7 +53,7 @@ foreach level (250 500 850)
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
 
- gdplot << EOF 
+ gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"

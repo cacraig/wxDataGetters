@@ -3,6 +3,7 @@ from gempak import Gempak
 from optparse import OptionParser
 from argparse import ArgumentParser
 import redis
+import ConfigParser
 
 
 # Usage : python dataGetter.py -dev -b --clean

@@ -37,7 +37,7 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
- gdplot2 << EOF 
+ gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
   GDATTIM  = "f${TIME}"

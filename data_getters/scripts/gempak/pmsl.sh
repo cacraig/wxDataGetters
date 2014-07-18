@@ -63,7 +63,7 @@ if (${model} == "ukmet") then
   @ lineColor = $lineColor + 3
  endif
 
- gdplot2 << EOF 
+ gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
   GDATTIM  = "f${TIME}"

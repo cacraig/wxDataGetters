@@ -79,7 +79,7 @@ foreach level (250 500 850)
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
- gdplot << EOF 
+ gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
   GDATTIM  = "f${TIME}"

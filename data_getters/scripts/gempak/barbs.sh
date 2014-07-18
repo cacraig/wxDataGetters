@@ -82,7 +82,7 @@ if (${model} == "ukmet") then
 
  
 
- gdplot << EOF 
+ gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
   GDATTIM  = "f${TIME}"
