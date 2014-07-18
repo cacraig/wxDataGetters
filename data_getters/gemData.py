@@ -149,7 +149,7 @@ class GemData:
     if model is None:
       self.runCmd("scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
     else:
-      self.runCmd("scp -r " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
+      self.runCmd("scp -r " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir)
 
   def runCmd(self, cmd):
     return call(cmd, shell=True)
