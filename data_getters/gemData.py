@@ -144,9 +144,12 @@ class GemData:
     self.runCmd("sudo grunt build-" + env)
     self.runCmd("git add src/assets")
 
-  def transferFilesToProd(self):
+  def transferFilesToProd(self, model = None):
     # scp -r /var/www/ngwips/client/dist/src/assets ubuntu@54.186.9.28:/var/www/ngwips/client/dist/src
-    self.runCmd("scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
+    if model is None:
+      self.runCmd("scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
+    else:
+      self.runCmd("scp -r " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
 
   def runCmd(self, cmd):
     return call(cmd, shell=True)
