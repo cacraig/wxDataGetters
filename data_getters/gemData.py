@@ -93,8 +93,8 @@ class GemData:
     self.runCmd(cmd)
     return
 
-  #timeout after 5 mins.
-  @timeout(300, os.strerror(errno.ETIMEDOUT))
+  #timeout after 15 mins.
+  @timeout(900, os.strerror(errno.ETIMEDOUT))
   def saveFile(self, savePath,url, file):
     gemFile = urllib2.urlopen(url).read()
     fp = open(savePath + file, 'w')
