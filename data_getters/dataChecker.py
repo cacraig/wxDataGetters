@@ -21,14 +21,10 @@ def main():
   redisConn = redis.Redis(constants.redisHost)
   beanstalkdConn = beanstalkc.Connection(host=constants.beanstalkdHost, port=11300)
 
-  # If key is not set in Redis... Set it.
-  if currentlyProcessing is None:
-    redisConn.set(model, "0")
-
-  print "Currently Processing: " + currentlyProcessing
   while True:
 
     currentlyProcessing = redisConn.get(model)
+    print "Currently Processing: " + currentlyProcessing
 
     # If key is not set in Redis... Set it.
     if currentlyProcessing is None:
