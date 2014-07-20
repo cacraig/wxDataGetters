@@ -23,6 +23,10 @@ def main():
 
   currentlyProcessing = redisConn.get(model)
 
+  # If key is not set in Redis... Set it.
+  if currentlyProcessing is None:
+    redisConn.set(model, "0")
+
   print "Currently Processing: " + currentlyProcessing
   while True:
     if currentlyProcessing != "1":
