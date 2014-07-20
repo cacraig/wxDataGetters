@@ -34,7 +34,6 @@ def main():
         # 0 = Not currently processing
         redisConn.set(model, "1")
         beanstalkdConn.put("python dataGetter.py -b --model=" + model + " --clean")
-        return
 
     print "doing nothing... Waiting 5 mins."
     # Sleep for 5 mins.
