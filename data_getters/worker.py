@@ -4,6 +4,7 @@ from subprocess import call
 import ConfigParser
 import json
 import redis
+from dataGetterModule import DataGetter
 
 def main():
 
@@ -28,8 +29,12 @@ def main():
     job = beanstalkdConn.reserve(timeout=None)
     # Work with the job:
     print "Doing job:: " + job.body
+    
     cmdObj = json.loads(job.body)
-    call(cmdObj['command'], shell=True)
+    dataGetter = DataGetter(cmdObj['model'])
+    dataGetter.run()
+
+    #call(cmdObj['command'], shell=True)
     redisConn.set(cmdObj['model'], "0")
     job.delete()
 
