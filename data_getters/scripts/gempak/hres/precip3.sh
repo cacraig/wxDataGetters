@@ -52,7 +52,7 @@ foreach TIME ($times:q)
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
  
- gdplot3_gf << EOF 
+ gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
   GDATTIM  = "f${TIME}"
