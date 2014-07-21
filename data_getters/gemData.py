@@ -151,9 +151,9 @@ class GemData:
   def transferFilesToProd(self, model = None):
     # scp -r /var/www/ngwips/client/dist/src/assets ubuntu@54.186.9.28:/var/www/ngwips/client/dist/src
     if model is None:
-      self.runCmd("sudo scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
+      self.runCmd("scp -r " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
     else:
-      self.runCmd("sudo scp -r " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir)
+      self.runCmd("scp -r " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir)
 
   def runCmd(self, cmd):
     return call(cmd, shell=True)
