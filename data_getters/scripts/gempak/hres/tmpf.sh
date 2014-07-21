@@ -26,7 +26,7 @@ set MODEL_PATH  = $4
 # Make our run directory.
 if !(-e ${outDir}) then
   mkdir -p ${baseDir}/${model}/${timeStamp}
-  chmod 777 -r ${baseDir}/${model}/${timeStamp}
+  chmod 777 -R ${baseDir}/${model}/${timeStamp}
 endif
 
 if (${model} == 'nam12km') then

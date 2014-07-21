@@ -28,6 +28,7 @@ set MODEL_PATH  = $4
 # Make our run directory.
 if !(-e ${outDir}) then
   mkdir -p ${baseDir}/${model}/${timeStamp}
+  chmod 777 -R ${baseDir}/${model}/${timeStamp}
 endif
 
 #Default barb/color width
