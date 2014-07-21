@@ -2,6 +2,7 @@ import beanstalkc
 import time
 from subprocess import call
 import ConfigParser
+import json
 
 def main():
 
@@ -26,7 +27,9 @@ def main():
     job = beanstalk.reserve(timeout=None)
     # Work with the job:
     print "Doing job:: " + job.body
-    call(job.body, shell=True)
+    cmdObj = json.loads(job.body)
+    call(cmdObj['command'], shell=True)
+    redisConn.set(cmdObj['model'], "0")
     job.delete()
 
   # Delete the job: 

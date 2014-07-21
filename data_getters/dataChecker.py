@@ -5,6 +5,7 @@ from libs.db import NgwipsDB
 import redis
 import beanstalkc
 import time
+import json
 
 def main():
   parser = ArgumentParser()
@@ -38,7 +39,9 @@ def main():
         # 1 = Currently processing
         # 0 = Not currently processing
         redisConn.set(model, "1")
-        beanstalkdConn.put("python dataGetter.py -b --model=" + model + " --clean")
+        cmd = "python dataGetter.py -b --model=" + model + " --clean"
+        cmdObj = {"model": model, "command": cmd}
+        beanstalkdConn.put(json.dumps(cmdObj))
 
     print "doing nothing... Waiting 5 mins."
     # Sleep for 5 mins.
