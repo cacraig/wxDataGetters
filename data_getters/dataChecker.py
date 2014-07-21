@@ -23,7 +23,7 @@ def main():
   beanstalkdConn = beanstalkc.Connection(host=constants.beanstalkdHost, port=11300)
 
   while True:
-
+    constants = Constants(model)
     currentlyProcessing = redisConn.get(model)
     print "Currently Processing: " + currentlyProcessing
 
