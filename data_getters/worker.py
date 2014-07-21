@@ -19,7 +19,7 @@ def main():
   beanstalkdConn = beanstalkc.Connection(host=beanstalkdHost, port=11300)
 
   # Switch to the default (tube):
-  beanstalk.use('default')
+  beanstalkdConn.use('default')
 
   print "Spinning our client..."
 
