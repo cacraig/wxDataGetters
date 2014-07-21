@@ -3,6 +3,7 @@ import time
 from subprocess import call
 import ConfigParser
 import json
+import redis
 
 def main():
 
