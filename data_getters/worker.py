@@ -25,7 +25,7 @@ def main():
 
   while True:
     # To receive a job:
-    job = beanstalk.reserve(timeout=None)
+    job = beanstalkdConn.reserve(timeout=None)
     # Work with the job:
     print "Doing job:: " + job.body
     cmdObj = json.loads(job.body)
