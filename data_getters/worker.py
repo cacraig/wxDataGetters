@@ -15,8 +15,8 @@ def main():
   beanstalkdHost = config.get('DEFAULT', 'BEANSTALKD_HOST')
   redisHost = config.get('DEFAULT', 'REDIS_HOST')
 
-  redisConn = redis.Redis(constants.redisHost)
-  beanstalkdConn = beanstalkc.Connection(host=constants.beanstalkdHost, port=11300)
+  redisConn = redis.Redis(redisHost)
+  beanstalkdConn = beanstalkc.Connection(host=beanstalkdHost, port=11300)
 
   # Switch to the default (tube):
   beanstalk.use('default')
