@@ -5,6 +5,7 @@ from subprocess import call
 from timeout import timeout
 import errno
 import psycopg2
+import redis
 
 # TODO: Speed up download, and require less RAM. 
 #         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
@@ -17,6 +18,7 @@ class GemData:
     self.conn = psycopg2.connect(self.constants.dbConnStr)
     self.cursor = self.conn.cursor()
     self.dbRunTimes = self.getCurrentRuns()
+    self.redisConn = redis.Redis(self.constants.redisHost)
     return
 
   '''''
@@ -52,7 +54,7 @@ class GemData:
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         self.updateModelTimes(key, self.constants.runTimes[key])
-
+        self.redisConn.set(key, "0")
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
@@ -64,7 +66,7 @@ class GemData:
           fp.close()
           # After data has been sucessfully retrieved, and no errors thrown update model run time.
           self.updateModelTimes(key, self.constants.runTimes[key])
-
+          self.redisConn.set(key, "0")
         except Exception, e:
           print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
           print " with exception %s" % e
