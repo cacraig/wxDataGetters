@@ -19,6 +19,7 @@ class GemData:
     self.cursor = self.conn.cursor()
     self.dbRunTimes = self.getCurrentRuns()
     self.redisConn = redis.Redis(self.constants.redisHost)
+    self.updated = False
     return
 
   '''''
@@ -54,6 +55,7 @@ class GemData:
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         self.updateModelTimes(key, self.constants.runTimes[key])
+        self.updated = True
         self.redisConn.set(key, "0")
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
@@ -66,6 +68,7 @@ class GemData:
           fp.close()
           # After data has been sucessfully retrieved, and no errors thrown update model run time.
           self.updateModelTimes(key, self.constants.runTimes[key])
+          self.updated = True
           self.redisConn.set(key, "0")
         except Exception, e:
           print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
@@ -76,6 +79,9 @@ class GemData:
     os.chdir(currentDir)
     self.conn.close()
     return
+
+  def isUpdated(self):
+    return self.updated
 
   def processGrib2(self, model, savePath, fileName):
     extension = fileName.split('.')[-1]

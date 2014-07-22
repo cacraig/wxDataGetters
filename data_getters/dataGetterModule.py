@@ -14,6 +14,7 @@ class DataGetter:
     dataGetter.getData()
     gempak = Gempak(dataGetter)
     gempak.runGempakScripts()
-    dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
-    dataGetter.transferFilesToProd(self.model)
+    if dataGetter.isUpdated():
+      dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
+      dataGetter.transferFilesToProd(self.model)
     return
