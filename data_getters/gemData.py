@@ -20,6 +20,7 @@ class GemData:
     self.dbRunTimes = self.getCurrentRuns()
     self.redisConn = redis.Redis(self.constants.redisHost)
     self.updated = False
+    self.catCmd = "cat "
     return
 
   '''''
@@ -47,14 +48,16 @@ class GemData:
         # download all files in http['files'].
         print "PROCESSING MANY"
         files = http['files']
+        savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
         for file,url in files.items():
           savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
           print "downloading " + savePath  + file
           self.saveFile(savePath,url,file)
-          self.processGrib2(key,savePath,file)
-
+          self.catCmd = self.catCmd + " " + savePath + file
+          
+        self.processGrib2(key,savePath)
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
-        self.updateModelTimes(key, self.constants.runTimes[key])
+        #self.updateModelTimes(key, self.constants.runTimes[key])
         self.updated = True
         self.redisConn.set(key, "0")
       else:
@@ -83,20 +86,26 @@ class GemData:
   def isUpdated(self):
     return self.updated
 
-  def processGrib2(self, model, savePath, fileName):
-    extension = fileName.split('.')[-1]
-    if extension != 'grib2':
-      return
+  def processGrib2(self, model, savePath):
+    # extension = fileName.split('.')[-1]
+    # if extension != 'grib2':
+    #   return
 
-    # for model.t06z.blahblah.hiresf07.blah -> forecastHour = "07"
-    forecastHour = fileName.split('.')[3][6:8]
+    # # for model.t06z.blahblah.hiresf07.blah -> forecastHour = "07"
+    # forecastHour = fileName.split('.')[3][6:8]
     currentRun = self.constants.runTimes[model]
-    inFile  = savePath + fileName
-    outFile = model + '/' + currentRun + "f0" + forecastHour + '_' + model + '.gem'
+    # inFile  = savePath + fileName
+    # outFile = model + '/' + currentRun + "f0" + forecastHour + '_' + model + '.gem'
+    # cmd = "dcgrib2 " + outFile + ' < ' + inFile
+    outFile = model + '/' + currentRun + '.grib2'
+    self.catCmd = self.catCmd + " > " + outFile
+    self.runCmd(self.catCmd)
+
+    inFile = outFile
+    outFile = model + '/' + currentRun + '.gem'
+
     cmd = "dcgrib2 " + outFile + ' < ' + inFile
 
-    print cmd
-    
     # convert our *.grib2 file into a *.gem file.
     self.runCmd(cmd)
     return

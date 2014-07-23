@@ -38,7 +38,7 @@ def main():
 
   # # Retrieve and save data.
   dataGetter.getData()
-  
+  print "Trying batch"
   # # Image Generation Block.
   if args.batch:
       gempak = Gempak(dataGetter)

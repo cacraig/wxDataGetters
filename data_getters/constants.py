@@ -35,8 +35,10 @@ class Constants:
     self.redisHost = config.get('DEFAULT', 'REDIS_HOST')
 
     self.expectedNumberOfFiles = {
-      "nam4km" : 42
+      "nam4km" : 44
     }
+
+    self.highResModelList = ['nam4km']
 
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
@@ -62,7 +64,7 @@ class Constants:
      'ruc': '00,01,02,03,04,05,06,07,08,09,10,11,12', \
      'gfs': '00,06,12,18,24,30,36,42,48,54,60,66,72,78,84,90,96,102,108,114,120,126,132,138,144,150,156,162,168,174,180,192,204,216,228,240', \
      'nam': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84', \
-     'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
+     #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
      'ukmet' : '00,06,12,18,24,30,36,42,48,54,60', \
      'ecmf1': '00,24,48,72,96,120,144,168,240', \
      'nam4km': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023,024,025,026,027,028,029,030,031,032,033,034,035,036,039,042,045,048,051,054,057,060'\
@@ -94,7 +96,7 @@ class Constants:
          'ruc'  : self.getRun('ruc'), \
          'nam'  : self.getRun('nam'), \
          'ukmet': self.getRun('ukmet'), \
-         'nam12km' : self.getRun('nam12km'), \
+         # 'nam12km' : self.getRun('nam12km'), \
          'nam4km' : self.getRun('nam4km') \
       }
 
@@ -152,7 +154,7 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = dirList[-1]
+    # latestRunDir  = "nam.20140721/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -177,6 +179,7 @@ class Constants:
         runFileList.append(file)
       else:
         runFileList.append(file)
+    runFileList = runFileList[0:2]
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType == 'nam':
@@ -197,7 +200,7 @@ class Constants:
   def getRun(self, type):
 
     if type == 'nam12km':
-      return self.getNam218(type)
+      return {} #self.getNam218(type)
 
     if type == 'nam4km':
       return self.getHighResRun(type)
@@ -314,4 +317,10 @@ class Constants:
     dataDict['files'] = runDict
 
     return dataDict
+
+  def isHighRes(self, model):
+    if model in self.highResModelList:
+      return True
+    else:
+      return False
 
