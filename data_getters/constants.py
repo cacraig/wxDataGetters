@@ -179,7 +179,6 @@ class Constants:
         runFileList.append(file)
       else:
         runFileList.append(file)
-    runFileList = runFileList[0:2]
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType == 'nam':
@@ -301,7 +300,7 @@ class Constants:
     
     # Skip if this run has not finished updating yet.
     if len(files) < self.expectedNumberOfFiles[type]:
-      print " SHIT "
+      print "NUMBER OF FILES: " + str(len(files))
       return {}
     
     scriptUrl = self.highResScriptUrls[type]
