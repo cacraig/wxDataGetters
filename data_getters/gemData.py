@@ -57,7 +57,7 @@ class GemData:
           
         self.processGrib2(key,savePath)
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
-        #self.updateModelTimes(key, self.constants.runTimes[key])
+        self.updateModelTimes(key, self.constants.runTimes[key])
         self.updated = True
         self.redisConn.set(key, "0")
       else:
