@@ -30,11 +30,11 @@ if !(-e ${outDir}) then
 endif
 
 if (${model} == 'nam12km') then
-  set extension = "_nam218.gem"
+  set extension = ".gem"
 endif
 
 if (${model} == 'nam4km') then
-  set extension = "_nam4km.gem"
+  set extension = ".gem"
 endif
 
 foreach TIME ($times:q)
@@ -54,7 +54,7 @@ foreach TIME ($times:q)
  
  gdplot2_gf << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${runTime}f${TIME}${extension}"
+  GDFILE   = "${MODEL_PATH}/${model}/${runTime}${extension}"
   GDATTIM  = "f${TIME}"
   GLEVEL  = 0 
   GVCORD  = none 
