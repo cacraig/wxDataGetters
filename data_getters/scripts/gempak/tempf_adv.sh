@@ -1,15 +1,15 @@
-# Usage ./tempf_adv.sh  <model>  <time1,time2,...>  <inFile>  <MODEL path>
+# Usage ./tempf_adv.sh  <model>  <time1,time2,...>  <runTime>  <MODEL path>
 
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 3 paremeters must be defined!"
-    echo "Usage ./tempf_adv.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>"
+    echo "Usage ./tempf_adv.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
     exit( 1 )
 endif
 
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
-set inFile = $3 
+set runTime = $3 
 
 set timeStamp = `echo $3 | sed 's/_/ /g'`
 # Get run timeStamp YYYYMMDDHH
@@ -19,7 +19,7 @@ set lineColor = 2
 
 set baseDir = "data"
 set variable = "tmpf_adv"
-
+set gdFile = ${model}".gem"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
@@ -33,6 +33,18 @@ endif
 
 foreach TIME ($times:q)
 
+  if (${model} == 'gfs' && ${TIME} > 192) then
+    set gdFile = ${runTime}"_2p5.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+    set gdFile = ${runTime}"_p5_2.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+    set gdFile = ${runTime}"_p5.gem"
+  endif
+
 foreach level (850 700)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
@@ -40,7 +52,7 @@ foreach level (850 700)
 
  gdplot2_gf << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
+  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
   CLEAR    = "n"
   GLEVEL   = "${level}"

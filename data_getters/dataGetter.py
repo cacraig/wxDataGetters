@@ -49,7 +49,7 @@ def main():
     dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
 
   if args.model:
-    dataGetter.transferFilesToProd(args.model)
+    #dataGetter.transferFilesToProd(args.model)
     return
 
   # if args.prod:
@@ -59,7 +59,7 @@ def main():
   #   dataGetter.mvAssets()
   #   dataGetter.rebuild('dev')
 
-  dataGetter.transferFilesToProd()
+  #dataGetter.transferFilesToProd()
 
 
 

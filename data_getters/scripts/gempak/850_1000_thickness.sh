@@ -5,13 +5,13 @@
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 4 paremeters must be defined!"
-    echo "Usage ./850_1000_thickness.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>"
+    echo "Usage ./850_1000_thickness.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
     exit( 1 )
 endif
 
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
-set inFile = $3 
+set runTime = $3 
 
 set variable = "850_1000_thickness"
 set level = "850"
@@ -26,6 +26,7 @@ set baseDir = "data"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 
+set gdFile = ${model}".gem"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -39,10 +40,21 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
+  if (${model} == 'gfs' && ${TIME} > 192) then
+    set gdFile = ${runTime}"_2p5.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+    set gdFile = ${runTime}"_p5_2.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+    set gdFile = ${runTime}"_p5.gem"
+  endif
 
  gdplot2_gf << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
+  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
   GLEVEL = 850:1000
   GVCORD = pres

@@ -35,8 +35,15 @@ class Constants:
     self.redisHost = config.get('DEFAULT', 'REDIS_HOST')
 
     self.expectedNumberOfFiles = {
-      "nam4km" : 44
+      "nam4km" : 44,
+      "gfs" : 47
     }
+
+    self.modelRegex = {
+      "nam": '^nam.t..z.(conus\w+).hiresf...tm...grib2$',
+      "gfs": '^gfs.t..z.pgrb2f\d{0,3}$',
+      "gfs2p5" : '^gfs.t..z.pgrbf\d{0,3}.2p5deg.grib2$'
+    };
 
     self.highResModelList = ['nam4km']
 
@@ -54,7 +61,17 @@ class Constants:
                 "lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on&"+ \
                 "lev_surface=on&var_ACPCP=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
                 "var_MXUPHL=on&var_PWAT=on&var_REFD=on&var_RH=on&var_TMP=on&var_UPHL=on&var_USTM=on&var_VSTM=on&var_WEASD=on&var_WTMP=on&leftlon=0&"+ \
-                "rightlon=360&toplat=90&bottomlat=-90&" \
+                "rightlon=360&toplat=90&bottomlat=-90&", \
+      "gfs"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_hd.pl?" + \
+                "lev_20_mb=on&lev_250_mb=on&lev_500_mb=on&lev_700_mb=on&lev_850_mb=on&lev_875_mb=on&lev_900_mb=on" + \
+                "&lev_925_mb=on&lev_1000_mb=on&lev_0-0.1_m_below_ground=on&lev_0.1-0.4_m_below_ground=on&lev_surface=on&" + \
+                "lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_80_m_above_ground=on&lev_100_m_above_ground=on&lev_mean_sea_level=on" + \
+                "&lev_3000-0_m_above_ground=on&lev_6000-0_m_above_ground=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&" + \
+                "lev_low_cloud_layer=on&lev_middle_cloud_layer=on&lev_high_cloud_layer=on&lev_low_cloud_bottom_level=on&lev_middle_cloud_bottom_level=on" + \
+                "&lev_high_cloud_bottom_level=on&lev_low_cloud_top_level=on&lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_low_cloud_top_level=on&" + \
+                "lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_convective_cloud_layer=on&lev_boundary_layer_cloud_layer=on&lev_top_of_atmosphere=on&" + \
+                "lev_tropopause=on&lev_max_wind=on&lev_highest_tropospheric_freezing_level=on&all_var=on&" + \
+                "leftlon=0&rightlon=360&toplat=90&bottomlat=0&" \
     }
     
     # Full path of data directory.
@@ -62,7 +79,10 @@ class Constants:
 
     self.modelTimes = {
      'ruc': '00,01,02,03,04,05,06,07,08,09,10,11,12', \
-     'gfs': '00,06,12,18,24,30,36,42,48,54,60,66,72,78,84,90,96,102,108,114,120,126,132,138,144,150,156,162,168,174,180,192,204,216,228,240', \
+     'gfs': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,' + \
+            '81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,'+ \
+            '150,153,156,159,162,165,168,171,174,177,180,183,186,189,192,204,216,228,240,252,264,276,' + \
+            '288,300,312,324,336,348,360,372,384', \
      'nam': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84', \
      'hrrr': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023', \
      #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
@@ -103,7 +123,7 @@ class Constants:
       }
 
     return;
-  
+
   '''''
   This method parses the soup, and gets all model links with extension _[model][type].gem
   ie. /*_gfs211.gem .
@@ -156,15 +176,17 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    # latestRunDir  = "nam.20140721/" # TEST
+    #latestRunDir  = "gfs.2014072418/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
     content = urllib2.urlopen(modelDataUrl).read()
 
+    print modelDataUrl
+
     soup = BeautifulSoup(content, 'html.parser')
 
-    urlRegex = '^'+ modelType +'.t..z.(conus\w+).hiresf...tm...grib2$'
+    urlRegex = self.modelRegex[modelType]
 
     hrefList = soup.find_all('a', text=re.compile(urlRegex))
     fileList = [i.get('href') for i in hrefList]
@@ -189,7 +211,49 @@ class Constants:
 
     self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    return (latestRunDir[:-1],runFileList)
+    # Get Extended GFS data. .5 degree data for f00 - f192,
+    #   and 2.5 degree data for f192-f384
+    if modelType == "gfs":
+      newFileList = []
+      for file in runFileList:
+        filePieces = file.split('.')
+        ext = filePieces[2]
+        forecastHour = ext.split('f')[1]
+        newFile = filePieces[0] + "." + filePieces[1] + ".mastergrb2f" + forecastHour
+        if int(forecastHour) % 6 == 0:
+          newFileList.append(newFile)
+      gfs2p5runList = self.getGFSExtended(soup)
+      runFileList =  newFileList
+      return (latestRunDir[:-1],runFileList, gfs2p5runList, modelDataUrl)
+    else:
+      return (latestRunDir[:-1],runFileList)
+
+  # Get the GFS 2.5 degree data f192-384
+  def getGFSExtended(self, soup):
+    urlRegex = self.modelRegex["gfs2p5"]
+
+    hrefList = soup.find_all('a', text=re.compile(urlRegex))
+    fileList = [i.get('href') for i in hrefList]
+    # for each href, grab latest Run hour.
+    latestHour = "00"
+    runFileList = []
+
+    maxForecastHour = int(192)
+
+    # Loop through file list. Build a list of files with latest run only.
+    for file in fileList:
+      forecastHour = int(file.split('.')[2].split('f')[1])
+      if forecastHour > maxForecastHour:
+        print forecastHour
+        runHour = file.split('.')[1][1:3]
+        if int(runHour) > int(latestHour):
+          latestHour = runHour
+          runFileList = []
+          runFileList.append(file)
+        else:
+          runFileList.append(file)
+  
+    return runFileList
 
   '''''
   This method gets the url for the latest model run of the model type requested.
@@ -204,6 +268,9 @@ class Constants:
       return {} #self.getNam218(type)
 
     if type == 'nam4km':
+      return self.getHighResRun(type)
+
+    if type == 'gfs':
       return self.getHighResRun(type)
 
     model = type
@@ -295,11 +362,13 @@ class Constants:
     print contentListUrl
     contentList = urllib2.urlopen(contentListUrl).read()
 
-    files = self.getLatestHiresFiles(contentList, model)
+    filesList = self.getLatestHiresFiles(contentList, model)
 
-    latestRun = files[0]
-    files = files[1]
     
+    latestRun = filesList[0]
+    files = filesList[1]
+    addlFiles = filesList[2]
+
     # Skip if this run has not finished updating yet.
     if len(files) < self.expectedNumberOfFiles[type]:
       print "NUMBER OF FILES: " + str(len(files))
@@ -308,9 +377,20 @@ class Constants:
     scriptUrl = self.highResScriptUrls[type]
     runDict = {}
 
+    # This is for the gfs 2p5 files only...
+    if addlFiles is not None:
+      for file in addlFiles:
+        runDict[file] = filesList[3] + file
+
     # Set file download paths, along with desired vars/levels.
+    if model == "gfs":
+      gribDir = latestRun + "/master"
+    else:
+      gribDir = latestRun
+
+
     for file in files:
-      runDict[file] = scriptUrl + "&dir=/" + latestRun + "&file=" + file
+      runDict[file] = scriptUrl + "&dir=/" + gribDir + "&file=" + file
 
     dataDict = {}
 

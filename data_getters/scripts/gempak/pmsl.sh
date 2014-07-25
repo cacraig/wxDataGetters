@@ -5,13 +5,13 @@
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
     echo "All 4 paremeters must be defined!"
-    echo "Usage ./pmsl.sh  <model>  <time1,time2,...>  <inFile> <MODEL path>"
+    echo "Usage ./pmsl.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
     exit( 1 )
 endif
 
 set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
-set inFile = $3 
+set runTime = $3 
 
 set variable = "pmsl"
 
@@ -21,7 +21,7 @@ set timeStamp = ${timeStamp[1]}
 
 set baseDir = "data"
 set lineColor = 13
-
+set gdFile = ${model}".gem"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
@@ -34,6 +34,17 @@ if !(-e ${outDir}) then
 endif
 
 foreach TIME ($times:q)
+  if (${model} == 'gfs' && ${TIME} > 192) then
+    set gdFile = ${runTime}"_2p5.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+    set gdFile = ${runTime}"_p5_2.gem"
+  endif
+
+  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+    set gdFile = ${runTime}"_p5.gem"
+  endif
 
  # Reset line color!
  set lineColor = 13
@@ -66,7 +77,7 @@ if (${model} == "ukmet") then
 
  gdplot2_gf << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${inFile}"
+  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
   GLEVEL   = "0"
   GVCORD   = "none"
