@@ -36,7 +36,8 @@ class Constants:
 
     self.expectedNumberOfFiles = {
       "nam4km" : 44,
-      "gfs" : 47
+      "gfs" : 32,
+      "gfs-ext": 14
     }
 
     self.modelRegex = {
@@ -374,6 +375,11 @@ class Constants:
       print "NUMBER OF FILES: " + str(len(files))
       return {}
     
+    if model == "gfs" && len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
+      # Check length of extended run hours.
+      print "Extended run not yet completed."
+      return {}
+
     scriptUrl = self.highResScriptUrls[type]
     runDict = {}
 
