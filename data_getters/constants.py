@@ -375,7 +375,7 @@ class Constants:
       print "NUMBER OF FILES: " + str(len(files))
       return {}
     
-    if model == "gfs" && len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
+    if model == "gfs" and len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
       # Check length of extended run hours.
       print "Extended run not yet completed."
       return {}
