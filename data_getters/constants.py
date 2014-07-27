@@ -368,8 +368,10 @@ class Constants:
     
     latestRun = filesList[0]
     files = filesList[1]
-    if filesList is not None:
+    try:
       addlFiles = filesList[2]
+    except IndexError:
+      print "Not GFS."
 
     # Skip if this run has not finished updating yet.
     if len(files) < self.expectedNumberOfFiles[type]:
