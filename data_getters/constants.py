@@ -195,8 +195,6 @@ class Constants:
     latestHour = "00"
     runFileList = []
 
-    print latestRunDir
-    exit(1)
 
     # Loop through file list. Build a list of files with latest run only.
     for file in fileList:

@@ -29,7 +29,6 @@ def main():
     job = beanstalkdConn.reserve(timeout=None)
     # Work with the job:
     print "Doing job:: " + job.body
-    
     cmdObj = json.loads(job.body)
     dataGetter = DataGetter(cmdObj['model'])
     dataGetter.run()
