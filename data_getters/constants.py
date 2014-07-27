@@ -368,12 +368,18 @@ class Constants:
     
     latestRun = filesList[0]
     files = filesList[1]
+
     try:
+      # Concat additional 2.5 degree files for GFS model.
       addlFiles = filesList[2]
       if model == "gfs" and len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
         # Check length of extended run hours.
         print "Extended run not yet completed."
         return {}
+          # This is for the gfs 2p5 files only...
+      if addlFiles is not None:
+        for file in addlFiles:
+          runDict[file] = filesList[3] + file
     except IndexError:
       print "Not GFS."
 
@@ -381,19 +387,11 @@ class Constants:
     if len(files) < self.expectedNumberOfFiles[type]:
       print "NUMBER OF FILES: " + str(len(files))
       return {}
-    
-    if model == "gfs" and len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
-      # Check length of extended run hours.
-      print "Extended run not yet completed."
-      return {}
 
     scriptUrl = self.highResScriptUrls[type]
     runDict = {}
 
-    # This is for the gfs 2p5 files only...
-    if addlFiles is not None:
-      for file in addlFiles:
-        runDict[file] = filesList[3] + file
+
 
     # Set file download paths, along with desired vars/levels.
     if model == "gfs":
