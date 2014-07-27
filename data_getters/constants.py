@@ -195,6 +195,9 @@ class Constants:
     latestHour = "00"
     runFileList = []
 
+    print latestRunDir
+    exit(1)
+
     # Loop through file list. Build a list of files with latest run only.
     for file in fileList:
       runHour = file.split('.')[1][1:3]
@@ -210,7 +213,10 @@ class Constants:
       # Get full name of our run. This is hacky, but I'm lazy.
       modelType = 'nam4km'
 
-    self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
+    if modelType == "gfs":
+      self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1]
+    else:
+      self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
     # Get Extended GFS data. .5 degree data for f00 - f192,
     #   and 2.5 degree data for f192-f384
