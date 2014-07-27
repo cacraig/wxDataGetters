@@ -368,7 +368,8 @@ class Constants:
     
     latestRun = filesList[0]
     files = filesList[1]
-    addlFiles = filesList[2]
+    if filesList is not None:
+      addlFiles = filesList[2]
 
     # Skip if this run has not finished updating yet.
     if len(files) < self.expectedNumberOfFiles[type]:
