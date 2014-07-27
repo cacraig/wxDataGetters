@@ -77,7 +77,8 @@ class GemData:
         try:
           print "Saving: " + http['url'] + " to " + savePath + http['file']
           gemFile = urllib2.urlopen(http['url']).read()
-          fp = open(savePath + self.constants.runTimes[key] + ".gem", 'w')
+          #fp = open(savePath + self.constants.runTimes[key] + ".gem", 'w')
+          fp = open(savePath + key + ".gem", 'w') # save as model.gem
           fp.write(gemFile)
           fp.close()
           # After data has been sucessfully retrieved, and no errors thrown update model run time.
