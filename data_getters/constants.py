@@ -360,6 +360,9 @@ class Constants:
   We must specify certain paramaters/levels to grab, rather than pulling the entire model run's data.
   '''''
   def getHighResRun(self, type):
+
+    runDict = {}
+    
     model = type
     if type == "nam12km" or type == "nam4km":
       model = 'nam'
@@ -393,7 +396,7 @@ class Constants:
       return {}
 
     scriptUrl = self.highResScriptUrls[type]
-    runDict = {}
+
 
 
 
