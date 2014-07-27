@@ -370,6 +370,10 @@ class Constants:
     files = filesList[1]
     try:
       addlFiles = filesList[2]
+      if model == "gfs" and len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
+        # Check length of extended run hours.
+        print "Extended run not yet completed."
+        return {}
     except IndexError:
       print "Not GFS."
 
