@@ -70,7 +70,6 @@ class GemData:
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         self.updateModelTimes(key, self.constants.runTimes[key])
         self.updated = True
-        self.redisConn.set(key, "0")
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
@@ -84,12 +83,13 @@ class GemData:
           # After data has been sucessfully retrieved, and no errors thrown update model run time.
           self.updateModelTimes(key, self.constants.runTimes[key])
           self.updated = True
-          self.redisConn.set(key, "0")
         except Exception, e:
           print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
           print " with exception %s" % e
           pass
-          
+      # END FOR Set model's redis key to not processing.
+      self.redisConn.set(key, "0")
+
     # Jump back to present WD
     os.chdir(currentDir)
     self.conn.close()

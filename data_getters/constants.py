@@ -110,7 +110,6 @@ class Constants:
 
     if modelsOverride:
       self.modelGems = { modelsOverride: self.getRun(modelsOverride) }
-      print self.modelGems
     else:
       # Get all current run files!
       self.modelGems = {
@@ -195,7 +194,6 @@ class Constants:
     latestHour = "00"
     runFileList = []
 
-
     # Loop through file list. Build a list of files with latest run only.
     for file in fileList:
       runHour = file.split('.')[1][1:3]
@@ -249,7 +247,6 @@ class Constants:
     for file in fileList:
       forecastHour = int(file.split('.')[2].split('f')[1])
       if forecastHour > maxForecastHour:
-        print forecastHour
         runHour = file.split('.')[1][1:3]
         if int(runHour) > int(latestHour):
           latestHour = runHour
@@ -396,9 +393,6 @@ class Constants:
       return {}
 
     scriptUrl = self.highResScriptUrls[type]
-
-
-
 
     # Set file download paths, along with desired vars/levels.
     if model == "gfs":
