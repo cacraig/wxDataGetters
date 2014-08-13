@@ -60,7 +60,7 @@ class Constants:
                 "&lev_2_m_above_ground=on&lev_1_hybrid_level=on&lev_3000-0_m_above_ground=on&lev_5000-2000_m_above_ground=on&lev_6000-0_m_above_ground=on"+ \
                 "&lev_850_mb=on&lev_cloud_base=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on&"+ \
                 "lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on&"+ \
-                "lev_surface=on&var_ACPCP=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
+                "lev_surface=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
                 "var_MXUPHL=on&var_PWAT=on&var_REFD=on&var_RH=on&var_TMP=on&var_UPHL=on&var_USTM=on&var_VSTM=on&var_WEASD=on&var_WTMP=on&leftlon=0&"+ \
                 "rightlon=360&toplat=90&bottomlat=-90&", \
       "gfs"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_hd.pl?" + \
