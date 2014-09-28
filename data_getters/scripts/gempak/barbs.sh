@@ -50,6 +50,22 @@ foreach TIME ($times:q)
     set gdFile = ${runTime}"_p5.gem"
   endif
 
+  if (${model} == 'nam' && ${TIME} > 60) then
+    set gdFile = ${runTime}"_4.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+    set gdFile = ${runTime}"_3.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+    set gdFile = ${runTime}"_2.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 18) then
+    set gdFile = ${runTime}"_1.gem"
+  endif
+
 foreach level (250 500 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}

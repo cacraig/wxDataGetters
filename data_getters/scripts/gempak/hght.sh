@@ -26,7 +26,6 @@ set variable = "hght"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 
-
 # Make our run directory.
 if !(-e ${outDir}) then
   mkdir -p ${baseDir}/${model}/${timeStamp}
@@ -44,6 +43,22 @@ foreach TIME ($times:q)
 
   if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
     set gdFile = ${runTime}"_p5.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} > 60) then
+    set gdFile = ${runTime}"_4.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+    set gdFile = ${runTime}"_3.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+    set gdFile = ${runTime}"_2.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 18) then
+    set gdFile = ${runTime}"_1.gem"
   endif
 
 foreach level (250 500 850)

@@ -15,7 +15,7 @@ class Gempak:
     os.chdir("scripts")
     for key,http in self.constants.modelGems.items():
       if key in self.constants.runTimes:
-        if 'files' in http and key != "gfs":
+        if 'files' in http and key != "gfs" and key != "nam":
           for file in glob.glob("gempak/hres/*.sh"):
             files = http['files']
             fileList = []
