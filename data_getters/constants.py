@@ -35,18 +35,24 @@ class Constants:
     self.redisHost = config.get('DEFAULT', 'REDIS_HOST')
 
     self.expectedNumberOfFiles = {
+      "nam": 28,
       "nam4km" : 44,
       "gfs" : 32,
       "gfs-ext": 14
     }
 
     self.modelRegex = {
-      "nam": '^nam.t..z.(conus\w+).hiresf...tm...grib2$',
+      "nam": "^nam.t..z.awip32...tm...grib2$",
+      "nam4km": '^nam.t..z.(conus\w+).hiresf...tm...grib2$',
       "gfs": '^gfs.t..z.pgrb2f\d{0,3}$',
       "gfs2p5" : '^gfs.t..z.pgrbf\d{0,3}.2p5deg.grib2$'
-    };
+    }
 
-    self.highResModelList = ['nam4km']
+    self.modelAliases = {
+      "nam4km" : "nam" \
+    }
+
+    self.highResModelList = ['nam4km', "gfs","nam"]
 
     # Intructions:
     #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
@@ -72,7 +78,14 @@ class Constants:
                 "&lev_high_cloud_bottom_level=on&lev_low_cloud_top_level=on&lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_low_cloud_top_level=on&" + \
                 "lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_convective_cloud_layer=on&lev_boundary_layer_cloud_layer=on&lev_top_of_atmosphere=on&" + \
                 "lev_tropopause=on&lev_max_wind=on&lev_highest_tropospheric_freezing_level=on&all_var=on&" + \
-                "leftlon=0&rightlon=360&toplat=90&bottomlat=0&" \
+                "leftlon=0&rightlon=360&toplat=90&bottomlat=0&", \
+      "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?" +\
+                "all_lev=on&var_ABSV=on&var_ACPCP=on&var_ALBDO=on&var_APCP=on&var_BRTMP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&"+ \
+                "var_CICEP=on&var_CIN=on&var_CPRAT=on&var_CRAIN=on&var_CSDSF=on&var_CSNOW=on&var_DPT=on&var_DZDT=on&var_EVP=on&"+ \
+                "var_GUST=on&var_HGT=on&var_HLCY=on&var_HPBL=on&var_ICEC=on&var_LAND=on&var_POT=on&var_PRES=on&var_PWAT=on&var_RH=on&" + \
+                "var_SMDRY=on&var_SMREF=on&var_SNFALB=on&var_SNMR=on&var_SNOD=on&var_SNOM=on&var_SNOWC=on&var_SOILL=on&var_SOILM=on&"+ \
+                "var_SOILW=on&var_SOTYP=on&var_TCDC=on&var_TMIN=on&var_TMP=on&var_TSOIL=on&var_UFLX=on&var_UGRD=on&var_VEG=on&var_VGRD=on&"+ \
+                "var_VIS=on&var_VSTM=on&var_VVEL=on&var_VWSH=on&var_WILT=on&var_WTMP=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&" \
     }
     
     # Full path of data directory.
@@ -158,10 +171,10 @@ class Constants:
   @param String type - String containing model type. 
   @return list
   '''''
-  def getLatestHiresFiles(self, html, type):
+  def getLatestHiresFiles(self, html, type, alias = None):
     soup = BeautifulSoup(html)
 
-    modelType = type
+    modelType = alias
 
     urlRegex = '(' + modelType + '.*)[^/]*$'
     hrefList = soup.find_all('a', text=re.compile(urlRegex))
@@ -176,7 +189,7 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2014072418/" # TEST
+    #latestRunDir  = "nam.20140927/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -186,7 +199,7 @@ class Constants:
 
     soup = BeautifulSoup(content, 'html.parser')
 
-    urlRegex = self.modelRegex[modelType]
+    urlRegex = self.modelRegex[type]
 
     hrefList = soup.find_all('a', text=re.compile(urlRegex))
     fileList = [i.get('href') for i in hrefList]
@@ -205,9 +218,9 @@ class Constants:
         runFileList.append(file)
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
-    if modelType == 'nam':
-      # Get full name of our run. This is hacky, but I'm lazy.
-      modelType = 'nam4km'
+    if modelType is not type:
+      # Use full name, and not alias.
+      modelType = type
 
     if modelType == "gfs":
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1]
@@ -266,13 +279,10 @@ class Constants:
   '''''
   def getRun(self, type):
 
-    if type == 'nam12km':
-      return {} #self.getNam218(type)
+    # if type == 'nam12km':
+    #   return {} #self.getNam218(type)
 
-    if type == 'nam4km':
-      return self.getHighResRun(type)
-
-    if type == 'gfs':
+    if self.isHighRes(type):
       return self.getHighResRun(type)
 
     model = type
@@ -359,15 +369,15 @@ class Constants:
   def getHighResRun(self, type):
 
     runDict = {}
-    
+
     model = type
-    if type == "nam12km" or type == "nam4km":
-      model = 'nam'
-    contentListUrl = self.highResDataHttp + model + "/prod/"
+    alias = self.getAlias(model)
+
+    contentListUrl = self.highResDataHttp + alias + "/prod/"
     print contentListUrl
     contentList = urllib2.urlopen(contentListUrl).read()
 
-    filesList = self.getLatestHiresFiles(contentList, model)
+    filesList = self.getLatestHiresFiles(contentList, model, alias)
 
     
     latestRun = filesList[0]
@@ -416,4 +426,10 @@ class Constants:
       return True
     else:
       return False
+
+  def getAlias(self, model):
+    if model in self.modelAliases:
+      return self.modelAliases[model]
+    else:
+      return model
 

@@ -28,6 +28,10 @@ set baseDir = "data"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 
+if ${model} == "nam" then
+    set gdFile = ${runTime}".gem"
+  endif
+
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -50,6 +54,22 @@ foreach TIME ($times:q)
 
   if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
     set gdFile = ${runTime}"_p5.gem"
+  endif
+  
+  if (${model} == 'nam' && ${TIME} > 60) then
+    set gdFile = ${runTime}"_4.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+    set gdFile = ${runTime}"_3.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+    set gdFile = ${runTime}"_2.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 18) then
+    set gdFile = ${runTime}"_1.gem"
   endif
 
 

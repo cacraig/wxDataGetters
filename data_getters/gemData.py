@@ -23,6 +23,7 @@ class GemData:
     self.catCmd = "cat "
     self.gfs2p5list = []
     self.gfsp5list = []
+    self.namList = []
     return
 
   '''''
@@ -57,16 +58,18 @@ class GemData:
           savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
           print "downloading " + savePath  + file
           self.saveFile(savePath,url,file)
-          if key != "gfs":
-            self.catCmd = self.catCmd + " " + savePath + file
-          else:
+          if key == "gfs":
             # GFS model will result in two files... a 2.5 degree file and a .5 degree file.
             if file.split('.')[2].split('f')[0] == "mastergrb2":
               self.gfsp5list.append(savePath + file)
             else:
               self.gfs2p5list.append(savePath + file)
               #self.saveFile(savePath,url,file)
-        
+          elif key == "nam":
+            self.namList.append(savePath + file)
+          else:
+            self.catCmd = self.catCmd + " " + savePath + file
+          
         self.processGrib2(key,savePath)
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         self.updateModelTimes(key, self.constants.runTimes[key])
@@ -167,6 +170,87 @@ class GemData:
 
       inFile = outFilep5_2
       outFile = model + '/' + currentRun + '_p5_2.gem'
+
+      cmd = "dcgrib2 " + outFile + ' < ' + inFile
+      self.runCmd(cmd)
+
+    elif model == "nam":
+
+      MAX_FORECASTS_IN_FILE = 7
+      outFile00_18 = model + '/' + currentRun + '_1.grib2'
+      outFile21_39 = model + '/' + currentRun + '_2.grib2'
+      outFile42_60 = model + '/' + currentRun + '_3.grib2'
+      outFile63_84 = model + '/' + currentRun + '_4.grib2'
+
+      f1 = open(outFile00_18, "w")
+      f2 = open(outFile21_39, "w")
+      f3 = open(outFile42_60, "w")
+      f4 = open(outFile63_84, "w")
+
+      def listSort(x, y):
+        xForecastHour = 0
+        yForecastHour = 0
+
+        xForecastHour = x[-13:-11]
+        yForecastHour = y[-13:-11]
+
+
+        if int(xForecastHour) > int(yForecastHour):
+          return 1
+        if int(xForecastHour) == int(yForecastHour):
+          return 0
+
+        return -1
+
+      # Sort Asc. 
+      self.namList.sort(listSort)
+
+      # Store days 1-5 in one file, and 5-8 in another.
+      # Gempak apparently has a max size allowed for gem file.
+      fileCtr = 0
+      for file in self.namList:
+        fp = open(file, 'r')
+
+        # Forecast Hours 00-18
+        if fileCtr < MAX_FORECASTS_IN_FILE:
+          f1.write(fp.read())
+
+        # Forecast hours 21-39
+        elif fileCtr < (MAX_FORECASTS_IN_FILE * 2):
+          f2.write(fp.read())
+
+        # Forecast hours 42-60
+        elif fileCtr < (MAX_FORECASTS_IN_FILE * 3):
+          f3.write(fp.read())
+
+        # Forecast Hours 63-84
+        else:
+          f4.write(fp.read())
+
+        fileCtr += 1
+
+      # # convert our *.grib2 file into a *.gem file.
+
+      inFile = outFile00_18
+      outFile = model + '/' + currentRun + '_1.gem'
+
+      cmd = "dcgrib2 " + outFile + ' < ' + inFile
+      self.runCmd(cmd)
+
+      inFile = outFile21_39
+      outFile = model + '/' + currentRun + '_2.gem'
+
+      cmd = "dcgrib2 " + outFile + ' < ' + inFile
+      self.runCmd(cmd)
+
+      inFile = outFile42_60
+      outFile = model + '/' + currentRun + '_3.gem'
+
+      cmd = "dcgrib2 " + outFile + ' < ' + inFile
+      self.runCmd(cmd)
+
+      inFile = outFile63_84
+      outFile = model + '/' + currentRun + '_4.gem'
 
       cmd = "dcgrib2 " + outFile + ' < ' + inFile
       self.runCmd(cmd)
