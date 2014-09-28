@@ -50,6 +50,7 @@ class GemData:
         # download all files in http['files'].
         print "PROCESSING MANY"
         files = http['files']
+
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
         for file,url in files.items():
@@ -65,14 +66,14 @@ class GemData:
             else:
               self.gfs2p5list.append(savePath + file)
               #self.saveFile(savePath,url,file)
-          
+        
         self.processGrib2(key,savePath)
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         self.updateModelTimes(key, self.constants.runTimes[key])
         self.updated = True
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-
+        
         try:
           print "Saving: " + http['url'] + " to " + savePath + http['file']
           gemFile = urllib2.urlopen(http['url']).read()
