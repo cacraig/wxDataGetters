@@ -117,7 +117,7 @@ if (${model} == "ukmet") then
       set regionName = "CONUS"
     endif
 
-gdplot2_gf << EOF 
+gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
@@ -127,7 +127,7 @@ gdplot2_gf << EOF
   PANEL    = "0"
   SKIP  =  "1/2"  
   SCALE =  "0"                                                              
-  GDPFUN =                                             
+  GFUNC =                                             
   CTYPE =                                                                    
   CONTUR =      
   GVECT = "WND"

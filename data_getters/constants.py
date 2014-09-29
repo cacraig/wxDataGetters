@@ -83,7 +83,7 @@ class Constants:
                 "all_lev=on&var_ABSV=on&var_ACPCP=on&var_ALBDO=on&var_APCP=on&var_BRTMP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&"+ \
                 "var_CICEP=on&var_CIN=on&var_CPRAT=on&var_CRAIN=on&var_CSDSF=on&var_CSNOW=on&var_DPT=on&var_DZDT=on&var_EVP=on&"+ \
                 "var_GUST=on&var_HGT=on&var_HLCY=on&var_HPBL=on&var_ICEC=on&var_LAND=on&var_POT=on&var_PRES=on&var_PWAT=on&var_RH=on&" + \
-                "var_SMDRY=on&var_SMREF=on&var_SNFALB=on&var_SNMR=on&var_SNOD=on&var_SNOM=on&var_SNOWC=on&var_SOILL=on&var_SOILM=on&"+ \
+                "var_SMDRY=on&var_SMREF=on&var_PRMSL=on&var_SNFALB=on&var_SNMR=on&var_SNOD=on&var_SNOM=on&var_SNOWC=on&var_SOILL=on&var_SOILM=on&"+ \
                 "var_SOILW=on&var_SOTYP=on&var_TCDC=on&var_TMIN=on&var_TMP=on&var_TSOIL=on&var_UFLX=on&var_UGRD=on&var_VEG=on&var_VGRD=on&"+ \
                 "var_VIS=on&var_VSTM=on&var_VVEL=on&var_VWSH=on&var_WILT=on&var_WTMP=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&" \
     }

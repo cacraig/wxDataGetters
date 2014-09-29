@@ -48,14 +48,18 @@ foreach TIME ($times:q)
   endif
 
   if (${model} == 'nam' && ${TIME} > 60) then
+    set gdFile = ${runTime}"_4.gem"
+  endif
+
+  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
     set gdFile = ${runTime}"_3.gem"
   endif
 
-  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 30) then
+  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
     set gdFile = ${runTime}"_2.gem"
   endif
 
-  if (${model} == 'nam' && ${TIME} <= 30) then
+  if (${model} == 'nam' && ${TIME} <= 18) then
     set gdFile = ${runTime}"_1.gem"
   endif
 
