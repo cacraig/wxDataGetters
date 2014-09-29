@@ -23,6 +23,7 @@ set gdFile = ${model}".gem"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
+set proj = "MER"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -65,8 +66,17 @@ foreach level (850 700)
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
- gdplot2_gf << EOF 
-         
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+    set regionName = ${REGION}
+    set proj = "MER"
+    
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+gdplot2_gf << EOF 
+       
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
   CLEAR    = "n"
@@ -96,8 +106,8 @@ foreach level (850 700)
   STNPLT =                                                                         
   SATFIL =                                                                         
   RADFIL =     
-  GAREA  = 19.00;-119.00;50.00;-56.00
-  PROJ   = STR/90;-100;0                                                                         
+  GAREA  = ${REGION}
+  PROJ   = ${proj}                                                                             
   STREAM =   
   MAP = 0                                                                      
   POSN   =                                                                   
@@ -109,15 +119,16 @@ foreach level (850 700)
   CLRBAR   = 1/h/lc/.5;.01;.5;.01
   DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
   run
- exit
+  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
- # convert to a transparent image layer.
- convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_${level}_${variable}_f${TIME}.gif
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+   # convert to a transparent image layer.
+   convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_${level}_${variable}_f${TIME}.gif
+  end
 
  end
 

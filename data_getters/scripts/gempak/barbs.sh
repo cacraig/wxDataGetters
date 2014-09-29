@@ -24,6 +24,7 @@ set baseDir = "data"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 set gdFile = ${model}".gem"
+set proj = "MER"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -108,9 +109,15 @@ if (${model} == "ukmet") then
   @ barbColor = $barbColor + 3
  endif
 
- 
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+    set regionName = ${REGION}
+    set proj = "MER"
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
 
- gdplot_gf << EOF 
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
@@ -120,7 +127,7 @@ if (${model} == "ukmet") then
   PANEL    = "0"
   SKIP  =  "1/2"  
   SCALE =  "0"                                                              
-  GFUNC =                                             
+  GDPFUN =                                             
   CTYPE =                                                                    
   CONTUR =      
   GVECT = "WND"
@@ -135,21 +142,23 @@ if (${model} == "ukmet") then
   TITLE =                                                                       
   CLEAR =  "yes" 
   IJSKIP   = "0"
-  GAREA = "19.00;-119.00;50.00;-56.00"
-  PROJ = "STR/90;-100;0"
+  GAREA  = ${REGION}
+  PROJ   = ${proj}    
   MAP      = "0"
   STNPLT   =
   DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
- # convert to a transparent image layer.
- convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_${level}_${variable}_f${TIME}.gif
+     # clean output buffer/gifs, and cleanup
+     gpend
+     rm last.nts
+     rm gemglb.nts
+     # convert to a transparent image layer.
+     convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+     rm init_${model}_${level}_${variable}_f${TIME}.gif
+
+    end
 
  end
 

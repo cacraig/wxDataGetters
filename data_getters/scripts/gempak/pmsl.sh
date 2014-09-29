@@ -26,6 +26,8 @@ set gdFile = ${model}".gem"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4
 
+set proj = "MER"
+
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -91,7 +93,15 @@ if (${model} == "ukmet") then
   @ lineColor = $lineColor + 3
  endif
 
- gdplot2_gf << EOF 
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+    set regionName = ${REGION}
+    set proj = "MER"
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
@@ -122,8 +132,8 @@ if (${model} == "ukmet") then
   REFVEC   =  
   TEXT     = 
   IJSKIP   = "0"
-  GAREA    = "19.00;-119.00;50.00;-56.00"
-  PROJ     = "STR/90;-100;0"
+  GAREA  = ${REGION}
+  PROJ   = ${proj}    
   MAP      = "0"
   MSCALE   = "0"
   LATLON   = 
@@ -132,12 +142,13 @@ if (${model} == "ukmet") then
   run
  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
- # convert to a transparent image layer.
- convert init_${model}_1000_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_1000_${variable}_f${TIME}.gif
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+   # convert to a transparent image layer.
+   convert init_${model}_1000_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_1000_${variable}_f${TIME}.gif
+ end
 
 end

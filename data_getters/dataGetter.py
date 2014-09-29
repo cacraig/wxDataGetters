@@ -48,9 +48,9 @@ def main():
   if args.clean:
     dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
 
-  if args.model:
-    dataGetter.transferFilesToProd(args.model)
-    return
+  # if args.model:
+  #   dataGetter.transferFilesToProd(args.model)
+  #   return
 
   # if args.prod:
   #   dataGetter.mvAssets()

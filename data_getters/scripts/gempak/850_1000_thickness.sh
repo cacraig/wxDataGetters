@@ -27,6 +27,7 @@ set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
 
 set gdFile = ${model}".gem"
+set proj = "MER"
 
 if ${model} == "nam" then
     set gdFile = ${runTime}".gem"
@@ -40,39 +41,49 @@ endif
 
 foreach TIME ($times:q)
 
- # Reset line color!
- set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
- mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
 
-  if (${model} == 'gfs' && ${TIME} > 192) then
-    set gdFile = ${runTime}"_2p5.gem"
-  endif
+   # Reset line color!
+   set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+   mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
-  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
-    set gdFile = ${runTime}"_p5_2.gem"
-  endif
+    if (${model} == 'gfs' && ${TIME} > 192) then
+      set gdFile = ${runTime}"_2p5.gem"
+    endif
 
-  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
-    set gdFile = ${runTime}"_p5.gem"
-  endif
+    if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+      set gdFile = ${runTime}"_p5_2.gem"
+    endif
 
-  if (${model} == 'nam' && ${TIME} > 60) then
-    set gdFile = ${runTime}"_4.gem"
-  endif
+    if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+      set gdFile = ${runTime}"_p5.gem"
+    endif
 
-  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
-    set gdFile = ${runTime}"_3.gem"
-  endif
+    if (${model} == 'nam' && ${TIME} > 60) then
+      set gdFile = ${runTime}"_4.gem"
+    endif
 
-  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
-    set gdFile = ${runTime}"_2.gem"
-  endif
+    if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+      set gdFile = ${runTime}"_3.gem"
+    endif
 
-  if (${model} == 'nam' && ${TIME} <= 18) then
-    set gdFile = ${runTime}"_1.gem"
-  endif
+    if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+      set gdFile = ${runTime}"_2.gem"
+    endif
 
- gdplot2_gf << EOF 
+    if (${model} == 'nam' && ${TIME} <= 18) then
+      set gdFile = ${runTime}"_1.gem"
+    endif
+
+    set regionName = ${REGION}
+    set proj = "MER"
+
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
@@ -99,8 +110,8 @@ foreach TIME ($times:q)
   STNPLT =                                                                         
   SATFIL =                                                                         
   RADFIL =     
-  GAREA  = 19.00;-119.00;50.00;-56.00
-  PROJ   = STR/90;-100;0                                                                        
+  GAREA  = ${REGION}
+  PROJ   = ${proj}                                                                           
   STREAM =   
   MAP    = 0                                                                      
   POSN   = 4                                                                       
@@ -113,12 +124,13 @@ foreach TIME ($times:q)
   run
  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
- # convert to a transparent image layer.
- convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/f${TIME}.gif
- rm init_${model}_${level}_${variable}_f${TIME}.gif
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+   # convert to a transparent image layer.
+   convert init_${model}_${level}_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_${level}_${variable}_f${TIME}.gif
+  end
 
 end

@@ -25,7 +25,7 @@ set gdFile = ${model}".gem"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4
-
+set proj = "MER"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -65,7 +65,16 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
- gdplot2_gf << EOF 
+ foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+     set regionName = ${REGION}
+     set proj = "MER"
+
+     if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
@@ -91,8 +100,8 @@ foreach TIME ($times:q)
   RADFIL = 
   TITLE =                                                                        
   STREAM =        
-  GAREA   = 19.00;-119.00;50.00;-56.00
-  PROJ    = STR/90;-100;0                                                                 
+  GAREA  = ${REGION}
+  PROJ   = ${proj}                                                                   
   POSN  =  4                                                                       
   COLORS = 2 
   MAP = 0                                                                      
@@ -100,13 +109,14 @@ foreach TIME ($times:q)
   GRDLBL = 5                                                                       
   LUTFIL = none
   FILTER = yes
-  DEVICE = "gif|${imgDir}/f${TIME}.gif|1280;1024| C"
+  DEVICE = "gif|${imgDir}/${regionName}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+  end
 
 end

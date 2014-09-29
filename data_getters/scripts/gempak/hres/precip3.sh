@@ -20,7 +20,8 @@ set variable = "precip3"
 
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
-set MODEL_PATH  = $4 
+set MODEL_PATH  = $4
+set proj = "MER"
 
 
 # Make our run directory.
@@ -51,8 +52,17 @@ foreach TIME ($times:q)
  if (${model} == "nam4km") then
    set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  endif 
+
+ foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+    set regionName = ${REGION}
+    set proj = "MER"
+
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
  
- gdplot2_gf << EOF 
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${runTime}${extension}"
   GDATTIM  = "f${TIME}"
@@ -75,8 +85,8 @@ foreach TIME ($times:q)
   CLRBAR  = 0
   WIND    = bm32/0.8 
   REFVEC  = 
-  GAREA   = 19.00;-119.00;50.00;-56.00
-  PROJ    = STR/90;-100;0
+  GAREA  = ${REGION}
+  PROJ   = ${proj}    
   CLEAR   = yes 
   MAP     = 0
   TITLE   = 
@@ -84,13 +94,15 @@ foreach TIME ($times:q)
   run
  exit
 EOF
- # clean output buffer/gifs, and cleanup
- gpend
- rm last.nts
- rm gemglb.nts
 
- # convert to a transparent image layer.
- convert init_${model}_sfc_${variable}_f${shortTime}.gif -transparent black ${imgDir}/f${shortTime}.gif
- rm init_${model}_sfc_${variable}_f${shortTime}.gif
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+
+   # convert to a transparent image layer.
+   convert init_${model}_sfc_${variable}_f${shortTime}.gif -transparent black ${imgDir}/${regionName}_f${shortTime}.gif
+   rm init_${model}_sfc_${variable}_f${shortTime}.gif
+ end
 
 end
