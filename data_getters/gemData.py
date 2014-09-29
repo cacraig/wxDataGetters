@@ -51,6 +51,7 @@ class GemData:
         # download all files in http['files'].
         print "PROCESSING MANY"
         files = http['files']
+
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
         for file,url in files.items():
@@ -75,7 +76,7 @@ class GemData:
         self.updated = True
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-
+        
         try:
           print "Saving: " + http['url'] + " to " + savePath + http['file']
           gemFile = urllib2.urlopen(http['url']).read()

@@ -29,6 +29,13 @@ def main():
     job.delete()
     redisConn.set(cmdObj['model'], "0")
 
+  modelCache = ['nam','gfs','nam4km','ruc','ecmf1','ukmet']
+
+  # reset cache  
+  for model in modelCache:
+    print "Re-Setting model-cache: " + model
+    redisConn.set(model, "0")
+
   print "Done clearing jobs."
 
   return
