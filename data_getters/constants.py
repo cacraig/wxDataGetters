@@ -37,7 +37,7 @@ class Constants:
     self.expectedNumberOfFiles = {
       "nam": 28,
       "nam4km" : 44,
-      "gfs" : 92
+      "gfs" : 73
     }
 
     self.modelRegex = {
@@ -345,6 +345,8 @@ class Constants:
   Reduces number of files, Data + Memory usage, and Processing time.
   Additional timesteps aren't really necessary anyways. After 240th hour
   shit hits the fan in terms of choas and inaccuracy.
+
+  Expected Filtered file count: 73
   '''''
   def filterGFSFiles(self, fileList):
     fileListCopy = []
@@ -356,12 +358,14 @@ class Constants:
       # print forecastHour
       # if forecastHour in [222,348,198]:
       #   fileListCopy.append(fileName)
+      if forecastHour <= 120:
+        fileListCopy.append(fileName)
 
-      if forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
+      elif forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
         # Remove file from list.
         fileListCopy.append(fileName)
 
-      if forecastHour > 240 and (forecastHour % 12) == 0:
+      elif forecastHour > 240 and (forecastHour % 12) == 0:
         # Remove file from list.
         fileListCopy.append(fileName)
 
