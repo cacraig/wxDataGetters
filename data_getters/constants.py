@@ -304,6 +304,11 @@ class Constants:
     latestRun = filesList[0]
     files = filesList[1]
 
+    # Skip if this run has not finished updating yet.
+    if len(files) < self.expectedNumberOfFiles[type]:
+      print "NUMBER OF FILES: " + str(len(files))
+      return {}
+
     scriptUrl = self.highResScriptUrls[type]
 
     # Set file download paths, along with desired vars/levels.

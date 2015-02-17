@@ -31,10 +31,10 @@ def main():
 
   if args.model:
     # initalize for only one model.
-    dataGetter = GemData(args.model)
+    dataGetter = GemData(args.model, False) # Second parameter enables DEBUG mode.
   else:
     # Initialize data getter
-    dataGetter = GemData()
+    dataGetter = GemData(None, False) # Second parameter enables DEBUG mode.
 
   # # Retrieve and save data.
   dataGetter.getData()
