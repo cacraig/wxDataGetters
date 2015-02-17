@@ -17,16 +17,13 @@ class Gempak:
       if key in self.constants.runTimes:
         if 'files' in http and key != "gfs" and key != "nam":
           for file in glob.glob("gempak/hres/*.sh"):
-            files = http['files']
-            fileList = []
-            for mfile,url in files.items():
-              fileList.append(mfile)
+            print "Executing HiRes gempak scripts."
             # Customized Gempak scripts for High resolution data in scripts/gempak/hres
             cmd = "tcsh "+ file + " " + key + " " + self.constants.modelTimes[key] + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             self.runCmd(cmd)
             print cmd
         else:
-          print "CUMMING ON YOUR FACE!"
+          print "Executing Non-HiRes gempak scripts."
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts
             cmd = "tcsh "+ file + " " + key + " " + self.constants.modelTimes[key] + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv

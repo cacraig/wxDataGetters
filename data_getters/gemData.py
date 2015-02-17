@@ -12,18 +12,15 @@ import redis
 # Class for downloading data, and cleaning data directories.
 class GemData:
 
-  def __init__(self, models=None):
+  def __init__(self, models=None, debug=False):
     self.constants = Constants(models)
-    print "CREATING CONN"
+    print "Creating Connection to DB & Redis..."
     self.conn = psycopg2.connect(self.constants.dbConnStr)
     self.cursor = self.conn.cursor()
     self.dbRunTimes = self.getCurrentRuns()
     self.redisConn = redis.Redis(self.constants.redisHost)
     self.updated = False
-    self.catCmd = "cat "
-    self.gfs2p5list = []
-    self.gfsp5list = []
-    self.namList = []
+    self.DEBUG = debug
     return
 
   '''''
@@ -57,22 +54,13 @@ class GemData:
         for file,url in files.items():
           savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
           print "downloading " + savePath  + file
-          self.saveFile(savePath,url,file)
-          if key == "gfs":
-            # GFS model will result in two files... a 2.5 degree file and a .5 degree file.
-            if file.split('.')[2].split('f')[0] == "mastergrb2":
-              self.gfsp5list.append(savePath + file)
-            else:
-              self.gfs2p5list.append(savePath + file)
-              #self.saveFile(savePath,url,file)
-          elif key == "nam":
-            self.namList.append(savePath + file)
-          else:
-            self.catCmd = self.catCmd + " " + savePath + file
-          
-        self.processGrib2(key,savePath)
+          self.saveFile(savePath, url, file)
+          self.processGrib2(key, savePath, file)
+
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
-        self.updateModelTimes(key, self.constants.runTimes[key])
+        if(self.DEBUG == False):
+          self.updateModelTimes(key, self.constants.runTimes[key])
+
         self.updated = True
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
@@ -91,8 +79,10 @@ class GemData:
           print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
           print " with exception %s" % e
           pass
+
       # END FOR Set model's redis key to not processing.
-      self.redisConn.set(key, "0")
+      if(self.DEBUG == False):
+        self.redisConn.set(key, "0")
 
     # Jump back to present WD
     os.chdir(currentDir)
@@ -101,181 +91,45 @@ class GemData:
 
   def isUpdated(self):
     return self.updated
-
-  # Process Grib2 files.
-  def processGrib2(self, model, savePath):
+  
+  # Convert grib2 files into gem files.
+  def processGrib2(self, model, savePath, fileName):
+    
+    if model == 'gfs':
+      # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
+      forecastHour = "f" + fileName.split('.')[4][1:4]
+    elif model == 'nam':
+      # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
+      forecastHour = "f" + fileName.split('.')[2][6:8]
+    elif model == 'nam4km':
+      # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
+      forecastHour = "f0" + fileName.split('.')[3][6:8]
 
     currentRun = self.constants.runTimes[model]
+    inFile  = savePath + fileName
+    outFile = model + '/' + currentRun + forecastHour + '.gem'
+    cmd = "dcgrib2 " + outFile + ' < ' + inFile
 
-    if model == "gfs":
-      outFilep5 = model + '/' + currentRun + '_p5.grib2'
-      outFilep5_2 = model + '/' + currentRun + '_p5_2.grib2'
-      outFile2p5 = model + '/' + currentRun + '2p5.grib2'
-
-      f = open(outFilep5, "w")
-      f2 = open(outFilep5_2, "w")
-      f3 = open(outFile2p5, "w")
-
-      def listSort(x, y):
-        xForecastHour = 0
-        yForecastHour = 0
-
-        if x[-3:-2] == 'f':
-          xForecastHour = x[-2:]
-        if y[-3:-2] == 'f':
-          yForecastHour = y[-2:]
-        if x[-4:-3] == 'f':
-          xForecastHour = x[-3:]
-        if y[-4:-3] == 'f':
-          yForecastHour = y[-3:]
-
-        if int(xForecastHour) > int(yForecastHour):
-          return 1
-        if int(xForecastHour) == int(yForecastHour):
-          return 0
-
-        return -1
-      # Sort Asc. 
-      self.gfsp5list.sort(listSort)
-
-      # Store days 1-5 in one file, and 5-8 in another.
-      # Gempak apparently has a max size allowed for gem file.
-      fileCtr = 0
-      for file in self.gfsp5list:
-        if fileCtr <=20:
-          fp = open(file, 'r')
-          f.write(fp.read())
-        else:
-          fp = open(file, 'r')
-          f2.write(fp.read())
-        fileCtr += 1
-
-      for file in self.gfs2p5list:
-        fp = open(file, 'r')
-        f3.write(fp.read())
-
-      inFile = outFile2p5
-      outFile = model + '/' + currentRun + '_2p5.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-
-      # # convert our *.grib2 file into a *.gem file.
-      self.runCmd(cmd)
-
-      inFile = outFilep5
-      outFile = model + '/' + currentRun + '_p5.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-      inFile = outFilep5_2
-      outFile = model + '/' + currentRun + '_p5_2.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-    elif model == "nam":
-
-      MAX_FORECASTS_IN_FILE = 7
-      outFile00_18 = model + '/' + currentRun + '_1.grib2'
-      outFile21_39 = model + '/' + currentRun + '_2.grib2'
-      outFile42_60 = model + '/' + currentRun + '_3.grib2'
-      outFile63_84 = model + '/' + currentRun + '_4.grib2'
-
-      f1 = open(outFile00_18, "w")
-      f2 = open(outFile21_39, "w")
-      f3 = open(outFile42_60, "w")
-      f4 = open(outFile63_84, "w")
-
-      def listSort(x, y):
-        xForecastHour = 0
-        yForecastHour = 0
-
-        xForecastHour = x[-13:-11]
-        yForecastHour = y[-13:-11]
-
-
-        if int(xForecastHour) > int(yForecastHour):
-          return 1
-        if int(xForecastHour) == int(yForecastHour):
-          return 0
-
-        return -1
-
-      # Sort Asc. 
-      self.namList.sort(listSort)
-
-      # Store days 1-5 in one file, and 5-8 in another.
-      # Gempak apparently has a max size allowed for gem file.
-      fileCtr = 0
-      for file in self.namList:
-        fp = open(file, 'r')
-
-        # Forecast Hours 00-18
-        if fileCtr < MAX_FORECASTS_IN_FILE:
-          f1.write(fp.read())
-
-        # Forecast hours 21-39
-        elif fileCtr < (MAX_FORECASTS_IN_FILE * 2):
-          f2.write(fp.read())
-
-        # Forecast hours 42-60
-        elif fileCtr < (MAX_FORECASTS_IN_FILE * 3):
-          f3.write(fp.read())
-
-        # Forecast Hours 63-84
-        else:
-          f4.write(fp.read())
-
-        fileCtr += 1
-
-      # # convert our *.grib2 file into a *.gem file.
-
-      inFile = outFile00_18
-      outFile = model + '/' + currentRun + '_1.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-      inFile = outFile21_39
-      outFile = model + '/' + currentRun + '_2.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-      inFile = outFile42_60
-      outFile = model + '/' + currentRun + '_3.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-      inFile = outFile63_84
-      outFile = model + '/' + currentRun + '_4.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-      self.runCmd(cmd)
-
-    else:
-      outFile = model + '/' + currentRun + '.grib2'
-      self.catCmd = self.catCmd + " > " + outFile
-      self.runCmd(self.catCmd)
-
-      inFile = outFile
-      outFile = model + '/' + currentRun + '.gem'
-
-      cmd = "dcgrib2 " + outFile + ' < ' + inFile
-
-      # convert our *.grib2 file into a *.gem file.
-      self.runCmd(cmd)
-
+    print cmd
+    
+    # convert our *.grib2 file into a *.gem file.
+    self.runCmd(cmd)
     return
 
-  #timeout after 15 mins.
+  # Saves file. Skips saving if file already exists.
+  # timeout after 15 mins.
   @timeout(900, os.strerror(errno.ETIMEDOUT))
-  def saveFile(self, savePath,url, file):
-    print url
+  def saveFile(self, savePath, url, file):
+
+    grib2File = savePath + file
+
+    # If file exists, don't download again!
+    if os.path.isfile(grib2File):
+      return
+
+    # File does not already exist, download it.
     gemFile = urllib2.urlopen(url).read()
-    fp = open(savePath + file, 'w')
+    fp = open(grib2File, 'w')
     fp.write(gemFile)
     fp.close()
     return
@@ -335,7 +189,7 @@ class GemData:
     return call(cmd, shell=True)
 
   def getCurrentRuns(self):
-    print "ATTEMPT"
+    print "Getting Current Runs from DB..."
     self.cursor.execute("SELECT name,current_run from model")
     rows = self.cursor.fetchall()
     print rows
@@ -349,9 +203,6 @@ class GemData:
   def updateModelTimes(self, model, time):
     try:
       self.cursor.execute("SELECT * from model where name='" + model + "'")
-      # if self.cursor.fetchone() is None:
-      #   self.cursor.execute("INSERT INTO current_run (name, utc_time) VALUES ('" + model + "','" + time + "')")
-      # else:
       self.cursor.execute("UPDATE model SET current_run ='" + time + "' WHERE name='" + model+"'")
     except Exception, e:
       print e.pgerror

@@ -41,39 +41,41 @@ endif
 
 foreach TIME ($times:q)
 
+  set gdFile = ${runTime}"f"${TIME}".gem"
+
   foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
 
    # Reset line color!
    set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
    mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
-    if (${model} == 'gfs' && ${TIME} > 192) then
-      set gdFile = ${runTime}"_2p5.gem"
-    endif
+    # if (${model} == 'gfs' && ${TIME} > 192) then
+    #   set gdFile = ${runTime}"_2p5.gem"
+    # endif
 
-    if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
-      set gdFile = ${runTime}"_p5_2.gem"
-    endif
+    # if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+    #   set gdFile = ${runTime}"_p5_2.gem"
+    # endif
 
-    if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
-      set gdFile = ${runTime}"_p5.gem"
-    endif
+    # if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+    #   set gdFile = ${runTime}"_p5.gem"
+    # endif
 
-    if (${model} == 'nam' && ${TIME} > 60) then
-      set gdFile = ${runTime}"_4.gem"
-    endif
+    # if (${model} == 'nam' && ${TIME} > 60) then
+    #   set gdFile = ${runTime}"_4.gem"
+    # endif
 
-    if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
-      set gdFile = ${runTime}"_3.gem"
-    endif
+    # if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+    #   set gdFile = ${runTime}"_3.gem"
+    # endif
 
-    if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
-      set gdFile = ${runTime}"_2.gem"
-    endif
+    # if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+    #   set gdFile = ${runTime}"_2.gem"
+    # endif
 
-    if (${model} == 'nam' && ${TIME} <= 18) then
-      set gdFile = ${runTime}"_1.gem"
-    endif
+    # if (${model} == 'nam' && ${TIME} <= 18) then
+    #   set gdFile = ${runTime}"_1.gem"
+    # endif
 
     set regionName = ${REGION}
     set proj = "MER"

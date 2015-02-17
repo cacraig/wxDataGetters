@@ -34,33 +34,36 @@ if !(-e ${outDir}) then
 endif
 
 foreach TIME ($times:q)
-  if (${model} == 'gfs' && ${TIME} > 192) then
-    set gdFile = ${runTime}"_2p5.gem"
-  endif
+  
+  set gdFile = ${runTime}"f"${TIME}".gem"
 
-  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
-    set gdFile = ${runTime}"_p5_2.gem"
-  endif
+  # if (${model} == 'gfs' && ${TIME} > 192) then
+  #   set gdFile = ${runTime}"_2p5.gem"
+  # endif
 
-  if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
-    set gdFile = ${runTime}"_p5.gem"
-  endif
+  # if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} > 120) then
+  #   set gdFile = ${runTime}"_p5_2.gem"
+  # endif
 
-  if (${model} == 'nam' && ${TIME} > 60) then
-    set gdFile = ${runTime}"_4.gem"
-  endif
+  # if (${model} == 'gfs' && ${TIME} < 192 && ${TIME} <= 120) then
+  #   set gdFile = ${runTime}"_p5.gem"
+  # endif
 
-  if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
-    set gdFile = ${runTime}"_3.gem"
-  endif
+  # if (${model} == 'nam' && ${TIME} > 60) then
+  #   set gdFile = ${runTime}"_4.gem"
+  # endif
 
-  if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
-    set gdFile = ${runTime}"_2.gem"
-  endif
+  # if (${model} == 'nam' && ${TIME} <= 60 && ${TIME} > 39) then
+  #   set gdFile = ${runTime}"_3.gem"
+  # endif
 
-  if (${model} == 'nam' && ${TIME} <= 18) then
-    set gdFile = ${runTime}"_1.gem"
-  endif
+  # if (${model} == 'nam' && ${TIME} <= 39 && ${TIME} > 18) then
+  #   set gdFile = ${runTime}"_2.gem"
+  # endif
+
+  # if (${model} == 'nam' && ${TIME} <= 18) then
+  #   set gdFile = ${runTime}"_1.gem"
+  # endif
 
 foreach level (850 700)
 

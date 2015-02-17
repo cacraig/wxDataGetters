@@ -37,15 +37,13 @@ class Constants:
     self.expectedNumberOfFiles = {
       "nam": 28,
       "nam4km" : 44,
-      "gfs" : 32,
-      "gfs-ext": 14
+      "gfs" : 92
     }
 
     self.modelRegex = {
       "nam": "^nam.t..z.awip32...tm...grib2$",
       "nam4km": '^nam.t..z.(conus\w+).hiresf...tm...grib2$',
-      "gfs": '^gfs.t..z.pgrb2f\d{0,3}$',
-      "gfs2p5" : '^gfs.t..z.pgrbf\d{0,3}.2p5deg.grib2$'
+      "gfs": '^gfs.t..z.pgrb2full.0p50.f\d{0,3}$'
     }
 
     self.modelAliases = {
@@ -69,7 +67,7 @@ class Constants:
                 "lev_surface=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
                 "var_MXUPHL=on&var_PWAT=on&var_REFD=on&var_RH=on&var_TMP=on&var_UPHL=on&var_USTM=on&var_VSTM=on&var_WEASD=on&var_WTMP=on&leftlon=0&"+ \
                 "rightlon=360&toplat=90&bottomlat=-90&", \
-      "gfs"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_hd.pl?" + \
+      "gfs"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?" + \
                 "lev_20_mb=on&lev_250_mb=on&lev_500_mb=on&lev_700_mb=on&lev_850_mb=on&lev_875_mb=on&lev_900_mb=on" + \
                 "&lev_925_mb=on&lev_1000_mb=on&lev_0-0.1_m_below_ground=on&lev_0.1-0.4_m_below_ground=on&lev_surface=on&" + \
                 "lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_80_m_above_ground=on&lev_100_m_above_ground=on&lev_mean_sea_level=on" + \
@@ -127,10 +125,10 @@ class Constants:
       # Get all current run files!
       self.modelGems = {
          'gfs'  : self.getRun('gfs'), \
-         'ecmf1': self.getRun('ecmf1'), \
-         'ruc'  : self.getRun('ruc'), \
+         # 'ecmf1': self.getRun('ecmf1'), \
+         # 'ruc'  : self.getRun('ruc'), \
          'nam'  : self.getRun('nam'), \
-         'ukmet': self.getRun('ukmet'), \
+         # 'ukmet': self.getRun('ukmet'), \
          # 'nam12km' : self.getRun('nam12km'), \
          'nam4km' : self.getRun('nam4km') \
       }
@@ -148,10 +146,10 @@ class Constants:
   def getModelLinks(self, html, type):
 
     soup = BeautifulSoup(html)
-    if type == "nam12km":
-      modelType = 'nam218'
-    else:
-      modelType = type + self.modelTypes[type]
+    # if type == "nam12km":
+    #   modelType = 'nam218'
+    # else:
+    modelType = type + self.modelTypes[type]
 
     # We want relative paths ending in fileExtension?q1=*
     urlRegex = '('+ modelType +'.*\.(gem))[^/]*$'
@@ -189,7 +187,8 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "nam.20140927/" # TEST
+    #latestRunDir  = "gfs.2015021618/" # TEST
+    #latestRunDir  = "nam.20150216/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -217,6 +216,8 @@ class Constants:
       else:
         runFileList.append(file)
 
+    # latestHour = "18" # TEST for NAM and NAM4km
+
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:
       # Use full name, and not alias.
@@ -224,51 +225,11 @@ class Constants:
 
     if modelType == "gfs":
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1]
+      runFileList = self.filterGFSFiles(runFileList)
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    # Get Extended GFS data. .5 degree data for f00 - f192,
-    #   and 2.5 degree data for f192-f384
-    if modelType == "gfs":
-      newFileList = []
-      for file in runFileList:
-        filePieces = file.split('.')
-        ext = filePieces[2]
-        forecastHour = ext.split('f')[1]
-        newFile = filePieces[0] + "." + filePieces[1] + ".mastergrb2f" + forecastHour
-        if int(forecastHour) % 6 == 0:
-          newFileList.append(newFile)
-      gfs2p5runList = self.getGFSExtended(soup)
-      runFileList =  newFileList
-      return (latestRunDir[:-1],runFileList, gfs2p5runList, modelDataUrl)
-    else:
-      return (latestRunDir[:-1],runFileList)
-
-  # Get the GFS 2.5 degree data f192-384
-  def getGFSExtended(self, soup):
-    urlRegex = self.modelRegex["gfs2p5"]
-
-    hrefList = soup.find_all('a', text=re.compile(urlRegex))
-    fileList = [i.get('href') for i in hrefList]
-    # for each href, grab latest Run hour.
-    latestHour = "00"
-    runFileList = []
-
-    maxForecastHour = int(192)
-
-    # Loop through file list. Build a list of files with latest run only.
-    for file in fileList:
-      forecastHour = int(file.split('.')[2].split('f')[1])
-      if forecastHour > maxForecastHour:
-        runHour = file.split('.')[1][1:3]
-        if int(runHour) > int(latestHour):
-          latestHour = runHour
-          runFileList = []
-          runFileList.append(file)
-        else:
-          runFileList.append(file)
-  
-    return runFileList
+    return (latestRunDir[:-1],runFileList)
 
   '''''
   This method gets the url for the latest model run of the model type requested.
@@ -278,9 +239,6 @@ class Constants:
   @return dictionary
   '''''
   def getRun(self, type):
-
-    # if type == 'nam12km':
-    #   return {} #self.getNam218(type)
 
     if self.isHighRes(type):
       return self.getHighResRun(type)
@@ -325,43 +283,6 @@ class Constants:
     return dataDict
 
   '''''
-  Get the *.gem data for the 12km NAM model.
-  '''''
-  def getNam218(self, type):
-
-    model = type
-
-    # Set our model List url.
-    modelListUrl = self.baseDataHttp + model + '/'
-
-    # Set our Model Data GET url.
-    modelGetUrl = self.getDataHttp + model + '/'
-    content = urllib2.urlopen(modelListUrl).read()
-    maxDate = 0
-    maxTime = 0
-    currentRun = 0
-
-    fileList = self.getModelLinks(content, type)
-    
-    first = fileList[0]
-
-    run = first[0:10]
-    runDict = {}
-
-    for file in fileList:
-      if file[0:10] == run:
-        runDict[file] = modelGetUrl + file
-
-    self.runTimes['nam12km'] = run
-
-    # Return a URL to the current model run .gem file.
-    dataDict = {}
-    # Skip ecmwf for now.
-    dataDict['files'] = runDict
-
-    return dataDict
-
-  '''''
   Get model data for NAM 4km, HRRR, WRF ARW, GFS .5 degree... etc.
   These must be downloaded as subsets of .grib2 files (due to their massive size)
   We must specify certain paramaters/levels to grab, rather than pulling the entire model run's data.
@@ -383,33 +304,10 @@ class Constants:
     latestRun = filesList[0]
     files = filesList[1]
 
-    try:
-      # Concat additional 2.5 degree files for GFS model.
-      addlFiles = filesList[2]
-      if model == "gfs" and len(addlFiles) < self.expectedNumberOfFiles["gfs-ext"]:
-        # Check length of extended run hours.
-        print "Extended run not yet completed."
-        return {}
-          # This is for the gfs 2p5 files only...
-      if addlFiles is not None:
-        for file in addlFiles:
-          runDict[file] = filesList[3] + file
-    except IndexError:
-      print "Not GFS."
-
-    # Skip if this run has not finished updating yet.
-    if len(files) < self.expectedNumberOfFiles[type]:
-      print "NUMBER OF FILES: " + str(len(files))
-      return {}
-
     scriptUrl = self.highResScriptUrls[type]
 
     # Set file download paths, along with desired vars/levels.
-    if model == "gfs":
-      gribDir = latestRun + "/master"
-    else:
-      gribDir = latestRun
-
+    gribDir = latestRun
 
     for file in files:
       runDict[file] = scriptUrl + "&dir=/" + gribDir + "&file=" + file
@@ -432,4 +330,35 @@ class Constants:
       return self.modelAliases[model]
     else:
       return model
+
+  '''''
+  Filter GFS model file list:
+  000-120 Hour (3 hour increment)
+  120-240 Hour (6 hour increment)
+  240-384 Hour (12 hour increment)
+
+  Reduces number of files, Data + Memory usage, and Processing time.
+  Additional timesteps aren't really necessary anyways. After 240th hour
+  shit hits the fan in terms of choas and inaccuracy.
+  '''''
+  def filterGFSFiles(self, fileList):
+    fileListCopy = []
+    for idx, fileName in enumerate(fileList):
+      forecastHour = int(fileName.split('.')[4][1:4])
+
+      # TESTING...
+      # print idx
+      # print forecastHour
+      # if forecastHour in [222,348,198]:
+      #   fileListCopy.append(fileName)
+
+      if forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
+        # Remove file from list.
+        fileListCopy.append(fileName)
+
+      if forecastHour > 240 and (forecastHour % 12) == 0:
+        # Remove file from list.
+        fileListCopy.append(fileName)
+
+    return fileListCopy
 
