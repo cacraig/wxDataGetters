@@ -37,7 +37,7 @@ def main():
     dataGetter = GemData(None, False) # Second parameter enables DEBUG mode.
 
   # # Retrieve and save data.
-  dataGetter.getData()
+  # dataGetter.getData()
   print "Trying batch"
   # Image Generation Block.
   if args.batch:

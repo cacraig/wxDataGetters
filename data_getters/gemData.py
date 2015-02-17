@@ -21,6 +21,12 @@ class GemData:
     self.redisConn = redis.Redis(self.constants.redisHost)
     self.updated = False
     self.DEBUG = debug
+
+    # If DEBUG is True, clear all model times so they aren't skipped.
+    if self.DEBUG:
+      for model,time in self.dbRunTimes.items():
+        self.dbRunTimes[model] = ""
+
     return
 
   '''''

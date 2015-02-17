@@ -40,6 +40,8 @@ endif
 
 foreach TIME ($times:q)
 
+ set gdFile = ${runTime}"f"${TIME}".gem"
+ 
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  
@@ -64,7 +66,7 @@ foreach TIME ($times:q)
  
 gdplot2_gf << EOF 
          
-  GDFILE   = "${MODEL_PATH}/${model}/${runTime}${extension}"
+  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
   GLEVEL  = 0 
   GVCORD  = none 
