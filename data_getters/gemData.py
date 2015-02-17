@@ -131,6 +131,7 @@ class GemData:
 
     # If file exists, don't download again!
     if os.path.isfile(grib2File):
+      print "File already downloaded. Skipping..."
       return
 
     # File does not already exist, download it.
