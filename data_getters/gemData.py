@@ -122,7 +122,7 @@ class GemData:
       forecastHour = "f" + fileName.split('.')[4][1:4]
     elif model == 'nam':
       # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
-      forecastHour = "f" + fileName.split('.')[2][6:8]
+      forecastHour = "f0" + fileName.split('.')[2][6:8]
     elif model == 'nam4km':
       # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
       forecastHour = "f0" + fileName.split('.')[3][6:8]

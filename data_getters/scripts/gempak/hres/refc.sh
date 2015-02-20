@@ -45,15 +45,15 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/comp/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/comp/${variable}
  
- set shortTime = ${TIME}
+ # set shortTime = ${TIME}
 
- if (${model} == "nam12km") then
-   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
- endif 
+ # if (${model} == "nam12km") then
+ #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ # endif 
 
- if (${model} == "nam4km") then
-   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
- endif 
+ # if (${model} == "nam4km") then
+ #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
+ # endif 
 
  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
     set regionName = ${REGION}
