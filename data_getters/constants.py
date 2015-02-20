@@ -74,7 +74,7 @@ class Constants:
       'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
                 "&lev_500_mb=on&lev_700_mb=on" + \
                 "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
-                "&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
+                "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
                 "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
 
       "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_150_mb=on&lev_200_mb=on&lev_250_mb=on&lev_2_hybrid_level=on" + \
