@@ -31,13 +31,13 @@ def main():
 
   if args.model:
     # initalize for only one model.
-    dataGetter = GemData(args.model, False) # Second parameter enables DEBUG mode.
+    dataGetter = GemData(args.model, True) # Second parameter enables DEBUG mode.
   else:
     # Initialize data getter
     dataGetter = GemData(None, False) # Second parameter enables DEBUG mode.
 
   # # Retrieve and save data.
-  # dataGetter.getData()
+  dataGetter.getData()
   print "Trying batch"
   # Image Generation Block.
   if args.batch:
@@ -46,7 +46,10 @@ def main():
 
   # Scrub all of our model data.
   if args.clean:
-    dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
+    if args.model:
+      dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + args.model)
+    else:
+      dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv)
 
   # if args.model:
   #   dataGetter.transferFilesToProd(args.model)

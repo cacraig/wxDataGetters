@@ -37,7 +37,7 @@ class GemData:
     os.chdir(self.constants.dataDirEnv)
 
     for key,http in self.constants.modelGems.items():
-
+      
       # If it is empty for any reason, skip!
       if not http:
         del self.constants.runTimes[key]
@@ -60,7 +60,7 @@ class GemData:
         for file,url in files.items():
           savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
           print "downloading " + savePath  + file
-          self.saveFile(savePath, url, file)
+          self.saveFile(savePath, url, file, key)
           self.processGrib2(key, savePath, file)
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
@@ -101,6 +101,22 @@ class GemData:
   # Convert grib2 files into gem files.
   def processGrib2(self, model, savePath, fileName):
     
+    inFile  = savePath + fileName
+    outFile = self.getGemFileName(model, savePath, fileName)
+    cmd = "dcgrib2 " + outFile + ' < ' + inFile
+
+    print cmd
+    
+    # convert our *.grib2 file into a *.gem file.
+    if os.path.isfile(outFile):
+      print "Not decoding, skipping"
+      return
+    self.runCmd(cmd)
+    return
+
+  def getForecastHour(self, model, fileName):
+    forecastHour = ""
+
     if model == 'gfs':
       # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
       forecastHour = "f" + fileName.split('.')[4][1:4]
@@ -111,28 +127,36 @@ class GemData:
       # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
       forecastHour = "f0" + fileName.split('.')[3][6:8]
 
-    currentRun = self.constants.runTimes[model]
-    inFile  = savePath + fileName
-    outFile = model + '/' + currentRun + forecastHour + '.gem'
-    cmd = "dcgrib2 " + outFile + ' < ' + inFile
+    return forecastHour
 
-    print cmd
-    
-    # convert our *.grib2 file into a *.gem file.
-    self.runCmd(cmd)
-    return
+  def getGemFileName(self, model, savePath, fileName):
+      forecastHour = self.getForecastHour(model,fileName)
+
+      currentRun = self.constants.runTimes[model]
+
+      outFile = model + '/' + currentRun + forecastHour + '.gem'
+
+      return outFile
 
   # Saves file. Skips saving if file already exists.
   # timeout after 15 mins.
   @timeout(900, os.strerror(errno.ETIMEDOUT))
-  def saveFile(self, savePath, url, file):
+  def saveFile(self, savePath, url, fileName, model = None):
 
-    grib2File = savePath + file
+    grib2File = savePath + fileName
+    
+    # If model is specified, check for a decoded .gem file.
+    if model is not None:
+      gemFile = self.getGemFileName(model, savePath, fileName)
+      if os.path.isfile(gemFile):
+        print "Decoded GEM file:" + gemFile + " already exists...skipping..."
+        return
+
 
     # If file exists, don't download again!
-    if os.path.isfile(grib2File):
-      print "File already downloaded. Skipping..."
-      return
+    # if os.path.isfile(grib2File):
+    #   print "File already downloaded. Skipping..."
+    #   return
 
     # File does not already exist, download it.
     gemFile = urllib2.urlopen(url).read()

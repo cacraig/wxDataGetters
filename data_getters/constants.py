@@ -37,7 +37,7 @@ class Constants:
     self.expectedNumberOfFiles = {
       "nam": 28,
       "nam4km" : 44,
-      "gfs" : 73
+      "gfs" : 65 # [BANDAID FIX] Actually 73 but if we begin d/l when 65 are complete, the rest should complete by the time script finishes
     }
 
     self.modelRegex = {
@@ -60,30 +60,29 @@ class Constants:
     # Each value contains a url to obtain a specific subset of the grib2 data.
     # This is done to reduce file size and processing/download time.
     self.highResScriptUrls = {
-      'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?lev_0C_isotherm=on&lev_1000-0_m_above_ground=on"+ \
-                "&lev_2_m_above_ground=on&lev_1_hybrid_level=on&lev_3000-0_m_above_ground=on&lev_5000-2000_m_above_ground=on&lev_6000-0_m_above_ground=on"+ \
-                "&lev_850_mb=on&lev_cloud_base=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on&"+ \
-                "lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on&"+ \
-                "lev_surface=on&var_REFC=on&var_APCP=on&var_CAPE=on&var_CIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on&var_HGT=on&var_HLCY=on&"+ \
-                "var_MXUPHL=on&var_PWAT=on&var_REFD=on&var_RH=on&var_TMP=on&var_UPHL=on&var_USTM=on&var_VSTM=on&var_WEASD=on&var_WTMP=on&leftlon=0&"+ \
-                "rightlon=360&toplat=90&bottomlat=-90&", \
-      "gfs"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?" + \
-                "lev_20_mb=on&lev_250_mb=on&lev_500_mb=on&lev_700_mb=on&lev_850_mb=on&lev_875_mb=on&lev_900_mb=on" + \
-                "&lev_925_mb=on&lev_1000_mb=on&lev_0-0.1_m_below_ground=on&lev_0.1-0.4_m_below_ground=on&lev_surface=on&" + \
-                "lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_80_m_above_ground=on&lev_100_m_above_ground=on&lev_mean_sea_level=on" + \
-                "&lev_3000-0_m_above_ground=on&lev_6000-0_m_above_ground=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&" + \
-                "lev_low_cloud_layer=on&lev_middle_cloud_layer=on&lev_high_cloud_layer=on&lev_low_cloud_bottom_level=on&lev_middle_cloud_bottom_level=on" + \
-                "&lev_high_cloud_bottom_level=on&lev_low_cloud_top_level=on&lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_low_cloud_top_level=on&" + \
-                "lev_middle_cloud_top_level=on&lev_high_cloud_top_level=on&lev_convective_cloud_layer=on&lev_boundary_layer_cloud_layer=on&lev_top_of_atmosphere=on&" + \
-                "lev_tropopause=on&lev_max_wind=on&lev_highest_tropospheric_freezing_level=on&all_var=on&" + \
-                "leftlon=0&rightlon=360&toplat=90&bottomlat=0&", \
-      "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?" +\
-                "all_lev=on&var_ABSV=on&var_ACPCP=on&var_ALBDO=on&var_APCP=on&var_BRTMP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&"+ \
-                "var_CICEP=on&var_CIN=on&var_CPRAT=on&var_CRAIN=on&var_CSDSF=on&var_CSNOW=on&var_DPT=on&var_DZDT=on&var_EVP=on&"+ \
-                "var_GUST=on&var_HGT=on&var_HLCY=on&var_HPBL=on&var_ICEC=on&var_LAND=on&var_POT=on&var_PRES=on&var_PWAT=on&var_RH=on&" + \
-                "var_SMDRY=on&var_SMREF=on&var_PRMSL=on&var_SNFALB=on&var_SNMR=on&var_SNOD=on&var_SNOM=on&var_SNOWC=on&var_SOILL=on&var_SOILM=on&"+ \
-                "var_SOILW=on&var_SOTYP=on&var_TCDC=on&var_TMIN=on&var_TMP=on&var_TSOIL=on&var_UFLX=on&var_UGRD=on&var_VEG=on&var_VGRD=on&"+ \
-                "var_VIS=on&var_VSTM=on&var_VVEL=on&var_VWSH=on&var_WILT=on&var_WTMP=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&" \
+      'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?lev_0C_isotherm=on&lev_1000_mb=on&lev_10_m_above_ground=on" + \
+                "&lev_2_m_above_ground=on&lev_850_mb=on&lev_cloud_base=on" + \
+                # "&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on" + \
+                # "&lev_convective_cloud_top_level=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on" + \
+                # "&lev_shallow_convective_cloud_bottom_level=on&lev_shallow_convective_cloud_top_level=on&lev_convective_cloud_bottom_level=on" + \
+                "&lev_max_wind=on&lev_mean_sea_level=on" + \
+                "&lev_surface=on&var_ABSV=on" + \
+                "&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on" + \
+                "&var_MSLET=on&var_NCPCP=on&var_REFC=on&var_RH=on&var_SNOWC=on&var_TMP=on&var_TSOIL=on&var_UGRD=on&var_VGRD=on&var_VVEL=on" + \
+                "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90", \
+
+      'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
+                "&lev_500_mb=on&lev_700_mb=on" + \
+                "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
+                "&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
+                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
+
+      "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_150_mb=on&lev_200_mb=on&lev_250_mb=on&lev_2_hybrid_level=on" + \
+                "&lev_2_m_above_ground=on&lev_500-1000_mb=on&lev_500_mb=on&lev_650_mb=on&lev_700_mb=on&lev_725_mb=on&lev_750_mb=on&lev_925_mb=on&lev_950_mb=on&lev_975_mb=on" + \
+                "&lev_cloud_base=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_max_wind=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on" + \
+                "&lev_surface=on&lev_850_mb=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on" + \
+                "&var_DZDT=on&var_EVP=on&var_GUST=on&var_HGT=on&var_ICEC=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_REFC=on&var_RH=on&var_TMAX=on" + \
+                "&var_TMIN=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
     }
     
     # Full path of data directory.
@@ -91,8 +90,8 @@ class Constants:
 
     self.modelTimes = {
      'ruc': '00,01,02,03,04,05,06,07,08,09,10,11,12', \
-     'gfs': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,' + \
-            '81,84,87,90,93,96,99,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,'+ \
+     'gfs': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,' + \
+            '081,084,087,090,093,096,099,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,'+ \
             '150,153,156,159,162,165,168,171,174,177,180,183,186,189,192,204,216,228,240,252,264,276,' + \
             '288,300,312,324,336,348,360,372,384', \
      'nam': '00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84', \
@@ -187,8 +186,8 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015021618/" # TEST
-    #latestRunDir  = "nam.20150216/" # TEST
+    #latestRunDir  = "gfs.2015021918/" # TEST
+    #latestRunDir  = "nam.20150218/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -216,7 +215,7 @@ class Constants:
       else:
         runFileList.append(file)
 
-    # latestHour = "18" # TEST for NAM and NAM4km
+    #latestHour = "18" # TEST for NAM and NAM4km
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:
@@ -228,6 +227,9 @@ class Constants:
       runFileList = self.filterGFSFiles(runFileList)
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
+
+    
+    #runFileList = runFileList[2:3] # test!
 
     return (latestRunDir[:-1],runFileList)
 
@@ -353,11 +355,6 @@ class Constants:
     for idx, fileName in enumerate(fileList):
       forecastHour = int(fileName.split('.')[4][1:4])
 
-      # TESTING...
-      # print idx
-      # print forecastHour
-      # if forecastHour in [222,348,198]:
-      #   fileListCopy.append(fileName)
       if forecastHour <= 120:
         fileListCopy.append(fileName)
 
