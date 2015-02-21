@@ -36,7 +36,7 @@ class Constants:
 
     self.expectedNumberOfFiles = {
       "nam": 28,
-      "nam4km" : 1,#44,
+      "nam4km" : 44,
       "gfs" : 65 # [BANDAID FIX] Actually 73 but if we begin d/l when 65 are complete, the rest should complete by the time script finishes
     }
 
@@ -188,7 +188,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015021918/" # TEST
-    latestRunDir  = "nam.20150219/" # TEST
+    #latestRunDir  = "nam.20150219/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -216,7 +216,7 @@ class Constants:
       else:
         runFileList.append(file)
 
-    latestHour = "18" # TEST for NAM and NAM4km
+    #latestHour = "18" # TEST for NAM and NAM4km
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:
@@ -230,7 +230,7 @@ class Constants:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
     
-    runFileList = runFileList[2:3] # test!
+    #runFileList = runFileList[2:3] # test!
 
     return (latestRunDir[:-1],runFileList)
 
