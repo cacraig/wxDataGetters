@@ -45,7 +45,7 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/comp/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/comp/${variable}
  
- # set shortTime = ${TIME}
+ set shortTime = ${TIME}
 
  # if (${model} == "nam12km") then
  #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
