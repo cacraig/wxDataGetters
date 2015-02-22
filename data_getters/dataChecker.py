@@ -58,7 +58,7 @@ def resetHourKeys(constants, model):
     self.redisConn.set(model + '-' + hour, "0")
   return
 
-def hasNewData(self, constants, model):
+def hasNewData(constants, model):
   for model,http in constants.modelGems.items():
     if not http:
       return False
