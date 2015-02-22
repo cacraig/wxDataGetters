@@ -22,7 +22,7 @@ def main():
   redisConn = redis.Redis(constants.redisHost)
   beanstalkdConn = beanstalkc.Connection(host=constants.beanstalkdHost, port=11300)
 
-  resetHourKeys(constants, model)
+  resetHourKeys(constants, model, redisConn)
 
   while True:
     constants = Constants(model)
@@ -34,7 +34,7 @@ def main():
       redisConn.set(model, "0")
 
     if currentlyProcessing != "1":
-      if hasNewData(constants, model):
+      if hasNewData(constants, model, redisConn):
         # Run has been updated. Put into queue.
         print "Putting into Queue..."
         # Set Currently processing 
@@ -52,13 +52,13 @@ def main():
 
   return
 
-def resetHourKeys(constants, model):
+def resetHourKeys(constants, model, redisConn):
   hourKeys = constants.getDefaultHoursByModel(model)
   for hour in hourKeys:
-    self.redisConn.set(model + '-' + hour, "0")
+    redisConn.set(model + '-' + hour, "0")
   return
 
-def hasNewData(constants, model):
+def hasNewData(constants, model, redisConn):
   for model,http in constants.modelGems.items():
     if not http:
       return False
