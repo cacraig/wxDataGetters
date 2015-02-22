@@ -16,12 +16,6 @@ class Gempak:
     prevWd = os.getcwd()
     os.chdir("scripts")
     for key,http in self.constants.modelGems.items():
-      
-      # Flag all forecast hours as processed.
-      if self.DEBUG == False:
-        for fHour in self.constants.modelTimes[key]:
-          self.redisConn.set(key + '-' + fHour, "1")
-
       if key in self.constants.runTimes:
         if 'files' in http and key != "gfs" and key != "nam":
           for file in glob.glob("gempak/hres/*.sh"):
@@ -37,6 +31,11 @@ class Gempak:
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             print cmd
             self.runCmd(cmd)
+      # Flag all forecast hours as processed.
+      if self.DEBUG == False:
+        for fHour in self.constants.modelTimes[key]:
+          self.redisConn.set(key + '-' + fHour, "1")
+
     os.chdir(prevWd)
     return
 

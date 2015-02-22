@@ -38,7 +38,7 @@ class GemData:
     os.chdir(self.constants.dataDirEnv)
 
     for key,http in self.constants.modelGems.items():
-      
+
       # If it is empty for any reason, skip!
       if not http:
         del self.constants.runTimes[key]
@@ -51,13 +51,11 @@ class GemData:
             print "Resetting Hour Keys for Mode ->" + key
             self.resetHourKeys(key)
 
-
-      if(self.DEBUG == False):
-        lastCompletedRun = self.redisConn.get(key + "-complete")
-        if self.constants.runTimes[key] == lastCompletedRun:
-          del self.constants.runTimes[key]
-          print "Skipping: " + key + "... Model not updated."
-          continue
+        # lastCompletedRun = self.redisConn.get(key + "-complete")
+        # if self.constants.runTimes[key] == lastCompletedRun:
+        #   del self.constants.runTimes[key]
+        #   print "Skipping: " + key + "... Model not updated."
+        #   continue
 
       if 'files' in http:
         # download all files in http['files'].
@@ -129,8 +127,8 @@ class GemData:
     return
 
   def setRunCompletionFlag(self, model):
-    if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
-      self.redisConn.set(key + '-complete', self.constants.runTimes[key])
+    if str(self.constants.lastForecastHour[model]) in self.constants.modelTimes[model]:
+      #self.redisConn.set(key + '-complete', self.constants.runTimes[key])
       self.complete = True
     return
   

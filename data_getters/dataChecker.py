@@ -23,6 +23,7 @@ def main():
   beanstalkdConn = beanstalkc.Connection(host=constants.beanstalkdHost, port=11300)
 
   resetHourKeys(constants, model, redisConn)
+  redisConn.set(model + '-complete', constants.runTimes[model])
 
   while True:
     constants = Constants(model)

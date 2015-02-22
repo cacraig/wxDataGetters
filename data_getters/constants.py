@@ -254,7 +254,7 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015021918/" # TEST
+    #latestRunDir  = "gfs.2015022118/" # TEST
     #latestRunDir  = "nam.20150219/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
@@ -296,7 +296,8 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[2:4] # test!
+    #runFileList = runFileList[-1] # test!
+    print "Length of currently updated files: " + str(len(runFileList))
 
     return (latestRunDir[:-1],runFileList)
 
@@ -391,6 +392,8 @@ class Constants:
     # A list of all Download urls.
     dataDict['files'] = runDict
 
+    print dataDict
+
     return dataDict
 
   def isHighRes(self, model):
@@ -422,16 +425,19 @@ class Constants:
     for idx, fileName in enumerate(fileList):
       forecastHour = int(fileName.split('.')[4][1:4])
 
-      if forecastHour <= 120:
+      if forecastHour == 384:
         fileListCopy.append(fileName)
 
-      elif forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
-        # Remove file from list.
-        fileListCopy.append(fileName)
+      # if forecastHour <= 120:
+      #   fileListCopy.append(fileName)
 
-      elif forecastHour > 240 and (forecastHour % 12) == 0:
-        # Remove file from list.
-        fileListCopy.append(fileName)
+      # elif forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
+      #   # Remove file from list.
+      #   fileListCopy.append(fileName)
+
+      # elif forecastHour > 240 and (forecastHour % 12) == 0:
+      #   # Remove file from list.
+      #   fileListCopy.append(fileName)
 
     return fileListCopy
 
