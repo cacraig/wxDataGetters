@@ -7,13 +7,21 @@ from subprocess import call
 class Gempak:
 
   def __init__(self, dataGetter):
-    self.constants = dataGetter.constants 
+    self.constants = dataGetter.constants
+    self.redisConn = dataGetter.redisConn
+    self.DEBUG = dataGetter.DEBUG
     return
 
   def runGempakScripts(self):
     prevWd = os.getcwd()
     os.chdir("scripts")
     for key,http in self.constants.modelGems.items():
+      
+      # Flag all forecast hours as processed.
+      if self.DEBUG == False:
+        for fHour in self.constants.modelTimes[key]:
+          self.redisConn.set(key + '-' + fHour, "1")
+
       if key in self.constants.runTimes:
         if 'files' in http and key != "gfs" and key != "nam":
           for file in glob.glob("gempak/hres/*.sh"):

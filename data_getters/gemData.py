@@ -81,9 +81,6 @@ class GemData:
           else:
             self.constants.modelTimes[key].append(fHour)
 
-          if(self.DEBUG == False):
-            self.redisConn.set(key + '-' + fHour, "1")
-
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         if(self.DEBUG == False):
           self.updateModelTimes(key, self.constants.runTimes[key])
