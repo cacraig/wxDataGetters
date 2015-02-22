@@ -276,7 +276,7 @@ class GemData:
   # Insert/update our current model run times.
   def updateModelTimes(self, model, time):
     # If the current run = run being processed...skip
-    if self.dbRunTimes[key] == time:
+    if self.dbRunTimes[model] == time:
       return
 
     try:
