@@ -76,7 +76,7 @@ class GemData:
           fHour = self.getForecastHour(key, file, True)
 
           if(self.DEBUG == False):
-            if self.redisConn.get(key + '-' + fHour) != "1"
+            if self.redisConn.get(key + '-' + fHour) != "1":
               self.constants.modelTimes[key].append(fHour)
           else:
             self.constants.modelTimes[key].append(fHour)
