@@ -51,11 +51,11 @@ class GemData:
             print "Resetting Hour Keys for Mode ->" + key
             self.resetHourKeys(key)
 
-        # lastCompletedRun = self.redisConn.get(key + "-complete")
-        # if self.constants.runTimes[key] == lastCompletedRun:
-        #   del self.constants.runTimes[key]
-        #   print "Skipping: " + key + "... Model not updated."
-        #   continue
+          lastCompletedRun = self.redisConn.get(key + "-complete")
+          if self.constants.runTimes[key] == lastCompletedRun:
+            del self.constants.runTimes[key]
+            print "Skipping: " + key + "... Model not updated."
+            continue
 
       if 'files' in http:
         # download all files in http['files'].
