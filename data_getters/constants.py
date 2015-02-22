@@ -296,7 +296,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    runFileList = runFileList[2:4] # test!
+    #runFileList = runFileList[2:4] # test!
 
     return (latestRunDir[:-1],runFileList)
 
