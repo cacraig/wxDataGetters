@@ -128,7 +128,7 @@ class GemData:
 
   def setRunCompletionFlag(self, model):
     if str(self.constants.lastForecastHour[model]) in self.constants.modelTimes[model]:
-      #self.redisConn.set(key + '-complete', self.constants.runTimes[key])
+      self.redisConn.set(key + '-complete', self.constants.runTimes[key])
       self.complete = True
     return
   
