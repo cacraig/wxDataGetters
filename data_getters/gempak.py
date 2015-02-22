@@ -19,14 +19,14 @@ class Gempak:
           for file in glob.glob("gempak/hres/*.sh"):
             print "Executing HiRes gempak scripts."
             # Customized Gempak scripts for High resolution data in scripts/gempak/hres
-            cmd = "tcsh "+ file + " " + key + " " + self.constants.modelTimes[key] + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             self.runCmd(cmd)
             print cmd
         else:
           print "Executing Non-HiRes gempak scripts."
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts
-            cmd = "tcsh "+ file + " " + key + " " + self.constants.modelTimes[key] + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             print cmd
             self.runCmd(cmd)
     os.chdir(prevWd)

@@ -19,8 +19,9 @@ class GemData:
     self.cursor = self.conn.cursor()
     self.dbRunTimes = self.getCurrentRuns()
     self.redisConn = redis.Redis(self.constants.redisHost)
-    self.updated = False
+    self.updated = True
     self.DEBUG = debug
+    self.complete = False
 
     # If DEBUG is True, clear all model times so they aren't skipped.
     if self.DEBUG:
@@ -44,8 +45,15 @@ class GemData:
         print "Skipping: " + key + "... Model not updated."
         continue
 
-      if key in self.dbRunTimes:
-        if self.constants.runTimes[key] == self.dbRunTimes[key]:
+      # if key in self.dbRunTimes:
+      #   if self.constants.runTimes[key] == self.dbRunTimes[key]:
+      #     del self.constants.runTimes[key]
+      #     print "Skipping: " + key + "... Model not updated."
+      #     continue
+
+      if(self.DEBUG == False):
+        lastCompletedRun = self.redisConn.get(key + "-complete")
+        if self.constants.runTimes[key] == lastCompletedRun:
           del self.constants.runTimes[key]
           print "Skipping: " + key + "... Model not updated."
           continue
@@ -62,14 +70,18 @@ class GemData:
           print "downloading " + savePath  + file
           self.saveFile(savePath, url, file, key)
           self.processGrib2(key, savePath, file)
+          # Append forecast hour to times to be processed... No prefixes also.
+          self.constants.modelTimes[key].append(self.getForecastHour(key, file, True))
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         if(self.DEBUG == False):
           self.updateModelTimes(key, self.constants.runTimes[key])
+          self.setRunCompletionFlag(key)
 
-        self.updated = True
+        #self.updated = True
       else:
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+        self.constants.setDefaultHours()
         
         try:
           print "Saving: " + http['url'] + " to " + savePath + http['file']
@@ -97,6 +109,15 @@ class GemData:
 
   def isUpdated(self):
     return self.updated
+
+  def isComplete(self):
+    return self.complete
+
+  def setRunCompletionFlag(self, model):
+    if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
+      self.redisConn.set(key + '-complete', self.constants.runTimes[key])
+      self.complete = True
+    return
   
   # Convert grib2 files into gem files.
   def processGrib2(self, model, savePath, fileName):
@@ -114,18 +135,22 @@ class GemData:
     self.runCmd(cmd)
     return
 
-  def getForecastHour(self, model, fileName):
+  def getForecastHour(self, model, fileName, noPrefix = False):
     forecastHour = ""
+    prefix = "f"
+
+    if noPrefix:
+      prefix = ""
 
     if model == 'gfs':
       # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
-      forecastHour = "f" + fileName.split('.')[4][1:4]
+      forecastHour = prefix + fileName.split('.')[4][1:4]
     elif model == 'nam':
       # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
-      forecastHour = "f0" + fileName.split('.')[2][6:8]
+      forecastHour = prefix + "0" + fileName.split('.')[2][6:8]
     elif model == 'nam4km':
       # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
-      forecastHour = "f0" + fileName.split('.')[3][6:8]
+      forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
 
     return forecastHour
 
@@ -210,7 +235,7 @@ class GemData:
     self.runCmd("git add src/assets")
 
   def transferFilesToProd(self, model = None):
-    # scp -r /var/www/ngwips/client/dist/src/assets ubuntu@54.186.9.28:/var/www/ngwips/client/dist/src
+
     if model is None:
       self.runCmd("rsync -vPr " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
     else:
@@ -232,9 +257,13 @@ class GemData:
 
   # Insert/update our current model run times.
   def updateModelTimes(self, model, time):
+    # If the current run = run being processed...skip
+    if self.dbRunTimes[key] == time:
+      return
+
     try:
-      self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET current_run ='" + time + "' WHERE name='" + model+"'")
+      # self.cursor.execute("SELECT * from model where name='" + model + "'")
+      self.cursor.execute("UPDATE model SET current_run ='" + time + "' previous_run= '" + self.dbRunTimes[key] + "' WHERE name='" + model+"'")
     except Exception, e:
       print e.pgerror
 

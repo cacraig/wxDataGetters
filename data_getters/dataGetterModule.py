@@ -15,7 +15,9 @@ class DataGetter:
     gempak = Gempak(dataGetter)
     gempak.runGempakScripts()
     if dataGetter.isUpdated():
-      # Scrub only model dir used....
-      dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + self.model)
+      # Scrub only model dir used. Only if run is complete.
+      if dataGetter.isCompleted():
+        dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + self.model)
+
       dataGetter.transferFilesToProd(self.model)
     return
