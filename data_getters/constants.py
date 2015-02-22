@@ -435,4 +435,23 @@ class Constants:
 
     return fileListCopy
 
+  def getForecastHour(self, model, fileName, noPrefix = False):
+    forecastHour = ""
+    prefix = "f"
+
+    if noPrefix:
+      prefix = ""
+
+    if model == 'gfs':
+      # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
+      forecastHour = prefix + fileName.split('.')[4][1:4]
+    elif model == 'nam':
+      # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
+      forecastHour = prefix + "0" + fileName.split('.')[2][6:8]
+    elif model == 'nam4km':
+      # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
+      forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
+
+    return forecastHour
+
 

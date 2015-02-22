@@ -73,7 +73,7 @@ class GemData:
           self.processGrib2(key, savePath, file)
 
           # Append forecast hour to times to be processed... No prefixes also.
-          fHour = self.getForecastHour(key, file, True)
+          fHour = self.constants.getForecastHour(key, file, True)
 
           if(self.DEBUG == False):
             if self.redisConn.get(key + '-' + fHour) != "1":
@@ -151,28 +151,28 @@ class GemData:
       return
     self.runCmd(cmd)
     return
+  
+  # def getForecastHour(self, model, fileName, noPrefix = False):
+  #   forecastHour = ""
+  #   prefix = "f"
 
-  def getForecastHour(self, model, fileName, noPrefix = False):
-    forecastHour = ""
-    prefix = "f"
+  #   if noPrefix:
+  #     prefix = ""
 
-    if noPrefix:
-      prefix = ""
+  #   if model == 'gfs':
+  #     # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
+  #     forecastHour = prefix + fileName.split('.')[4][1:4]
+  #   elif model == 'nam':
+  #     # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
+  #     forecastHour = prefix + "0" + fileName.split('.')[2][6:8]
+  #   elif model == 'nam4km':
+  #     # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
+  #     forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
 
-    if model == 'gfs':
-      # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
-      forecastHour = prefix + fileName.split('.')[4][1:4]
-    elif model == 'nam':
-      # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
-      forecastHour = prefix + "0" + fileName.split('.')[2][6:8]
-    elif model == 'nam4km':
-      # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
-      forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
-
-    return forecastHour
+  #   return forecastHour
 
   def getGemFileName(self, model, savePath, fileName):
-      forecastHour = self.getForecastHour(model,fileName)
+      forecastHour = self.constants.getForecastHour(model,fileName)
 
       currentRun = self.constants.runTimes[model]
 
