@@ -28,11 +28,12 @@ def main():
   while True:
     constants = Constants(model)
     currentlyProcessing = redisConn.get(model)
-    print "Currently Processing: " + currentlyProcessing
 
     # If key is not set in Redis... Set it.
     if currentlyProcessing is None:
       redisConn.set(model, "0")
+      
+    print "Currently Processing: " + currentlyProcessing
 
     if currentlyProcessing != "1":
       # If it has new hourly data, or it is a new run altogether. Put it in the Queue.
