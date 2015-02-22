@@ -87,6 +87,7 @@ class GemData:
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         if(self.DEBUG == False):
           self.updateModelTimes(key, self.constants.runTimes[key])
+          print "SETTING COMPLETION FLAG  " + key + "-complete" 
           self.setRunCompletionFlag(key)
 
         #self.updated = True
