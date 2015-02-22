@@ -281,7 +281,7 @@ class GemData:
 
     try:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET current_run ='" + time + "' previous_run= '" + self.dbRunTimes[key] + "' WHERE name='" + model+"'")
+      self.cursor.execute("UPDATE model SET current_run ='" + time + "' previous_run= '" + self.dbRunTimes[model] + "' WHERE name='" + model+"'")
     except Exception, e:
       print e.pgerror
 
