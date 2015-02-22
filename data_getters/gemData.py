@@ -45,11 +45,12 @@ class GemData:
         print "Skipping: " + key + "... Model not updated."
         continue
 
-      # if key in self.dbRunTimes:
-      #   if self.constants.runTimes[key] == self.dbRunTimes[key]:
-      #     del self.constants.runTimes[key]
-      #     print "Skipping: " + key + "... Model not updated."
-      #     continue
+      if(self.DEBUG == False):
+        if key in self.dbRunTimes:
+          if self.constants.runTimes[key] != self.dbRunTimes[key]:
+            print "Resetting Hour Keys for Mode ->" + key
+            self.resetHourKeys(key)
+
 
       if(self.DEBUG == False):
         lastCompletedRun = self.redisConn.get(key + "-complete")
@@ -70,8 +71,18 @@ class GemData:
           print "downloading " + savePath  + file
           self.saveFile(savePath, url, file, key)
           self.processGrib2(key, savePath, file)
+
           # Append forecast hour to times to be processed... No prefixes also.
-          self.constants.modelTimes[key].append(self.getForecastHour(key, file, True))
+          fHour = self.getForecastHour(key, file, True)
+
+          if(self.DEBUG == False):
+            if self.redisConn.get(key + '-' + fHour) != "1"
+              self.constants.modelTimes[key].append(fHour)
+          else:
+            self.constants.modelTimes[key].append(fHour)
+
+          if(self.DEBUG == False):
+            self.redisConn.set(key + '-' + fHour, "1")
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         if(self.DEBUG == False):
@@ -79,24 +90,24 @@ class GemData:
           self.setRunCompletionFlag(key)
 
         #self.updated = True
-      else:
-        savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-        self.constants.setDefaultHours()
+      # else:
+      #   savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+      #   self.constants.setDefaultHours()
         
-        try:
-          print "Saving: " + http['url'] + " to " + savePath + http['file']
-          gemFile = urllib2.urlopen(http['url']).read()
-          #fp = open(savePath + self.constants.runTimes[key] + ".gem", 'w')
-          fp = open(savePath + key + ".gem", 'w') # save as model.gem
-          fp.write(gemFile)
-          fp.close()
-          # After data has been sucessfully retrieved, and no errors thrown update model run time.
-          self.updateModelTimes(key, self.constants.runTimes[key])
-          self.updated = True
-        except Exception, e:
-          print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
-          print " with exception %s" % e
-          pass
+      #   try:
+      #     print "Saving: " + http['url'] + " to " + savePath + http['file']
+      #     gemFile = urllib2.urlopen(http['url']).read()
+      #     #fp = open(savePath + self.constants.runTimes[key] + ".gem", 'w')
+      #     fp = open(savePath + key + ".gem", 'w') # save as model.gem
+      #     fp.write(gemFile)
+      #     fp.close()
+      #     # After data has been sucessfully retrieved, and no errors thrown update model run time.
+      #     self.updateModelTimes(key, self.constants.runTimes[key])
+      #     self.updated = True
+      #   except Exception, e:
+      #     print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
+      #     print " with exception %s" % e
+      #     pass
 
       # END FOR Set model's redis key to not processing.
       if(self.DEBUG == False):
@@ -112,6 +123,12 @@ class GemData:
 
   def isComplete(self):
     return self.complete
+
+  def resetHourKeys(self, model):
+    hourKeys = self.constants.getDefaultHoursByModel(model)
+    for hour in hourKeys:
+      self.redisConn.set(model + '-' + hour, "0")
+    return
 
   def setRunCompletionFlag(self, model):
     if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
