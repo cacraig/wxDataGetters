@@ -392,7 +392,7 @@ class Constants:
     # A list of all Download urls.
     dataDict['files'] = runDict
 
-    print dataDict
+    print files
 
     return dataDict
 
@@ -425,19 +425,19 @@ class Constants:
     for idx, fileName in enumerate(fileList):
       forecastHour = int(fileName.split('.')[4][1:4])
 
-      if forecastHour == 384:
+      # if forecastHour == 384:
+      #   fileListCopy.append(fileName)
+
+      if forecastHour <= 120:
         fileListCopy.append(fileName)
 
-      # if forecastHour <= 120:
-      #   fileListCopy.append(fileName)
+      elif forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
+        # Remove file from list.
+        fileListCopy.append(fileName)
 
-      # elif forecastHour > 120 and forecastHour <=240 and (forecastHour % 6) == 0:
-      #   # Remove file from list.
-      #   fileListCopy.append(fileName)
-
-      # elif forecastHour > 240 and (forecastHour % 12) == 0:
-      #   # Remove file from list.
-      #   fileListCopy.append(fileName)
+      elif forecastHour > 240 and (forecastHour % 12) == 0:
+        # Remove file from list.
+        fileListCopy.append(fileName)
 
     return fileListCopy
 
