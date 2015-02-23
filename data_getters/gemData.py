@@ -127,9 +127,18 @@ class GemData:
     return
 
   def setRunCompletionFlag(self, model):
+
+    f = open('/home/vagrant/logs/output.log','w')
+    f.write('Trying: ' + model + '-complete')
+    for item in self.constants.modelTimes[model]:
+      f.write("Hour: " + item)
+
     if str(self.constants.lastForecastHour[model]) in self.constants.modelTimes[model]:
-      self.redisConn.set(key + '-complete', self.constants.runTimes[key])
+      self.redisConn.set(model + '-complete', self.constants.runTimes[model])
       self.complete = True
+      f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.constants.runTimes[model])
+
+    f.close() # you can omit in most cases as the destructor will call if
     return
   
   # Convert grib2 files into gem files.
