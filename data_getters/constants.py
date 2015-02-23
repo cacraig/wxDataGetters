@@ -69,7 +69,7 @@ class Constants:
     self.highResScriptUrls = {
       'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?lev_0C_isotherm=on&lev_1000_mb=on&lev_10_m_above_ground=on" + \
                 "&lev_2_m_above_ground=on&lev_850_mb=on&lev_cloud_base=on" + \
-                #"&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on" + \
+                "&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on" + \
                 # "&lev_convective_cloud_top_level=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on" + \
                 # "&lev_shallow_convective_cloud_bottom_level=on&lev_shallow_convective_cloud_top_level=on&lev_convective_cloud_bottom_level=on" + \
                 "&lev_max_wind=on&lev_mean_sea_level=on" + \
@@ -255,7 +255,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015022118/" # TEST
-    #latestRunDir  = "nam.20150219/" # TEST
+    #latestRunDir  = "nam.20150220/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -296,7 +296,8 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[-1] # test!
+    #runFileList = [runFileList[-1]] # test!
+
     print "Length of currently updated files: " + str(len(runFileList))
 
     return (latestRunDir[:-1],runFileList)
