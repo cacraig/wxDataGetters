@@ -41,9 +41,9 @@ class Constants:
     }
 
     self.lastForecastHour = {
-      "nam": 84,
-      "nam4km": 60,
-      "gfs": 384
+      "nam": "084",
+      "nam4km": "060",
+      "gfs": "384"
 
     }
 

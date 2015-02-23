@@ -133,7 +133,7 @@ class GemData:
     for item in self.constants.modelTimes[model]:
       f.write("Hour: " + item)
 
-    if str(self.constants.lastForecastHour[model]) in self.constants.modelTimes[model]:
+    if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
       self.redisConn.set(model + '-complete', self.constants.runTimes[model])
       self.complete = True
       f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.constants.runTimes[model])
