@@ -106,8 +106,8 @@ class GemData:
       #     pass
 
       # END FOR Set model's redis key to not processing.
-      if(self.DEBUG == False):
-        self.redisConn.set(key, "0")
+      # if(self.DEBUG == False):
+      #   self.redisConn.set(key, "0")
 
     # Jump back to present WD
     os.chdir(currentDir)
