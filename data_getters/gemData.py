@@ -50,7 +50,6 @@ class GemData:
           if self.constants.runTimes[key] != self.dbRunTimes[key]:
             print "Resetting Hour Keys for Mode ->" + key
             self.resetHourKeys(key)
-
           lastCompletedRun = self.redisConn.get(key + "-complete")
           if self.constants.runTimes[key] == lastCompletedRun:
             del self.constants.runTimes[key]

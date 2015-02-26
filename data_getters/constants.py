@@ -284,7 +284,7 @@ class Constants:
       else:
         runFileList.append(file)
 
-    latestHour = "00" # TEST for NAM and NAM4km
+    # latestHour = "00" # TEST for NAM and NAM4km
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:
