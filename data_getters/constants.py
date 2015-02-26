@@ -72,6 +72,7 @@ class Constants:
                 "&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on" + \
                 # "&lev_convective_cloud_top_level=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on" + \
                 # "&lev_shallow_convective_cloud_bottom_level=on&lev_shallow_convective_cloud_top_level=on&lev_convective_cloud_bottom_level=on" + \
+                "&lev_30-0_mb_above_ground=on" + \
                 "&lev_max_wind=on&lev_mean_sea_level=on" + \
                 "&lev_surface=on&var_ABSV=on" + \
                 "&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on" + \
@@ -255,7 +256,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015022118/" # TEST
-    #latestRunDir  = "nam.20150220/" # TEST
+    #latestRunDir  = "nam.20150226/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -283,7 +284,7 @@ class Constants:
       else:
         runFileList.append(file)
 
-    #latestHour = "18" # TEST for NAM and NAM4km
+    latestHour = "00" # TEST for NAM and NAM4km
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:

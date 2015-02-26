@@ -47,6 +47,59 @@ foreach TIME ($times:q)
  
  set shortTime = ${TIME}
 
+
+gddiag << EOFD
+glevel = 2
+garea = 
+gvcord = hght
+gdattim = "f${TIME}"
+gdfile = "${MODEL_PATH}/${model}/${gdFile}"
+gdoutf = "${MODEL_PATH}/${model}/${gdFile}"
+gpack = none
+!
+gfunc = sgt(tmpk,273)
+GRDNAM = rain1@0%none
+r
+
+gfunc = sgt(tmpk@30:0%pdly,273)
+grdnam = rain2@0%none
+r
+
+glevel = 0
+gvcord = none
+gfunc = mask(rain1,rain2)
+grdnam = rain@0%none
+r
+
+glevel = 2
+gvcord = hght
+gfunc = sle(tmpk,276)
+grdnam = snow1@0%none
+r
+
+gfunc = sle(tmpk@30:0%pdly,273)
+grdnam = snow2@0%none
+r
+
+glevel = 0
+gvcord = none
+gfunc = mask(snow1,snow2)
+grdnam = snow
+r
+
+glevel = 2
+gvcord = hght
+gfunc = sle(tmpk,273)
+grdnam = frzn1@0%none
+r
+
+gfunc = mask(frzn1@0%none,rain2@0%none)
+grdnam = frzn@0%none
+r
+
+e
+EOFD
+
  # if (${model} == "nam12km") then
  #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  # endif 
@@ -64,44 +117,62 @@ foreach TIME ($times:q)
       set regionName = "CONUS"
     endif
 
-gdplot2_gf << EOF 
-         
-  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
-  GDATTIM  = "f${TIME}"
-  GLEVEL = 0
-  GVCORD = NONE
-  PANEL  = 0                                                                       
-  SKIP   = 0
-  SCALE  = 0
-  GDPFUN = REFC
-  TYPE   = f
-  CONTUR = 0                                         
-  HILO   =                                                                          
-  HLSYM  =      
-  FINT   = 5;10;15;20;25;30;35;40;45;50;55;60;65;70;75;80
-  FLINE  = 0;26;24;4;21;22;23;20;18;17;15;14;28;29;7;31                                   
-  WIND   = 
-  REFVEC =                                                                                                                                   
-  CLEAR  = yes                                                                     
-  STNPLT =                                                                         
-  SATFIL =                                                                         
-  RADFIL = 
-  TITLE  =                                                                        
-  STREAM =        
+
+gdcntr_gf << EOF
+  device   = "gif|${imgDir}/${regionName}_f${shortTime}.gif|1280;1024| C"
+  gdfile   = "${MODEL_PATH}/${model}/${gdFile}"
+  map      = 1
+  clear    = y
+  gdattim  = "f${TIME}"
+  text     = 
+  TITLE    = 
+  GLEVEL   = 0
+  GVCORD   = none
+  CTYPE    = F
+  PANEL    = 0
+  SKIP     = 0
+  SCALE    = 0
+  CONTUR   = 0
+  HILO     =
+  LATLON   = 0
+  STNPLT   =
+  SATFIL   =
+  RADFIL   =
+  LUTFIL   =
+  STREAM   =
+
   GAREA  = ${REGION}
-  PROJ   = ${proj}                                                                   
-  POSN   =                                                                         
-  COLORS = 1 
-  MAP    = 1                                                                      
-  MARKER =                                                                        
-  GRDLBL =   
-  CLRBAR = 1                                                                     
-  LUTFIL = none
-  FILTER = yes
-  DEVICE = "gif|${imgDir}/${regionName}_f${shortTime}.gif|1280;1024| C"
-  run
- exit
+  PROJ   = ${proj} 
+   
+  POSN     = 0
+  COLORS   = 1
+  MARKER   = 0
+  GRDLBL   = 0
+  FILTER   = YES
+
+  GFUNC    = mask(refc,rain^f${TIME})
+  FINT   = 5;10;15;20;25;30;35;40;45;50;55;60;65;70;75;80
+  FLINE  =  0;26;24;4;21;22;23;20;18;17;15;14;28;29;7;31
+  CLRBAR   = 1/V/LL/0.001;0.1/0.5;0.01/1|.7/1/1
+  r
+
+  GFUNC    = mask(refc,frzn^f${TIME})
+  FINT   =  5;10;15;20;25;30;35;40
+  FLINE  =  0;11;11;12;13;14;15;16;16
+  CLRBAR   = 1/V/LL/0.025;0.1/0.5;0.01/1|.7/1/1
+  clear = n
+  title =
+  r
+
+  GFUNC = mask(refc,snow^f${TIME})
+  FINT   = 5;10;15;20;25;30;35;40
+  FLINE  =  0;6;6;27;26;25;24;4;4
+  CLRBAR   = 1/V/LL/0.050;0.1/0.5;0.01/1|.7/1/1
+  r
+
+  exit
 EOF
+
    # clean output buffer/gifs, and cleanup
    gpend
    rm last.nts
