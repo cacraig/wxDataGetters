@@ -121,7 +121,7 @@ EOFD
 gdcntr_gf << EOF
   device   = "gif|${imgDir}/${regionName}_f${shortTime}.gif|1280;1024| C"
   gdfile   = "${MODEL_PATH}/${model}/${gdFile}"
-  map      = 1
+  map      = 0
   clear    = y
   gdattim  = "f${TIME}"
   text     = 
