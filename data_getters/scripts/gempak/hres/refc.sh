@@ -57,11 +57,11 @@ gdfile = "${MODEL_PATH}/${model}/${gdFile}"
 gdoutf = "${MODEL_PATH}/${model}/${gdFile}"
 gpack = none
 !
-gfunc = sgt(tmpk,273)
+gfunc = sgt(tmpk,272)
 GRDNAM = rain1@0%none
 r
 
-gfunc = sgt(tmpk@30:0%pdly,273)
+gfunc = sgt(tmpk@30:0%pdly,272)
 grdnam = rain2@0%none
 r
 
@@ -89,7 +89,7 @@ r
 
 glevel = 2
 gvcord = hght
-gfunc = sle(tmpk,273)
+gfunc = sle(tmpk,273.1)
 grdnam = frzn1@0%none
 r
 
