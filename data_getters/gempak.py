@@ -1,6 +1,7 @@
 import glob
 import os
 from subprocess import call
+import concurrent.futures
 
 # This class contains execution logic for gempak scripts.
 
@@ -39,9 +40,48 @@ class Gempak:
           # Set all forecast hours processed.
           self.redisConn.set(key + '-' + fHour, "1")
 
-
-
     os.chdir(prevWd)
+    return
+
+  def doThreadedGempakScripts(self):
+    cmdList = []
+    prevWd = os.getcwd()
+    os.chdir("scripts")
+    for key,http in self.constants.modelGems.items():
+      if key in self.constants.runTimes:
+        if 'files' in http and key != "gfs" and key != "nam":
+          for file in glob.glob("gempak/hres/*.sh"):
+            print "Executing HiRes gempak scripts."
+            # Customized Gempak scripts for High resolution data in scripts/gempak/hres
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            cmdList.append(cmd)
+            #self.runCmd(cmd)
+            print cmd
+        else:
+          print "Executing Non-HiRes gempak scripts."
+          for file in glob.glob("gempak/*.sh"):
+            # Non High-Res scripts
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            print cmd
+            cmdList.append(cmd)
+            #self.runCmd(cmd)
+
+      with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        result = ''.join(executor.map(self.runCmd, cmdList))
+
+      print "Done with Threads."
+
+      # Flag all forecast hours as processed.
+      if self.DEBUG == False:
+        # Set to not processing status.
+        self.redisConn.set(key, "0")
+        for fHour in self.constants.modelTimes[key]:
+          # Set all forecast hours processed.
+          self.redisConn.set(key + '-' + fHour, "1")
+
+    return
+
+  def runGempakScriptThread(self):
     return
 
   def runCmd(self, cmd):

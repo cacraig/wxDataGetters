@@ -42,7 +42,7 @@ def main():
   # Image Generation Block.
   if args.batch:
       gempak = Gempak(dataGetter)
-      gempak.runGempakScripts()
+      gempak.doThreadedGempakScripts()
 
   # Scrub all of our model data.
   if args.clean:

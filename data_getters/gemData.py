@@ -6,6 +6,8 @@ from timeout import timeout
 import errno
 import psycopg2
 import redis
+import concurrent.futures
+
 
 # TODO: Speed up download, and require less RAM. 
 #         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
@@ -63,20 +65,22 @@ class GemData:
 
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
-        for file,url in files.items():
-          savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-          print "downloading " + savePath  + file
-          self.saveFile(savePath, url, file, key)
-          self.processGrib2(key, savePath, file)
+        self.getDataThreaded(files, key)
 
-          # Append forecast hour to times to be processed... No prefixes also.
-          fHour = self.constants.getForecastHour(key, file, True)
+        # for file,url in files.items():
+        #   savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+        #   print "downloading " + savePath  + file
+        #   self.saveFile(savePath, url, file, key)
+        #   self.processGrib2(key, savePath, file)
 
-          if(self.DEBUG == False):
-            if self.redisConn.get(key + '-' + fHour) != "1":
-              self.constants.modelTimes[key].append(fHour)
-          else:
-            self.constants.modelTimes[key].append(fHour)
+        #   # Append forecast hour to times to be processed... No prefixes also.
+        #   fHour = self.constants.getForecastHour(key, file, True)
+
+        #   if(self.DEBUG == False):
+        #     if self.redisConn.get(key + '-' + fHour) != "1":
+        #       self.constants.modelTimes[key].append(fHour)
+        #   else:
+        #     self.constants.modelTimes[key].append(fHour)
 
         # After data has been sucessfully retrieved, and no errors thrown update model run time.
         if(self.DEBUG == False):
@@ -155,25 +159,6 @@ class GemData:
       return
     self.runCmd(cmd)
     return
-  
-  # def getForecastHour(self, model, fileName, noPrefix = False):
-  #   forecastHour = ""
-  #   prefix = "f"
-
-  #   if noPrefix:
-  #     prefix = ""
-
-  #   if model == 'gfs':
-  #     # for gfs.t18z.pgrb2full.0p50.f006 -> forecastHour = "006"
-  #     forecastHour = prefix + fileName.split('.')[4][1:4]
-  #   elif model == 'nam':
-  #     # for nam.t18z.awip3281.tm00.grib2 -> forecastHour = "081"
-  #     forecastHour = prefix + "0" + fileName.split('.')[2][6:8]
-  #   elif model == 'nam4km':
-  #     # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
-  #     forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
-
-  #   return forecastHour
 
   def getGemFileName(self, model, savePath, fileName):
       forecastHour = self.constants.getForecastHour(model,fileName)
@@ -209,6 +194,61 @@ class GemData:
     fp = open(grib2File, 'w')
     fp.write(gemFile)
     fp.close()
+    return
+
+  def saveFilesThread(self, arg):
+    # (model, savePath, fileName, url)
+    model = arg[0]
+    savePath = arg[1]
+    fileName = arg[2]
+    url = arg[3]
+
+    print "downloading " + savePath  + fileName
+
+    grib2File = savePath + fileName
+
+    if model is not None:
+      gemFile = self.getGemFileName(model, savePath, fileName)
+      if os.path.isfile(gemFile):
+        print "Decoded GEM file:" + gemFile + " already exists...skipping..."
+        return ''
+
+
+    # If file exists, don't download again!
+    # if os.path.isfile(grib2File):
+    #   print "File already downloaded. Skipping..."
+    #   return
+
+    # File does not already exist, download it.
+    gemFile = urllib2.urlopen(url).read()
+    fp = open(grib2File, 'w')
+    fp.write(gemFile)
+    fp.close()
+
+    self.processGrib2(model, savePath, fileName)
+
+    return ''
+
+  def getDataThreaded(self, files, key):
+    savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+    args = []
+    for file,url in files.items():
+      grib2File = savePath + file
+      arg = (key, savePath, file, url)
+      # Append forecast hour to times to be processed... No prefixes also.
+      fHour = self.constants.getForecastHour(key, file, True)
+
+      if(self.DEBUG == False):
+        if self.redisConn.get(key + '-' + fHour) != "1":
+          self.constants.modelTimes[key].append(fHour)
+      else:
+        self.constants.modelTimes[key].append(fHour)
+      args.append(arg)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+      result = ''.join(executor.map(self.saveFilesThread, args))
+    print "Done with Threads."
+
     return
 
   '''''
@@ -290,6 +330,3 @@ class GemData:
 
     self.conn.commit()
     return
-
-
-    

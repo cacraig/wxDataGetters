@@ -13,7 +13,7 @@ class DataGetter:
     dataGetter = GemData(self.model)
     dataGetter.getData()
     gempak = Gempak(dataGetter)
-    gempak.runGempakScripts()
+    gempak.doThreadedGempakScripts()
     if dataGetter.isUpdated():
       # Scrub only model dir used. Only if run is complete.
       if dataGetter.isComplete():

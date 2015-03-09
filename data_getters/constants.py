@@ -256,7 +256,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015022118/" # TEST
-    #latestRunDir  = "nam.20150226/" # TEST
+    #latestRunDir  = "nam.20150306/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -284,7 +284,7 @@ class Constants:
       else:
         runFileList.append(file)
 
-    # latestHour = "00" # TEST for NAM and NAM4km
+    #latestHour = "00" # TEST for NAM and NAM4km
 
     # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
     if modelType is not type:
@@ -297,7 +297,8 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = [runFileList[-1]] # test!
+    #runFileList = runFileList[-10:-1] # test!
+    print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
 
