@@ -84,4 +84,7 @@ class Gempak:
 
   def runCmd(self, cmd):
     FNULL = open(os.devnull, 'w')
-    return call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
+    print "Currently executing..."
+    print cmd
+    call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
+    return ''
