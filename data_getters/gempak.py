@@ -83,4 +83,4 @@ class Gempak:
     return
 
   def runCmd(self, cmd):
-    return call(cmd, shell=True)
+    return call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
