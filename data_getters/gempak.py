@@ -1,6 +1,6 @@
 import glob
 import os
-from subprocess import call
+from subprocess import call, STDOUT
 import concurrent.futures
 
 # This class contains execution logic for gempak scripts.
@@ -83,4 +83,5 @@ class Gempak:
     return
 
   def runCmd(self, cmd):
-    return call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    FNULL = open(os.devnull, 'w')
+    return call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
