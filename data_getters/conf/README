@@ -6,3 +6,31 @@ visudo -f /etc/sudoers.d/gempak
 Add the following:
 
 user ALL=(ALL) NOPASSWD:ALL
+
+
+SETUP:  
+  
+Install Gempak. Mofify Gemenviron.profile  
+  
+# install tcsh  
+sudo apt-get install csh  
+sudo apt-get install tcsh  
+  
+  
+# Install python  
+sudo apt-get install python  
+
+# Install perl  
+sudo apt-get install perl  
+  
+#install Beautiful soup  
+sudo apt-get install python-bs4  
+  
+# install image magick  
+sudo apt-get install libmagickwand-dev  
+sudo apt-get install imagemagick  
+
+sudo apt-get install python-setuptools python-dev build-essential  
+sudo easy_install pip  
+sudo pip install --upgrade virtualenv [OPTIONAL]  
+sudo pip install futures  
