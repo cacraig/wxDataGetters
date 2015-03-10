@@ -65,6 +65,7 @@ class GemData:
 
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
+        # Get all data. Spawn multiple threads.
         self.getDataThreaded(files, key)
 
         # for file,url in files.items():

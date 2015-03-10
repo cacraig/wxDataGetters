@@ -64,10 +64,11 @@ class Gempak:
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             print cmd
             cmdList.append(cmd)
-            #self.runCmd(cmd)
+            self.runCmd(cmd)
 
-      with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        result = ''.join(executor.map(self.runCmd, cmdList))
+      if len(cmdList) > 0:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+          result = ''.join(executor.map(self.runCmd, cmdList))
 
       print "Done with Threads."
 
@@ -79,9 +80,6 @@ class Gempak:
           # Set all forecast hours processed.
           self.redisConn.set(key + '-' + fHour, "1")
 
-    return
-
-  def runGempakScriptThread(self):
     return
 
   def runCmd(self, cmd):
