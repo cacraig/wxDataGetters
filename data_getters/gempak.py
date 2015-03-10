@@ -80,6 +80,7 @@ class Gempak:
           # Set all forecast hours processed.
           self.redisConn.set(key + '-' + fHour, "1")
 
+    os.chdir(prevWd)
     return
 
   def runCmd(self, cmd):
