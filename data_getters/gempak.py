@@ -54,8 +54,8 @@ class Gempak:
             print "Executing HiRes gempak scripts."
             # Customized Gempak scripts for High resolution data in scripts/gempak/hres
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            cmdList.append(cmd)
-            #self.runCmd(cmd)
+            #cmdList.append(cmd)
+            self.runCmd(cmd)
             print cmd
         else:
           print "Executing Non-HiRes gempak scripts."
@@ -64,7 +64,7 @@ class Gempak:
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             print cmd
             cmdList.append(cmd)
-            self.runCmd(cmd)
+            #self.runCmd(cmd)
 
       if len(cmdList) > 0:
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
