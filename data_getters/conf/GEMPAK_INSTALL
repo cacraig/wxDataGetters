@@ -1,0 +1,137 @@
+######################################################
+#
+# GEMPAK INSTALLATION
+#
+######################################################
+
+# change $GEMDATA env var in Gemenviron.profile to... 
+GEMDATA=$GEMPAK/data ; export GEMDATA
+
+# Add to ~/.profile
+. /home/user/gempak/NAWIPS/Gemenviron.profile
+
+
+# Package install(s)
+
+sudo apt-get install gcc build-essential gfortran libX11-dev libXt-dev libXext-dev libXp-dev libXft-dev libXtst-dev xorg xbitmaps flex byacc libmotif3 libmotif-dev
+
+# SEE for Directions: https://www.unidata.ucar.edu/software/gempak/doc/install.html
+
+# Download
+SEE: https://www.unidata.ucar.edu/downloads/gempak/index.jsp
+
+# Untar (Anything that isnt 7.3.0 sucks dick.)
+tar -xvzf gempak-7.3.0.tar.gz
+
+# symlink
+ln -s GEMPAK7 NAWIPS
+
+# Go to build dir
+cd $NAWIPS
+
+# Compile 
+make all >& make.out
+
+# Monitor Compile
+tail -f make.out 
+
+# Install
+make install
+
+# Clean
+make clean
+
+# Uninstalling
+make distclean
+
+----------------------------------------------
+- FONT SHIT - NMAP2 will blow the fuck up.
+----------------------------------------------
+
+sudo apt-get install -y \
+xfonts-traditional \
+xfonts-base \
+xfonts-scalable \
+xfonts-100dpi \
+xfonts-100dpi-transcoded \
+xfonts-75dpi \
+xfonts-75dpi-transcoded \
+xfonts-biznet-100dpi \
+xfonts-biznet-75dpi \
+xfonts-biznet-base \
+
+xset +fp /usr/share/fonts/X11/75dpi/
+xset +fp /usr/share/fonts/X11/100dpi/
+
+-------------------------------------------------
+-
+- Grid modifications because of missing grid paramters.
+-
+--------------------------------------------------
+
+# Add to $GEMTBL/grid/g2varsncep1.tbl
+
+!
+! Forecast Radar Imagery category
+!D# CT# ID# PD# NAME                             UNITS                GNAM         SCALE   MISSING
+!23|123|123|123|12345678901234567890123456789012|12345678901234567890|123456789012|12345|123456.89
+000 016 192 000 refl backscatter from rain       mm6/m3               REFZR            0  -9999.00
+000 016 193 000 refl backscatter from ice        mm6/m3               REFZI            0  -9999.00
+000 016 194 000 refl backscatter from convection mm6/m3               REFZC            0  -9999.00
+000 016 195 000 reflectivity                     dB                   REFD             0  -9999.00
+000 016 195 002 reflectivity                     dB                   REFD             0  -9999.00
+000 016 196 000 Maximum/Composite reflectivity   dB                   REFC             0  -9999.00
+000 016 197 000 Echo Top                         m                    RETOP            0  -9999.00
+000 016 198 000 Hrly Max Sim Refl at 1km AGL     dB                   MAXREF           0  -9999.00
+000 016 198 008 Hrly Max Sim Refl at 1km AGL     dB                   MAXREF           0  -9999.00
+
+! Other Moisture.
+000 001 195 000 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 192 000 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 001 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 002 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 005 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 008 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 011 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 192 012 Categorical rain                 0,1                  WXTR             0  -9999.00
+000 001 193 000 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 001 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 002 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 005 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 008 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 011 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 193 012 Categorical freezing rain        0,1                  WXTZ             0  -9999.00
+000 001 194 000 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 001 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 002 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 005 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 008 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 011 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 194 012 Categorical ice pellets          0,1                  WXTP             0  -9999.00
+000 001 195 000 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 001 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 002 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 005 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 008 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 011 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 195 012 Categorical snow                 0,1                  WXTS             0  -9999.00
+
+
+# Make better gif processing programs
+cd $NAWIPS
+make programs_gf
+make install programs_gf
+
+
+
+######################################################
+#
+# Data Getting/ Viewing
+#
+######################################################
+# Be sure to run . ~/gempak/GEMPAK7/Gemenviron.profile 
+# This will set the env. vars adn allow you to use nmap2, gdplot, etc.
+
+# Make all the data directories. /data/model/nam ...etc. 
+
+/home/cacraig/gempak/GEMPAK7/gempak/data/model/nam/2014021006_f000_nam221.gem

@@ -34,3 +34,11 @@ sudo apt-get install python-setuptools python-dev build-essential
 sudo easy_install pip  
 sudo pip install --upgrade virtualenv [OPTIONAL]  
 sudo pip install futures  
+
+# Install beanstalkd
+
+# Install supervisor
+
+# Install Redis
+
+# Set up Data Checkers

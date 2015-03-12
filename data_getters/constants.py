@@ -83,14 +83,14 @@ class Constants:
                 "&lev_500_mb=on&lev_700_mb=on" + \
                 "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
                 "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
-                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
+                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&var_WEASD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
 
       "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_150_mb=on&lev_200_mb=on&lev_250_mb=on&lev_2_hybrid_level=on" + \
                 "&lev_2_m_above_ground=on&lev_500-1000_mb=on&lev_500_mb=on&lev_650_mb=on&lev_700_mb=on&lev_725_mb=on&lev_750_mb=on&lev_925_mb=on&lev_950_mb=on&lev_975_mb=on" + \
                 "&lev_cloud_base=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_max_wind=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on" + \
                 "&lev_surface=on&lev_850_mb=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CIN=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on" + \
                 "&var_DZDT=on&var_EVP=on&var_GUST=on&var_HGT=on&var_ICEC=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_REFC=on&var_RH=on&var_TMAX=on" + \
-                "&var_TMIN=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
+                "&var_TMIN=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&var_WEASD=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
     }
     
     # Full path of data directory.
@@ -255,8 +255,8 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015022118/" # TEST
-    #latestRunDir  = "nam.20150306/" # TEST
+    #latestRunDir  = "gfs.2015030818/" # TEST
+    #latestRunDir  = "nam.20150308/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -297,7 +297,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[-10:-1] # test!
+    #runFileList = runFileList[-28:-25] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
@@ -462,5 +462,16 @@ class Constants:
       forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
 
     return forecastHour
+
+  def getPreviousTime(self, model, currentHour):
+    if currentHour == '000':
+      return '000'
+    defaultHours = self.getDefaultHoursByModel(model)
+    defaultHours.sort() #assert ascending order
+    for (idx,hour) in enumerate(defaultHours):
+      if currentHour == hour:
+        return defaultHours[idx-1]
+
+    return '000'
 
 

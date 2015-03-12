@@ -59,12 +59,22 @@ class Gempak:
             print cmd
         else:
           print "Executing Non-HiRes gempak scripts."
+          #if key == "nam" or key=="gfs":
+          self.constants.modelTimes[key].sort()
+          previousTime = self.constants.getPreviousTime(key, self.constants.modelTimes[key][0])
+          
+          # Do gddiag. (Mutable, cannot thread this.)
+          for file in glob.glob("gempak/grids/*.sh"):
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
+            print "Doing: " + file + " =>  " + cmd
+            self.runCmd(cmd)
+
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
             print cmd
-            cmdList.append(cmd)
-            #self.runCmd(cmd)
+            #cmdList.append(cmd)
+            self.runCmd(cmd)
 
       if len(cmdList) > 0:
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
