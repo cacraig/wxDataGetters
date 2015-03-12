@@ -52,19 +52,19 @@ gpack = none
 !
 gvcord = pres
 glevel= 500
-gfunc = sgt(tmpk,271.16)
+gfunc = sge(tmpk,271.16)
 GRDNAM = tmax500@0%none
 r
 
 gvcord = pres
 glevel= 850
-gfunc = sgt(tmpk,271.16)
+gfunc = sge(tmpk,271.16)
 GRDNAM = tmax850@0%none
 r
 
 gvcord=hght
 glevel= 2
-gfunc = sgt(tmpk,271.16)
+gfunc = sge(tmpk,271.16)
 GRDNAM = tmax2m@0%none
 r
 
