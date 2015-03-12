@@ -60,6 +60,7 @@ class Gempak:
         else:
           print "Executing Non-HiRes gempak scripts."
           #if key == "nam" or key=="gfs":
+          previousTime = '000'
           if len(self.constants.modelTimes[key]) >0:
             self.constants.modelTimes[key].sort()
             previousTime = self.constants.getPreviousTime(key, self.constants.modelTimes[key][0])
