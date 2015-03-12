@@ -69,7 +69,6 @@ gdplot2_gf << EOF
   GVCORD  = none
   PANEL   = 0 
   SKIP    = 
-  GAREA   = 19.00;-119.00;50.00;-56.00
   SCALE   = 0
   clear   = y
   TYPE    = f     
