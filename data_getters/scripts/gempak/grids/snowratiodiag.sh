@@ -71,14 +71,14 @@ r
 gvcord = pres
 glevel = 0
 gvcord = none
-gfunc = MISS(tmax850, tmax500)
+gfunc = SMAX(tmax850, tmax500)
 grdnam = tmax_500_850@0%none
 r
 
 gvcord = pres
 glevel = 0
 gvcord = none
-gfunc = MISS(tmax_500_850,tmax2m)
+gfunc = SMAX(tmax_500_850,tmax2m)
 grdnam = tmax_500_850_2m@0%none
 r
 
