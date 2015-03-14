@@ -5,7 +5,6 @@
 
 # Usage ./snow.sh  <model>  <time1,time2,...>  <inFile> <MODEL path> <previousTime>
 
-
 echo "checking for params..."
 if( $1 == "" || $2 == "" || $3 == "" || $4 == "" || $5 == "") then
     echo "All 5 paremeters must be defined!"
@@ -31,6 +30,7 @@ set variable = "snow"
 
 set baseDir = "data"
 set gdFile = ${model}".gem"
+
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4 
@@ -44,9 +44,15 @@ endif
 
 set previous = $5
 
+set root = $cwd
+
+cd ${MODEL_PATH}
+
 foreach TIME ($times:q)
 
   set gdFile = ${runTime}"f"${TIME}".gem"
+  set previousgdFile = ${runTime}"f"${previous}".gem"
+  echo ${MODEL_PATH}/${model}/${previousgdFile}
 
 
   foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
@@ -61,10 +67,11 @@ foreach TIME ($times:q)
    set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
    mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
-gdplot2_gf << EOF 
+
+gdplot3_gf << EOF 
        
-  GDFILE  = "${MODEL_PATH}/${model}/${gdFile}"
-  GDATTIM = f${previous}:f${TIME}
+  GDFILE  = "${model}/${gdFile}+${model}/${previousgdFile}"
+  GDATTIM = f${TIME}
   GLEVEL  = 0 
   GVCORD  = none
   PANEL   = 0 
@@ -78,9 +85,9 @@ gdplot2_gf << EOF
   MARKER   = 2
   GRDLBL   = 5         
   CINT    = 
-  FINT    = 0.5;1;2;3;4;5;6;7;8;9;10;11;12;13; ! 0.5;1;2;3;4;5;6;7;8;9;10;11;12;13;
-  FLINE   = 0;21-30;14-20;5;6;7;8;9;10;11;12;13 ! 0;21-30;14-20;5;6;7;8;9;10;11;12;13
-  GDPFUN  = MUL(quo(swemdiff,25.4),tminrat^f${TIME}) ! MUL(quo(swemdiff,25.4),tmaxrat^f${TIME}) 
+  FINT    = 0.5;1;2;3;4;5;6;7;8;9;10;11;12;13
+  FLINE   = 0;21-30;14-20;5;6;7;8;9;10;11;12;13
+  GDPFUN  = MUL(quo(SUB(SWEM, SWEM+2^F${previous}),25.4),10)
   CTYPE   = 
   GAREA   = ${REGION}
   PROJ    = ${proj}    
@@ -89,6 +96,8 @@ gdplot2_gf << EOF
   TITLE   = 
   DEVICE  = "gif|init_${model}_sfc_${variable}_f${TIME}.gif|1280;1024| C"
   run
+
+
   exit
 EOF
    # clean output buffer/gifs, and cleanup
@@ -96,7 +105,7 @@ EOF
    rm last.nts
    rm gemglb.nts
    # convert to a transparent image layer.
-   convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${root}/${imgDir}/${regionName}_f${TIME}.gif
    rm init_${model}_sfc_${variable}_f${TIME}.gif
   end
 
@@ -104,3 +113,5 @@ EOF
 
 
 end
+
+cd ${root}

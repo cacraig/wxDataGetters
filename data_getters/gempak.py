@@ -2,6 +2,7 @@ import glob
 import os
 from subprocess import call, STDOUT
 import concurrent.futures
+from grib2Plot import Grib2Plot
 
 # This class contains execution logic for gempak scripts.
 
@@ -11,6 +12,7 @@ class Gempak:
     self.constants = dataGetter.constants
     self.redisConn = dataGetter.redisConn
     self.DEBUG = dataGetter.DEBUG
+    self.grib2Plotter = Grib2Plot()
     return
 
   def runGempakScripts(self):
@@ -65,11 +67,15 @@ class Gempak:
             self.constants.modelTimes[key].sort()
             previousTime = self.constants.getPreviousTime(key, self.constants.modelTimes[key][0])
 
+            # Do Snowfall plotting in Matplotlib...
+            # only CONUS. EXPIRAMENTAL!
+            self.grib2Plotter.plotSnowFall(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv, previousTime)
+
             # Do gddiag. (Mutable, cannot thread this.)
-            for file in glob.glob("gempak/grids/*.sh"):
-              cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
-              print "Doing: " + file + " =>  " + cmd
-              self.runCmd(cmd)
+            # for file in glob.glob("gempak/grids/*.sh"):
+            #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
+            #   print "Doing: " + file + " =>  " + cmd
+            #   self.runCmd(cmd)
 
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts

@@ -114,28 +114,6 @@ gfunc = SMAX(tmin_500_850,tmin2m)
 grdnam = tmin_500_850_2m@0%none
 r
 
-gdfile=${MODEL_PATH}/${model}/${previousgdFile}
-glevel = 0
-gdattim = f${previous}
-gvcord = none
-gfunc = SWEM
-grdnam = swem1
-r
-
-gdfile=${MODEL_PATH}/${model}/${gdFile}
-gdattim = f${TIME}
-glevel = 0
-gvcord = none
-gfunc = SWEM
-grdnam = swem2
-r
-
-glevel = 0
-gvcord = none
-gfunc = SUB(swem1^F${previous},swem2^F${TIME})
-grdnam = swemdiff
-r
-
 glevel = 0
 gvcord = none
 gfunc = ADD(12, MUL(2,SUB(271.16,tmax_500_850_2m@0%none)))
@@ -162,3 +140,25 @@ end
 # MUL(quo(mul(SWEM@0%none,10),25.4),ADD(12, MUL(2,SUB(271.16,tmax_500_850_2m@0%none))))
 
 # MUL(quo(mul(SWEM@0%none,10),25.4),ADD(12, SUB(271.16,tmin_500_850_2m@0%none)))
+
+# gdfile=${MODEL_PATH}/${model}/${previousgdFile}
+# glevel = 0
+# gdattim = f${previous}
+# gvcord = none
+# gfunc = SWEM
+# grdnam = swem1
+# r
+
+# gdfile=${MODEL_PATH}/${model}/${gdFile}
+# gdattim = f${TIME}
+# glevel = 0
+# gvcord = none
+# gfunc = SWEM
+# grdnam = swem2
+# r
+
+# glevel = 0
+# gvcord = none
+# gfunc = SUB(swem1^F${previous},swem2^F${TIME})
+# grdnam = swemdiff
+# r

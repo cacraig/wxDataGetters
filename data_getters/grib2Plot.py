@@ -8,7 +8,7 @@ import coltbls
 from subprocess import call, STDOUT
 
 # Plot SnowFall!
-class grib2Plot:
+class Grib2Plot:
 
   '''''
   Intialize the grib2Plot class with everything we need!
@@ -18,7 +18,7 @@ class grib2Plot:
   def __init__(self):
     return
 
-  def plotSnowFall(self, model="gfs", times = ["048","051"], runTime="2015031312", modelDataPath="/vagrant", previousTime = "045"):
+  def plotSnowFall(self, model, times, runTime, modelDataPath, previousTime):
     previous = previousTime
     regions = ['CONUS']
     level = "sfc"
@@ -31,8 +31,8 @@ class grib2Plot:
     #   for region in regions:
     #     for time in times:
     #       runHour = runTime[-2:]
-    #       startFile = "gfs.t" + runHour + "z.pgrb2.0p25.f"+ previous 
-    #       endFile = "gfs.t" + runHour + "z.pgrb2.0p25.f"+ time
+    #       startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2.0p25.f"+ previous 
+    #       endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2.0p25.f"+ time
     #       tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
     #       saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
     #       self.doSnowPlot(startFile, endFile, region, model,tempFileName, saveFileName, True)
@@ -42,8 +42,8 @@ class grib2Plot:
       for region in regions:
         for time in times:
           runHour = runTime[-2:]
-          startFile = modelDataPath + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ previous 
-          endFile = modelDataPath + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time
+          startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ previous 
+          endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time
           tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
           saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
           self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
@@ -104,13 +104,13 @@ class grib2Plot:
     # data = data[:]
     lat, lon = grbT2m.latlons()
 
-    if model == "gfs" and not isGFS0p25:
-      x = np.arange(-180, 180.5, .5)
-      y = np.arange(-90, 91, .5)
-      x,y = np.meshgrid(x,y)
-      x,y = m(x,y)
-    else:
-      x,y = m(lon,lat)
+    # if model == "gfs" and not isGFS0p25:
+    #   x = np.arange(-180, 180.5, .5)
+    #   y = np.arange(-90, 91, .5)
+    #   x,y = np.meshgrid(x,y)
+    #   x,y = m(x,y)
+    # else:
+    x,y = m(lon,lat)
 
     fig = plt.figure(figsize=(8.26,6.402))
     ax = fig.add_axes([1,1,1,1],axisbg='k')
@@ -126,18 +126,18 @@ class grib2Plot:
     # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
     # plt.figsize = (10.83,13.55)
     #plt.colorbar(cs, orientation='vertical')
-
+    print "convert "+ tempFileName + " -transparent '#000000' " + saveFileName
     fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0)
     call("convert "+ tempFileName + " -transparent '#000000' " + saveFileName, shell=True)
-    #call("rm " + tempFileName)
+    call("rm " + tempFileName, shell=True)
 
 
     fig.clf()
 
     return
 
-g2plot = grib2Plot()
-g2plot.plotSnowFall()
+# g2plot = grib2Plot()
+# g2plot.plotSnowFall()
 
 # rcParams['figure.figsize'] = (8.26,15)
 
