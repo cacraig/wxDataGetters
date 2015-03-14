@@ -32,6 +32,11 @@ class Grib2Plot:
   @return void
   '''''
   def __init__(self):
+    self.regionBounds = {
+      "CONUS": (19,-119, 50, -56, "stere"), \
+      "NC" : (30.00, -87.25, 41.00, -71.25, "merc"), \
+      "WA" : (41.75, -128.00, 52.75, -112.00, "merc") \
+    }
     return
 
   def plotSnowFall(self, model, times, runTime, modelDataPath, previousTime):
@@ -58,16 +63,18 @@ class Grib2Plot:
     if model == "nam":
       for region in regions:
         for time in times:
+          shortTime = time[-2:]
+          shortTimePrevious = previous[-2:]
           runHour = runTime[-2:]
-          startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ previous +".tm00.grib2"
-          endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
+          startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTimePrevious +".tm00.grib2"
+          endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTime +".tm00.grib2"
           tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
           saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
           self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
 
           # Get 24 hour snowfall totals
           if int(time) % 24 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(24)
+            startTime = self.getAccumulationStartTime(24, time)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
             call("mkdir -p " + imgDir, shell=True)
@@ -78,7 +85,7 @@ class Grib2Plot:
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
           if int(time) % 72 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(72)
+            startTime = self.getAccumulationStartTime(72, time)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
             call("mkdir -p " + imgDir, shell=True)
@@ -101,7 +108,7 @@ class Grib2Plot:
 
           # Get 24 hour snowfall totals
           if int(time) % 24 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(24)
+            startTime = self.getAccumulationStartTime(24, time)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
             call("mkdir -p " + imgDir, shell=True)
@@ -112,7 +119,7 @@ class Grib2Plot:
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
           if int(time) % 72 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(72)
+            startTime = self.getAccumulationStartTime(72, time)
             #save to model/snow72/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
             call("mkdir -p " + imgDir, shell=True)
@@ -123,7 +130,7 @@ class Grib2Plot:
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 120 hour snowfall totals
           if int(time) % 120 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(120)
+            startTime = self.getAccumulationStartTime(120, time)
             #save to model/snow120/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"120"
             call("mkdir -p " + imgDir, shell=True)
@@ -182,7 +189,7 @@ class Grib2Plot:
     print snow.min()
 
     m = Basemap(llcrnrlat=19,urcrnrlat=50,\
-                 llcrnrlon=-119,urcrnrlon=-56, \
+                llcrnrlon=-119,urcrnrlon=-56, \
                 resolution='l',projection='stere',\
                 lat_ts=50,lat_0=90,lon_0=-100.)
 
@@ -220,11 +227,13 @@ class Grib2Plot:
 
     return
 
-  def getAccumulationStartTime(self, divisor):
-    quotient = int(time/divisor) # 24 / 24 = 1 (quotient)
-    startInt = (quotient-1) * divisor # (1-1) * 24 = 0 (Start time if hour = 24)
-    if startInt > 100:
-      startTime= "0" + str(startInt)
-    else:
-      startTime= "00" + str(startInt)
+  def getAccumulationStartTime(self, divisor, time):
+    quotient  = int(int(time)/divisor) # 24 / 24 = 1 (quotient)
+    startInt  = (quotient-1) * divisor # (1-1) * 24 = 0 (Start time if hour = 24)
+    startTime = time 
+    if startInt < 100:
+      if startInt < 10:
+        startTime= "00" + str(startInt)
+      else:
+        startTime= "0" + str(startInt)
     return startTime
