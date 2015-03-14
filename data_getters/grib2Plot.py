@@ -38,6 +38,18 @@ class Grib2Plot:
     #       self.doSnowPlot(startFile, endFile, region, model,tempFileName, saveFileName, True)
     #       previous = time
 
+    # nam.t18z.awip3281.tm00.grib2
+    if model == "nam":
+      for region in regions:
+        for time in times:
+          runHour = runTime[-2:]
+          startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ previous +".tm00.grib2"
+          endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
+          tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
+          saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+          self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          previous = time
+
     if model == "gfs":
       for region in regions:
         for time in times:

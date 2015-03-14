@@ -80,7 +80,7 @@ class Gempak:
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
-            print cmd
+            # print cmd
             #cmdList.append(cmd)
             self.runCmd(cmd)
 
