@@ -7,6 +7,22 @@ from matplotlib.colors import LinearSegmentedColormap
 import coltbls
 from subprocess import call, STDOUT
 
+# See: /home/vagrant/GEMPAK7/gempak/tables/stns/geog.tbl 
+# !------------------------------------------------------------------------------
+# !G      GEOG NAME           CENLAT  CENLON   LLLAT   LLLON   URLAT   URLON PROJ
+# !(8)    (18)              (8)     (8)     (8)     (8)     (8)     (8)      (30)
+# !------------------------------------------------------------------------------
+# NC      NORTH CAROLINA       35.50  -79.25   30.00  -87.25   41.00  -71.25 NPS
+# WA      WASHINGTON           47.25 -120.00   41.75 -128.00   52.75 -112.00 NPS
+
+# setup north polar stereographic basemap.
+# The longitude lon_0 is at 6-o'clock, and the
+# latitude circle boundinglat is tangent to the edge
+# of the map at lon_0. Default value of lat_ts
+# (latitude of true scale) is pole.
+# m = Basemap(projection='npstere',boundinglat=10,lon_0=270,resolution='l')
+
+
 # Plot SnowFall!
 class Grib2Plot:
 
@@ -50,7 +66,7 @@ class Grib2Plot:
           self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
 
           # Get 24 hour snowfall totals
-          if int(time) % 24 == 0 && int(time) > 0:
+          if int(time) % 24 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(24)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
@@ -61,7 +77,7 @@ class Grib2Plot:
             saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
-          if int(time) % 72 == 0 && int(time) > 0:
+          if int(time) % 72 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(72)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
@@ -84,7 +100,7 @@ class Grib2Plot:
           self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
 
           # Get 24 hour snowfall totals
-          if int(time) % 24 == 0 && int(time) > 0:
+          if int(time) % 24 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(24)
             #save to model/snow24/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
@@ -95,7 +111,7 @@ class Grib2Plot:
             saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
-          if int(time) % 72 == 0 && int(time) > 0:
+          if int(time) % 72 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(72)
             #save to model/snow72/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
@@ -106,7 +122,7 @@ class Grib2Plot:
             saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 120 hour snowfall totals
-          if int(time) % 120 == 0 && int(time) > 0:
+          if int(time) % 120 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(120)
             #save to model/snow120/*
             imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"120"
