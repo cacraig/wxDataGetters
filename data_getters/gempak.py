@@ -81,8 +81,8 @@ class Gempak:
             # Non High-Res scripts
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
             # print cmd
-            #cmdList.append(cmd)
-            self.runCmd(cmd)
+            cmdList.append(cmd)
+            #self.runCmd(cmd)
 
       if len(cmdList) > 0:
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
