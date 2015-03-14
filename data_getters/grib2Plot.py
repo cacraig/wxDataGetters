@@ -46,6 +46,9 @@ class Grib2Plot:
     variable = "snow"
     baseDir = "data"
     imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable
+    imgDir24 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "24"
+    imgDir72 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "72"
+    imgDir120 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "120"
     call("mkdir -p " + imgDir, shell=True)
 
     # if model == "gfs":
@@ -75,24 +78,24 @@ class Grib2Plot:
           # Get 24 hour snowfall totals
           if int(time) % 24 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(24, time)
+            variableAccum = variable + "24"
             #save to model/snow24/*
-            imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
-            call("mkdir -p " + imgDir, shell=True)
+            call("mkdir -p " + imgDir24, shell=True)
             startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ startTime +".tm00.grib2"
             endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
-            tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-            saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
           if int(time) % 72 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(72, time)
+            variableAccum = variable + "72"
             #save to model/snow24/*
-            imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
-            call("mkdir -p " + imgDir, shell=True)
+            call("mkdir -p " + imgDir72, shell=True)
             startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ startTime +".tm00.grib2"
             endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
-            tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-            saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           previous = time
 
@@ -109,35 +112,35 @@ class Grib2Plot:
           # Get 24 hour snowfall totals
           if int(time) % 24 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(24, time)
+            variableAccum = variable + "24"
             #save to model/snow24/*
-            imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"24"
-            call("mkdir -p " + imgDir, shell=True)
+            call("mkdir -p " + imgDir24, shell=True)
             startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ startTime 
             endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time
-            tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-            saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 72 hour snowfall totals
           if int(time) % 72 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(72, time)
+            variableAccum = variable + "72"
             #save to model/snow72/*
-            imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"72"
-            call("mkdir -p " + imgDir, shell=True)
+            call("mkdir -p " + imgDir72, shell=True)
             startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ startTime 
             endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time
-            tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-            saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           # Get 120 hour snowfall totals
           if int(time) % 120 == 0 and int(time) > 0:
             startTime = self.getAccumulationStartTime(120, time)
+            variableAccum = variable + "120"
             #save to model/snow120/*
-            imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable+"120"
-            call("mkdir -p " + imgDir, shell=True)
+            call("mkdir -p " + imgDir120, shell=True)
             startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ startTime 
             endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time
-            tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-            saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir120 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           previous = time
 
@@ -191,7 +194,7 @@ class Grib2Plot:
     m = Basemap(llcrnrlat=19,urcrnrlat=50,\
                 llcrnrlon=-119,urcrnrlon=-56, \
                 resolution='l',projection='stere',\
-                lat_ts=50,lat_0=90,lon_0=-100.)
+                lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
 
     lat, lon = grbT2m.latlons()
 
@@ -203,10 +206,10 @@ class Grib2Plot:
     # else:
     x,y = m(lon,lat)
 
-    fig = plt.figure(figsize=(8.26,6.402))
+    fig = plt.figure(figsize=(6.402,5.121))
     ax = fig.add_axes([1,1,1,1],axisbg='k')
     SNOWP_LEVS = [0.25,0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,14,16,18]
-    cs = plt.contourf(x,y,swemAccum,SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
+    cs = plt.contourf(x,y,swemAccum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
 
     # m.drawcoastlines()
     #m.fillcontinents()
