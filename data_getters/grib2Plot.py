@@ -42,7 +42,7 @@ class Grib2Plot:
       "NC" : (30.00, -87.25, 41.00, -71.25, "merc"), \
       "WA" : (41.75, -128.00, 52.75, -112.00, "merc") \
     }
-    self.regions   = ['CONUS', 'NC', 'WA'] 
+    self.regions   = ['WA'] 
     self.constants = constants
     return
 
@@ -199,23 +199,28 @@ class Grib2Plot:
 
     snow = swemAccum/25.4 * dtot
     borderWidth = "0x0"
+    frameWidth = 6.402
+
     if region == "CONUS":
       m = Basemap(llcrnrlat=19,urcrnrlat=50,\
                   llcrnrlon=-119,urcrnrlon=-56, \
                   resolution='l',projection='stere',\
                   lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
-      #fig = plt.figure(figsize=(6.022,5.121))
-      fig = plt.figure(figsize=(6.402,5.121))
-      borderWidth = "0x38"
+      # fig = plt.figure(figsize=(6.402,5.121))
+      borderWidth = 38.
+      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      fig = plt.figure(figsize=(frameWidth,5.121))
     if region == "NC":
       # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25
       m = Basemap(llcrnrlat=30.00,urcrnrlat=41.00,\
             llcrnrlon=-87.25,urcrnrlon=-71.25, \
             resolution='l',projection='merc',\
             lat_ts=20, fix_aspect=False)
-      #fig = plt.figure(figsize=(5.042,5.121))
-      fig = plt.figure(figsize=(6.402,5.121))
-      borderWidth = "0x34"
+
+      #fig = plt.figure(figsize=(6.402,5.121))
+      borderWidth = 34.
+      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      fig = plt.figure(figsize=(frameWidth,5.121))
     if region == "WA":
       # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
       m = Basemap(llcrnrlat=41.75,urcrnrlat=52.75,\
@@ -223,8 +228,10 @@ class Grib2Plot:
             resolution='l',projection='merc',\
             lat_ts=50, fix_aspect=False)
       #fig = plt.figure(figsize=(6.062,5.121))
-      fig = plt.figure(figsize=(6.402,5.121))
-      borderWidth = "0x136"
+      borderWidth = 136.
+      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      fig = plt.figure(figsize=(frameWidth,5.121))
+
 
 
     lat, lon = grbT2m.latlons()
@@ -249,9 +256,9 @@ class Grib2Plot:
     # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
     # plt.figsize = (10.83,13.55)
     #plt.colorbar(cs, orientation='vertical')
-    print "convert "+ tempFileName + " -transparent '#000000' " + saveFileName
+    print "convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
     fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0)
-    call("convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + borderWidth + saveFileName, shell=True)
+    call("convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
     call("rm " + tempFileName, shell=True)
 
 
