@@ -42,7 +42,7 @@ class Grib2Plot:
       "NC" : (30.00, -87.25, 41.00, -71.25, "merc"), \
       "WA" : (41.75, -128.00, 52.75, -112.00, "merc") \
     }
-    self.regions   = ['NC', 'WA', 'CONUS'] 
+    self.regions   = ['CONUS', 'NC', 'WA'] 
     self.constants = constants
     return
 
@@ -194,10 +194,10 @@ class Grib2Plot:
     dtot = dmin + dmax # Total Snow water equivalent ratios
 
     swemAccum =  data['swemCurr'] - data['swemPrev']
+    swemAccum.clip(0)
+    dtot.clip(0)
 
     snow = swemAccum/25.4 * dtot
-    print swemAccum.min()
-    print snow.min()
 
     if region == "CONUS":
       m = Basemap(llcrnrlat=19,urcrnrlat=50,\
@@ -210,37 +210,35 @@ class Grib2Plot:
       m = Basemap(llcrnrlat=30.00,urcrnrlat=41.00,\
             llcrnrlon=-87.25,urcrnrlon=-71.25, \
             resolution='l',projection='merc',\
-            lat_ts=50, fix_aspect=False)
-      fig = plt.figure(figsize=(8.26,6.4028))
+            lat_ts=20, fix_aspect=False)
+      fig = plt.figure(figsize=(6.402,5.121))
     if region == "WA":
       # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
       m = Basemap(llcrnrlat=41.75,urcrnrlat=52.75,\
             llcrnrlon=-128.00,urcrnrlon=-112.00, \
             resolution='l',projection='merc',\
             lat_ts=50, fix_aspect=False)
-      fig = plt.figure(figsize=(8.26,6.4028))
+      fig = plt.figure(figsize=(6.402,5.121))
 
 
     lat, lon = grbT2m.latlons()
 
-    # if model == "gfs" and not isGFS0p25:
-    #   x = np.arange(-180, 180.5, .5)
-    #   y = np.arange(-90, 91, .5)
-    #   x,y = np.meshgrid(x,y)
-    #   x,y = m(x,y)
-    # else:
+    if model == "gfs" and region is not "CONUS":
+      # GFS model (and some others) come with (0 - 360) Longitudes.
+      # This must be converted to (-180 - 180) when using Mercator.
+      lon = self.convertLon360to180(lon, snow)
+
     x,y = m(lon,lat)
 
-    
     ax = fig.add_axes([1,1,1,1],axisbg='k')
     SNOWP_LEVS = [0.25,0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,14,16,18]
-    cs = plt.contourf(x,y,swemAccum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
+    cs = plt.contourf(x,y,snow, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
 
     #m.drawcoastlines()
     #m.fillcontinents()
     m.drawmapboundary()
-    # m.drawstates()
-    # m.drawcountries()
+    #m.drawstates()
+    #m.drawcountries()
     # m.drawparallels(np.arange(-90.,120.,30.),labels=[1,0,0,0]) # 19.00;-119.00;50.00;-56.00
     # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
     # plt.figsize = (10.83,13.55)
@@ -266,3 +264,13 @@ class Grib2Plot:
       else:
         startTime= "0" + str(startInt)
     return startTime
+
+  # Take a ndarray of Longitudes, and shift E/W to (-180-180) range.
+  def convertLon360to180(self, lons, data):
+    loncopy = lons.copy()
+    for i,j in enumerate(lons):
+      for n,l in enumerate(j):
+        #data,loncopy[i] = shiftgrid(-180., data, j,start=False)
+        if l >= 180:
+          loncopy[i][n]=loncopy[i][n]-360. 
+    return loncopy
