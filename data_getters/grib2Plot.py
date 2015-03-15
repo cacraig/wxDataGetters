@@ -204,21 +204,25 @@ class Grib2Plot:
                   llcrnrlon=-119,urcrnrlon=-56, \
                   resolution='l',projection='stere',\
                   lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
-      fig = plt.figure(figsize=(6.402,5.121))
+      fig = plt.figure(figsize=(6.022,5.121))
+      #fig = plt.figure(figsize=(6.402,5.121))
+
     if region == "NC":
       # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25
       m = Basemap(llcrnrlat=30.00,urcrnrlat=41.00,\
             llcrnrlon=-87.25,urcrnrlon=-71.25, \
             resolution='l',projection='merc',\
             lat_ts=20, fix_aspect=False)
-      fig = plt.figure(figsize=(6.402,5.121))
+      fig = plt.figure(figsize=(5.042,5.121))
+      #fig = plt.figure(figsize=(6.402,5.121))
     if region == "WA":
       # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
       m = Basemap(llcrnrlat=41.75,urcrnrlat=52.75,\
             llcrnrlon=-128.00,urcrnrlon=-112.00, \
             resolution='l',projection='merc',\
             lat_ts=50, fix_aspect=False)
-      fig = plt.figure(figsize=(6.402,5.121))
+      fig = plt.figure(figsize=(6.062,5.121))
+      #fig = plt.figure(figsize=(6.402,5.121))
 
 
     lat, lon = grbT2m.latlons()
