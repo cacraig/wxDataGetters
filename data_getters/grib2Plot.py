@@ -42,7 +42,7 @@ class Grib2Plot:
       "NC" : (30.00, -87.25, 41.00, -71.25, "merc"), \
       "WA" : (41.75, -128.00, 52.75, -112.00, "merc") \
     }
-    self.regions   = ['WA'] 
+    self.regions   = ['CONUS', 'NC','WA'] 
     self.constants = constants
     return
 
