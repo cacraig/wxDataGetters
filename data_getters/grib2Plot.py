@@ -252,7 +252,7 @@ class Grib2Plot:
 
 
     fig.clf()
-    fig.close()
+    plt.close()
 
     return
 
