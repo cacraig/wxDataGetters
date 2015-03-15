@@ -6,6 +6,7 @@ from pylab import rcParams
 from matplotlib.colors import LinearSegmentedColormap
 import coltbls
 from subprocess import call, STDOUT
+import concurrent.futures
 
 # See: /home/vagrant/GEMPAK7/gempak/tables/stns/geog.tbl 
 # !------------------------------------------------------------------------------
@@ -14,6 +15,10 @@ from subprocess import call, STDOUT
 # !------------------------------------------------------------------------------
 # NC      NORTH CAROLINA       35.50  -79.25   30.00  -87.25   41.00  -71.25 NPS
 # WA      WASHINGTON           47.25 -120.00   41.75 -128.00   52.75 -112.00 NPS
+# WWE     WINTER WX AREA       36.00  -78.00   18.00 -106.00   54.00  -50.00 NPS
+# OK      OKLAHOMA             35.75  -97.25   30.25 -105.25   41.25  -89.25 NPS
+# MA      MASSACHUSETTS        42.25  -72.25   36.75  -80.25   47.75  -64.25 NPS (LABELED NEUS)
+# CENTUS  CENTRAL US           36.15  -91.20   24.70 -105.40   47.60  -77.00 STR/90;-95;0
 
 # setup north polar stereographic basemap.
 # The longitude lon_0 is at 6-o'clock, and the
@@ -31,17 +36,18 @@ class Grib2Plot:
 
   @return void
   '''''
-  def __init__(self):
+  def __init__(self, constants):
     self.regionBounds = {
       "CONUS": (19,-119, 50, -56, "stere"), \
       "NC" : (30.00, -87.25, 41.00, -71.25, "merc"), \
       "WA" : (41.75, -128.00, 52.75, -112.00, "merc") \
     }
+    self.regions   = ['NC', 'WA', 'CONUS'] 
+    self.constants = constants
     return
 
   def plotSnowFall(self, model, times, runTime, modelDataPath, previousTime):
     previous = previousTime
-    regions = ['CONUS']
     level = "sfc"
     variable = "snow"
     baseDir = "data"
@@ -50,6 +56,8 @@ class Grib2Plot:
     imgDir72 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "72"
     imgDir120 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "120"
     call("mkdir -p " + imgDir, shell=True)
+
+
 
     # if model == "gfs":
     #   for region in regions:
@@ -64,7 +72,7 @@ class Grib2Plot:
 
     # nam.t18z.awip3281.tm00.grib2
     if model == "nam":
-      for region in regions:
+      for region in self.regions:
         for time in times:
           shortTime = time[-2:]
           shortTimePrevious = previous[-2:]
@@ -81,8 +89,8 @@ class Grib2Plot:
             variableAccum = variable + "24"
             #save to model/snow24/*
             call("mkdir -p " + imgDir24, shell=True)
-            startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ startTime +".tm00.grib2"
-            endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
+            startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTimePrevious +".tm00.grib2"
+            endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTime +".tm00.grib2"
             tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
             saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
@@ -92,15 +100,15 @@ class Grib2Plot:
             variableAccum = variable + "72"
             #save to model/snow24/*
             call("mkdir -p " + imgDir72, shell=True)
-            startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ startTime +".tm00.grib2"
-            endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
+            startFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTimePrevious +".tm00.grib2"
+            endFile = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ shortTime +".tm00.grib2"
             tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
             saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
           previous = time
 
     if model == "gfs":
-      for region in regions:
+      for region in self.regions:
         for time in times:
           runHour = runTime[-2:]
           startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ previous 
@@ -191,10 +199,27 @@ class Grib2Plot:
     print swemAccum.min()
     print snow.min()
 
-    m = Basemap(llcrnrlat=19,urcrnrlat=50,\
-                llcrnrlon=-119,urcrnrlon=-56, \
-                resolution='l',projection='stere',\
-                lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
+    if region == "CONUS":
+      m = Basemap(llcrnrlat=19,urcrnrlat=50,\
+                  llcrnrlon=-119,urcrnrlon=-56, \
+                  resolution='l',projection='stere',\
+                  lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
+      fig = plt.figure(figsize=(6.402,5.121))
+    if region == "NC":
+      # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25
+      m = Basemap(llcrnrlat=30.00,urcrnrlat=41.00,\
+            llcrnrlon=-87.25,urcrnrlon=-71.25, \
+            resolution='l',projection='merc',\
+            lat_ts=50, fix_aspect=False)
+      fig = plt.figure(figsize=(8.26,6.4028))
+    if region == "WA":
+      # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
+      m = Basemap(llcrnrlat=41.75,urcrnrlat=52.75,\
+            llcrnrlon=-128.00,urcrnrlon=-112.00, \
+            resolution='l',projection='merc',\
+            lat_ts=50, fix_aspect=False)
+      fig = plt.figure(figsize=(8.26,6.4028))
+
 
     lat, lon = grbT2m.latlons()
 
@@ -206,12 +231,12 @@ class Grib2Plot:
     # else:
     x,y = m(lon,lat)
 
-    fig = plt.figure(figsize=(6.402,5.121))
+    
     ax = fig.add_axes([1,1,1,1],axisbg='k')
     SNOWP_LEVS = [0.25,0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,14,16,18]
     cs = plt.contourf(x,y,swemAccum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
 
-    # m.drawcoastlines()
+    #m.drawcoastlines()
     #m.fillcontinents()
     m.drawmapboundary()
     # m.drawstates()

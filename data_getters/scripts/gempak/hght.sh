@@ -21,7 +21,7 @@ set lineColor = 2
 set gdFile = ${model}".gem"
 set baseDir = "data"
 set variable = "hght"
-set proj = "MER"
+set proj = "MER//NM"
 
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
@@ -111,7 +111,7 @@ foreach level (250 500 850)
 
  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
 
-  set proj = "MER"
+  set proj = "MER//NM"
   set regionName = ${REGION}
   if (${REGION} == "19.00;-119.00;50.00;-56.00") then
     set proj = "STR/90;-100;0"

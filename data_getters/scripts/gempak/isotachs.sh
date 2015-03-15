@@ -27,7 +27,7 @@ set gdFile = ${model}".gem"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4
-set proj = "MER"
+set proj = "MER//NM"
 
 # Make our run directory.
 if !(-e ${outDir}) then
@@ -76,7 +76,7 @@ foreach level (250 500 850)
  #cd ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
   foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
-   set proj = "MER"
+   set proj = "MER//NM"
    set regionName = ${REGION}
    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
       set proj = "STR/90;-100;0"

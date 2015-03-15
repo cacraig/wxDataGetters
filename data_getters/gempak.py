@@ -12,7 +12,7 @@ class Gempak:
     self.constants = dataGetter.constants
     self.redisConn = dataGetter.redisConn
     self.DEBUG = dataGetter.DEBUG
-    self.grib2Plotter = Grib2Plot()
+    self.grib2Plotter = Grib2Plot(self.constants)
     return
 
   def runGempakScripts(self):

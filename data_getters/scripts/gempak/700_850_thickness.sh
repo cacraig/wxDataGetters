@@ -28,7 +28,7 @@ set baseDir = "data"
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4
 
-set proj = "MER"
+set proj = "MER//NM"
 
 if ${model} == "nam" then
     set gdFile = ${runTime}".gem"
@@ -78,7 +78,7 @@ foreach TIME ($times:q)
     #   set gdFile = ${runTime}"_1.gem"
     # endif
 
-    set proj = "MER"
+    set proj = "MER//NM"
 
     set regionName = ${REGION}
 

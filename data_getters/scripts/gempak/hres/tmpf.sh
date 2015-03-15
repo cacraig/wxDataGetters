@@ -21,7 +21,7 @@ set variable = "tmpf"
 #Set output Directory = Timestamp_model
 set outDir = ${baseDir}/${model}/${timeStamp}
 set MODEL_PATH  = $4
-set proj = "MER"
+set proj = "MER//NM"
 
 
 # Make our run directory.
@@ -57,7 +57,7 @@ foreach TIME ($times:q)
 
  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
     set regionName = ${REGION}
-    set proj = "MER"
+    set proj = "MER//NM"
 
     if (${REGION} == "19.00;-119.00;50.00;-56.00") then
       set proj = "STR/90;-100;0"
