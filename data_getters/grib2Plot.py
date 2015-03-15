@@ -208,7 +208,7 @@ class Grib2Plot:
                   lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
       # fig = plt.figure(figsize=(6.402,5.121))
       borderWidth = 38.
-      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      frameWidth = frameWidth - ((borderWidth*2.)/200.)
       fig = plt.figure(figsize=(frameWidth,5.121))
     if region == "NC":
       # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25
@@ -219,7 +219,7 @@ class Grib2Plot:
 
       #fig = plt.figure(figsize=(6.402,5.121))
       borderWidth = 34.
-      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      frameWidth = frameWidth - ((borderWidth*2.)/200.)
       fig = plt.figure(figsize=(frameWidth,5.121))
     if region == "WA":
       # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
@@ -229,7 +229,7 @@ class Grib2Plot:
             lat_ts=50, fix_aspect=False)
       #fig = plt.figure(figsize=(6.062,5.121))
       borderWidth = 136.
-      frameWidth = frameWidth - str((borderWidth*2.)/200.)
+      frameWidth = frameWidth - ((borderWidth*2.)/200.)
       fig = plt.figure(figsize=(frameWidth,5.121))
 
 
