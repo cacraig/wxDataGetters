@@ -95,9 +95,12 @@ class Grib2Plot:
         else:
           x,y = m(lon,lat)
 
-
+        print x.shape
+        print y.shape
+        print temp2m.shape
+        
         if proj != 'merc':
-          cs = m.pcolormesh(x,y,temp2m,cmap=plt.cm.jet)
+          cs = m.pcolormesh(x, y, temp2m, cmap=plt.cm.jet)
         else:
           cs = m.contourf(x,y,temp2m,20,cmap=plt.cm.jet)
 
