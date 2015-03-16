@@ -172,11 +172,12 @@ gdcntr_gf << EOF
 
   exit
 EOF
-
    # clean output buffer/gifs, and cleanup
    gpend
+
    rm last.nts
    rm gemglb.nts
+   convert ${imgDir}/${regionName}_f${shortTime}.gif -transparent black ${imgDir}/${regionName}_f${shortTime}.gif
   end
 
 end

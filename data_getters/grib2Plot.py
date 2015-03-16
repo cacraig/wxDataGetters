@@ -7,6 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import coltbls
 from subprocess import call, STDOUT
 import concurrent.futures
+import os
 
 # See: /home/vagrant/GEMPAK7/gempak/tables/stns/geog.tbl 
 # !------------------------------------------------------------------------------
@@ -65,7 +66,7 @@ class Grib2Plot:
           g2File = self.getGrib2File(modelDataPath, runHour, model, time)
 
         tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-        saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+        saveFileName = imgDir + "/" + region +"_f" + time + ".png"
         try:
           grbs=pygrib.open(g2File)
           grbs.seek(0)
@@ -106,10 +107,6 @@ class Grib2Plot:
 
         # m.drawcoastlines()
         m.drawmapboundary()
-        print "Region" + region
-        print "Size"
-        print fig.get_size_inches()
-        print fig.dpi
 
 
         # m.drawstates()
@@ -133,12 +130,19 @@ class Grib2Plot:
         ##### two new lines ####
         # fig.set_facecolor('black')
         # END COLORBARS
+        
+        # PNG optimization
+        # pngquant -o lossy.png --force --quality=70-80 input.png
+        # optipng -o1 -strip all -out out.png -clobber input.png
 
-
-        #print "convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+        print "convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+        print "pngquant -o "+ os.getcwd()+ "/" + tempFileName + " --force --quality=70-80 "+ os.getcwd()+ "/" + tempFileName
         fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0, facecolor=fig.get_facecolor())
+        call("pngquant -o "+ tempFileName + " --force --quality=45-60 "+ tempFileName, shell=True)
+        #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
+        
         call("convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
-        call("rm " + tempFileName, shell=True)
+        #call("rm " + tempFileName, shell=True)
 
         fig.clf()
         plt.close()

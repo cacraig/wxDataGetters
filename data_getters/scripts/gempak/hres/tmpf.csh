@@ -107,6 +107,7 @@ EOF
    gpend
    rm last.nts
    rm gemglb.nts
+   #convert ${imgDir}/${regionName}_f${shortTime}.gif ${imgDir}/${regionName}_f${shortTime}.gif
   end
 
 end
