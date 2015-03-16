@@ -86,20 +86,19 @@ class Grib2Plot:
           # GFS model (and some others) come with (0 - 360) Longitudes.
           # This must be converted to (-180 - 180) when using Mercator.
           lon = self.convertLon360to180(lon, temp2m)
-
-        if model == 'gfs'and proj != 'merc':
-          x = np.arange(-180, 180.5, 1.0)
-          y = np.arange(-90, 91, 1.0)
-          x,y = np.meshgrid(x,y)
-          x,y = m(x,y)
-        else:
-          x,y = m(lon,lat)
-
-        print x.shape
-        print y.shape
-        print temp2m.shape
         
-        if proj != 'merc':
+        # TURNING OFF MESHGRID FOR GFS FOR NOW. DAMN SHAPE BUG yo.
+        # if model == 'gfs'and proj != 'merc':
+        #   x = np.arange(-180, 180.5, 1.0).reshape((361,720))
+        #   y = np.arange(-90, 91, 1.0).reshape((361,720))
+        #   x,y = np.meshgrid(x,y)
+        #   x,y = m(x,y)
+        # else:
+        x,y = m(lon,lat)
+
+
+        # TURNING OFF MESHGRID FOR GFS FOR NOW. DAMN SHAPE BUG yo.
+        if proj != 'merc' and model != 'gfs':
           cs = m.pcolormesh(x, y, temp2m, cmap=plt.cm.jet)
         else:
           cs = m.contourf(x,y,temp2m,20,cmap=plt.cm.jet)

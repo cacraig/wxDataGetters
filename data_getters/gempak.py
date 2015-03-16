@@ -64,7 +64,7 @@ class Gempak:
             # Customized Gempak scripts for High resolution data in scripts/gempak/hres
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
             #cmdList.append(cmd)
-            #self.runCmd(cmd)
+            self.runCmd(cmd)
             print cmd
         else:
           print "Executing Non-HiRes gempak scripts."
@@ -83,7 +83,7 @@ class Gempak:
             #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
             #   print "Doing: " + file + " =>  " + cmd
             #   self.runCmd(cmd)
-            
+
           # Do gempak stuff.
           for file in glob.glob("gempak/*.sh"):
             # Non High-Res scripts
