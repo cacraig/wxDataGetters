@@ -58,6 +58,9 @@ class Grib2Plot:
 
     for region in self.regions:
       for time in times:
+        # Sub regions (contourf is broken right now for global models Sub regions. Use gempak...)
+        if model == 'gfs' and region != 'CONUS':
+          continue
 
         if model == 'nam' or model == 'nam4km':
           # Requires time in format 00-99
@@ -148,7 +151,7 @@ class Grib2Plot:
         #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
         
         call("convert "+ tempFileName + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
-        #call("rm " + tempFileName, shell=True)
+        call("rm " + tempFileName, shell=True)
 
         fig.clf()
         plt.close()
