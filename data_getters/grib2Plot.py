@@ -404,8 +404,11 @@ class Grib2Plot:
     g2file = ""
     if model == 'nam':
       g2file = modelDataPath + model + "/" + "nam.t" + runHour + "z.awip32"+ time +".tm00.grib2"
+    # elif model == 'gfs':
+    #   g2file = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time 
     elif model == 'gfs':
-      g2file = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2full.0p50.f"+ time 
+      # gfs.t18z.pgrb2.0p25.f009
+      g2file = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2.0p25.f"+ time 
     elif model == 'nam4km':
       # nam.t00z.conusnest.hiresf03.tm00.grib2
       g2file = modelDataPath + model + "/" + "nam.t" + runHour + "z.conusnest.hiresf"+ time +".tm00.grib2"

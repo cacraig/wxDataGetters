@@ -50,7 +50,8 @@ class Constants:
     self.modelRegex = {
       "nam": "^nam.t..z.awip32...tm...grib2$",
       "nam4km": '^nam.t..z.(conus\w+).hiresf...tm...grib2$',
-      "gfs": '^gfs.t..z.pgrb2full.0p50.f\d{0,3}$'
+      #"gfs": '^gfs.t..z.pgrb2full.0p50.f\d{0,3}$'
+      "gfs": '^gfs.t..z.pgrb2.0p25.f\d{0,3}$'
     }
 
     self.modelAliases = {
@@ -79,7 +80,7 @@ class Constants:
                 "&var_MSLET=on&var_NCPCP=on&var_REFC=on&var_RH=on&var_SNOWC=on&var_TMP=on&var_TSOIL=on&var_UGRD=on&var_VGRD=on&var_VVEL=on" + \
                 "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90", \
 
-      'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p50.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
+      'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
                 "&lev_500_mb=on&lev_700_mb=on" + \
                 "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
                 "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
@@ -255,7 +256,7 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015031600/" # TEST
+    latestRunDir  = "gfs.2015031700/" # TEST
     #latestRunDir  = "nam.20150310/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
@@ -297,7 +298,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[0:4] # test!
+    runFileList = runFileList[0:4] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
