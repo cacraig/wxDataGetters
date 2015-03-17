@@ -45,6 +45,7 @@ class Grib2Plot:
     }
     self.regions   = ['CONUS','NC','WA'] 
     self.constants = constants
+    self.isPng = ['CONUS']
     return
 
   def plot2mTemp(self, model, times, runTime, modelDataPath):
@@ -64,9 +65,14 @@ class Grib2Plot:
         else:
           # Requires time in format 000-999
           g2File = self.getGrib2File(modelDataPath, runHour, model, time)
+        
+        convertExtension = ".gif"
+        if region in self.isPng:
+          convertExtension = ".png"
+
 
         tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-        saveFileName = imgDir + "/" + region +"_f" + time + ".png"
+        saveFileName = imgDir + "/" + region +"_f" + time + convertExtension
         try:
           grbs=pygrib.open(g2File)
           grbs.seek(0)
@@ -141,7 +147,7 @@ class Grib2Plot:
         call("pngquant -o "+ tempFileName + " --force --quality=45-60 "+ tempFileName, shell=True)
         #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
         
-        call("convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+        call("convert "+ tempFileName + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
         #call("rm " + tempFileName, shell=True)
 
         fig.clf()
