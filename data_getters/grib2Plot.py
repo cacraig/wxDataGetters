@@ -219,52 +219,51 @@ class Grib2Plot:
             tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
             saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
             self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-          previous = time
 
         if model == "gfs":
-          for region in self.regions:
-            for time in times:
-              runHour = runTime[-2:]
-              startFile = self.getGrib2File(modelDataPath, runHour, model, previous)
-              endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-              tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-              saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
-              self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          runHour = runTime[-2:]
+          startFile = self.getGrib2File(modelDataPath, runHour, model, previous)
+          endFile = self.getGrib2File(modelDataPath, runHour, model, time)
+          tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
+          saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+          self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
 
-              # Get 24 hour snowfall totals
-              if int(time) % 24 == 0 and int(time) > 0:
-                startTime = self.getAccumulationStartTime(24, time)
-                variableAccum = variable + "24"
-                #save to model/snow24/*
-                call("mkdir -p " + imgDir24, shell=True)
-                startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-                endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-                tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-                saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
-                self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-              # Get 72 hour snowfall totals
-              if int(time) % 72 == 0 and int(time) > 0:
-                startTime = self.getAccumulationStartTime(72, time)
-                variableAccum = variable + "72"
-                #save to model/snow72/*
-                call("mkdir -p " + imgDir72, shell=True)
-                startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-                endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-                tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-                saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
-                self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-              # Get 120 hour snowfall totals
-              if int(time) % 120 == 0 and int(time) > 0:
-                startTime = self.getAccumulationStartTime(120, time)
-                variableAccum = variable + "120"
-                #save to model/snow120/*
-                call("mkdir -p " + imgDir120, shell=True)
-                startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-                endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-                tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-                saveFileName = imgDir120 + "/" + region +"_f" + time + ".gif"
-                self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-              previous = time
+          # Get 24 hour snowfall totals
+          if int(time) % 24 == 0 and int(time) > 0:
+            startTime = self.getAccumulationStartTime(24, time)
+            variableAccum = variable + "24"
+            #save to model/snow24/*
+            call("mkdir -p " + imgDir24, shell=True)
+            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
+            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
+            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          # Get 72 hour snowfall totals
+          if int(time) % 72 == 0 and int(time) > 0:
+            startTime = self.getAccumulationStartTime(72, time)
+            variableAccum = variable + "72"
+            #save to model/snow72/*
+            call("mkdir -p " + imgDir72, shell=True)
+            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
+            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
+            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          # Get 120 hour snowfall totals
+          if int(time) % 120 == 0 and int(time) > 0:
+            startTime = self.getAccumulationStartTime(120, time)
+            variableAccum = variable + "120"
+            #save to model/snow120/*
+            call("mkdir -p " + imgDir120, shell=True)
+            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
+            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
+            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+            saveFileName = imgDir120 + "/" + region +"_f" + time + ".gif"
+            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+
+        # Set the previous time for next iteration.
+        previous = time
 
     return
 
