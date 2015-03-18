@@ -57,10 +57,14 @@ class Grib2Plot:
     runHour = runTime[-2:]
 
     for region in self.regions:
+
+      borderBottomCmd = '' # Reset any bottom border.
+
+      # Sub regions (contourf is broken right now for global models Sub regions. Use gempak...)
+      if model == 'gfs' and region != 'CONUS':
+        continue
+
       for time in times:
-        # Sub regions (contourf is broken right now for global models Sub regions. Use gempak...)
-        if model == 'gfs' and region != 'CONUS':
-          continue
 
         if model == 'nam' or model == 'nam4km':
           # Requires time in format 00-99
@@ -88,9 +92,12 @@ class Grib2Plot:
 
         # Convert Kelvin to (F)
         temp2m = ((temp2m- 273.15)* 1.8000) + 32.00
-        m, fig, borderWidth, proj = self.getRegionProjection(region)
+        m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
 
         lat, lon = gTemp2m.latlons()
+
+        if borderBottom > 1.0:
+          borderBottomCmd = " -gravity south -splice 0x" + str(int(borderBottom))
 
         if model == "gfs" and region is not "CONUS":
           # GFS model (and some others) come with (0 - 360) Longitudes.
@@ -144,13 +151,13 @@ class Grib2Plot:
         # pngquant -o lossy.png --force --quality=70-80 input.png
         # optipng -o1 -strip all -out out.png -clobber input.png
 
-        print "convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+        print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+
         print "pngquant -o "+ os.getcwd()+ "/" + tempFileName + " --force --quality=70-80 "+ os.getcwd()+ "/" + tempFileName
         fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0, facecolor=fig.get_facecolor())
         call("pngquant -o "+ tempFileName + " --force --quality=45-60 "+ tempFileName, shell=True)
         #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
-        
-        call("convert "+ tempFileName + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+        call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
         call("rm " + tempFileName, shell=True)
 
         fig.clf()
@@ -269,12 +276,16 @@ class Grib2Plot:
 
   def doSnowPlot(self, startFile, endFile, region, model, tempFileName, saveFileName, isGFS0p25 = False):
 
+    borderBottomCmd = "" # Reset bottom border.
+
     try:
       grbs=pygrib.open(startFile)
       grbs.seek(0)
       grbSwemPrevious = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
     except Exception, e:
-      print "Failure on loading grib file = " + startFile
+      print "Failure on loading grib [START] file = " + startFile
+      print "Region" + region
+      print "Model" + model
       print e
       return
 
@@ -286,7 +297,9 @@ class Grib2Plot:
       grbT850 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
       grbT2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
     except Exception, e:
-      print "Failure on loading grib file = " + endFile
+      print "Failure on loading grib [END] file = " + endFile
+      print "Region" + region
+      print "Model" + model
       print e
       return
 
@@ -315,7 +328,10 @@ class Grib2Plot:
 
     snow = swemAccum/25.4 * 10
 
-    m, fig, borderWidth, proj = self.getRegionProjection(region)
+    m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
+
+    if borderBottom > 1.0:
+      borderBottomCmd = " -gravity south -splice 0x" + str(int(borderBottom))
 
     lat, lon = grbT2m.latlons()
 
@@ -375,9 +391,9 @@ class Grib2Plot:
     # END COLORBARS
 
 
-    #print "convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+    print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + borderBottomCmd + " " + saveFileName
     fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
-    call("convert "+ tempFileName + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+    call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
     call("rm " + tempFileName, shell=True)
 
     fig.clf()
@@ -421,10 +437,12 @@ class Grib2Plot:
     return g2file
 
   def getRegionProjection(self, region):
-    borderWidth = "0x0"
+    borderWidth = 1.
     frameWidth = 6.402
+    frameHieght = 5.121
     fig = None
     proj = None
+    borderBottom = 1.
 
     if region == "CONUS":
       proj = 'stere'
@@ -434,8 +452,11 @@ class Grib2Plot:
                   lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
       # fig = plt.figure(figsize=(6.402,5.121))
       borderWidth = 61. # In Pixels. Should match that generated by Gempak.
+      borderBottom = 40.
       frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,5.121), dpi = 200)
+      frameHieght = frameHieght - ((borderBottom)/200.)
+      fig = plt.figure(figsize=(frameWidth, frameHieght), dpi = 200)
+      
     if region == "NC":
       proj = 'merc'
       # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25
@@ -447,7 +468,7 @@ class Grib2Plot:
       #fig = plt.figure(figsize=(6.402,5.121))
       borderWidth = 34. # In Pixels. Should match that generated by Gempak.
       frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,5.121), dpi = 200)
+      fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
     if region == "WA":
       proj = 'merc'
       # WA      WASHINGTON   41.75 -128.00   52.75 -112.00 
@@ -458,6 +479,6 @@ class Grib2Plot:
       #fig = plt.figure(figsize=(6.062,5.121))
       borderWidth = 136. # In Pixels. Should match that generated by Gempak.
       frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,5.121), dpi = 200)
+      fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
 
-    return (m,fig, borderWidth, proj)
+    return (m,fig, borderWidth, proj, borderBottom)

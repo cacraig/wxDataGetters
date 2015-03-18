@@ -13,9 +13,10 @@ set model  = $1
 
 # Only use this for the gfs atm...
 # Bug with contourf and subregions.
-if (${model} != 'gfs'){
+if (${model} != 'gfs') then
   exit
-}
+endif
+
 
 set times  = `echo $2:q | sed 's/,/ /g'`
 set runTime = $3 
