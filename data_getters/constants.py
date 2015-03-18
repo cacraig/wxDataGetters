@@ -257,7 +257,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015031700/" # TEST
-    #latestRunDir  = "nam.20150310/" # TEST
+    #latestRunDir  = "nam.20150317/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
