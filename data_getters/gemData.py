@@ -341,7 +341,7 @@ class GemData:
 
     try:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET updating =" + boolValue + " WHERE name='" + model+"'")
+      self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
     except Exception, e:
       print e
 
