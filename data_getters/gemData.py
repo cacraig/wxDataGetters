@@ -59,7 +59,7 @@ class GemData:
             print "Skipping: " + key + "... Model not updated."
             continue
 
-      if 'files' in http:
+      if 'files' in http:updatingDir
         # download all files in http['files'].
         print "PROCESSING MANY"
         files = http['files']
@@ -341,7 +341,7 @@ class GemData:
 
     try:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET updating ='" + boolValue + "' WHERE name='" + model+"'")
+      self.cursor.execute("UPDATE model SET updating =" + boolValue + " WHERE name='" + model+"'")
     except Exception, e:
       print e.pgerror
 
