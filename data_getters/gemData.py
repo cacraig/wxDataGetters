@@ -59,7 +59,7 @@ class GemData:
             print "Skipping: " + key + "... Model not updated."
             continue
 
-      if 'files' in http:updatingDir
+      if 'files' in http:
         # download all files in http['files'].
         print "PROCESSING MANY"
         files = http['files']
