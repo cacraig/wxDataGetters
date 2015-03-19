@@ -332,7 +332,7 @@ class GemData:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
       self.cursor.execute("UPDATE model SET current_run ='" + time + "', previous_run= '" + self.dbRunTimes[model] + "', updating=1 WHERE name='" + model+"'")
     except Exception, e:
-      print e.pgerror
+      print e
 
     self.conn.commit()
     return
@@ -343,7 +343,7 @@ class GemData:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
       self.cursor.execute("UPDATE model SET updating =" + boolValue + " WHERE name='" + model+"'")
     except Exception, e:
-      print e.pgerror
+      print e
 
     self.conn.commit()
     return
