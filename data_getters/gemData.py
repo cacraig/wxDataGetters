@@ -1,7 +1,7 @@
 import urllib2
 from constants import Constants
 import os
-from subprocess import call
+from subprocess import call, STDOUT
 from timeout import timeout
 import errno
 import psycopg2
@@ -309,7 +309,10 @@ class GemData:
       self.runCmd("rsync -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir + self.updatingDir)
 
   def runCmd(self, cmd):
-    return call(cmd, shell=True)
+    FNULL = open(os.devnull, 'w')
+    print "Currently executing..."
+    print cmd
+    return call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
 
   def getCurrentRuns(self):
     print "Getting Current Runs from DB..."
