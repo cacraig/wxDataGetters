@@ -24,6 +24,7 @@ class GemData:
     self.updated = True
     self.DEBUG = debug
     self.complete = False
+    self.updatingDir = "updating/"
 
     # If DEBUG is True, clear all model times so they aren't skipped.
     if self.DEBUG:
@@ -140,6 +141,10 @@ class GemData:
     if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
       self.redisConn.set(model + '-complete', self.constants.runTimes[model])
       self.complete = True
+      # Set updating directory to empty string.
+      # When model is complete, copy images to completed directory
+      self.updatingDir = ""
+      self.setUpdatingFlag(model, 0)
       f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.constants.runTimes[model])
 
     f.close() # you can omit in most cases as the destructor will call if
@@ -301,7 +306,7 @@ class GemData:
     if model is None:
       self.runCmd("rsync -vPr " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
     else:
-      self.runCmd("rsync -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir)
+      self.runCmd("rsync -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir + self.updatingDir)
 
   def runCmd(self, cmd):
     return call(cmd, shell=True)
@@ -325,7 +330,18 @@ class GemData:
 
     try:
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET current_run ='" + time + "', previous_run= '" + self.dbRunTimes[model] + "' WHERE name='" + model+"'")
+      self.cursor.execute("UPDATE model SET current_run ='" + time + "', previous_run= '" + self.dbRunTimes[model] + "', updated=1 WHERE name='" + model+"'")
+    except Exception, e:
+      print e.pgerror
+
+    self.conn.commit()
+    return
+
+  def setUpdatingFlag(self, model, boolValue):
+
+    try:
+      # self.cursor.execute("SELECT * from model where name='" + model + "'")
+      self.cursor.execute("UPDATE model SET updating ='" + boolValue + "' WHERE name='" + model+"'")
     except Exception, e:
       print e.pgerror
 
