@@ -24,7 +24,7 @@ class GemData:
     self.updated = True
     self.DEBUG = debug
     self.complete = False
-    self.updatingDir = "updating/"
+    self.updatingDir = "/updating"
 
     # If DEBUG is True, clear all model times so they aren't skipped.
     if self.DEBUG:
