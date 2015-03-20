@@ -20,6 +20,8 @@ class DataGetter:
         dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + self.model)
         # Model is complete. Reset updating flag to 0;
         dataGetter.setUpdatingFlag(self.model, 0)
-
       dataGetter.transferFilesToProd(self.model)
+
+    dataGetter.closeConnection()
+    
     return

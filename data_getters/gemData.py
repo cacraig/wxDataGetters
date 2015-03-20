@@ -116,7 +116,8 @@ class GemData:
 
     # Jump back to present WD
     os.chdir(currentDir)
-    self.conn.close()
+    if self.DEBUG == True:
+      self.closeConnection()
     return
 
   def isUpdated(self):
@@ -124,6 +125,9 @@ class GemData:
 
   def isComplete(self):
     return self.complete
+
+  def closeConnection(self):
+    return self.conn.close()
 
   def resetHourKeys(self, model):
     hourKeys = self.constants.getDefaultHoursByModel(model)
@@ -342,7 +346,6 @@ class GemData:
   def setUpdatingFlag(self, model, boolValue):
 
     try:
-      self.cursor = self.conn.cursor()
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
       self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
     except Exception, e:
