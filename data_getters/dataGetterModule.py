@@ -18,6 +18,8 @@ class DataGetter:
       # Scrub only model dir used. Only if run is complete.
       if dataGetter.isComplete():
         dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + self.model)
+        # Model is complete. Reset updating flag to 0;
+        dataGetter.setUpdatingFlag(self.model, 0)
 
       dataGetter.transferFilesToProd(self.model)
     return

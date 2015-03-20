@@ -144,7 +144,6 @@ class GemData:
       # Set updating directory to empty string.
       # When model is complete, copy images to completed directory
       self.updatingDir = ""
-      self.setUpdatingFlag(model, 0)
       f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.constants.runTimes[model])
 
     f.close() # you can omit in most cases as the destructor will call if
