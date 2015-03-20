@@ -342,6 +342,7 @@ class GemData:
   def setUpdatingFlag(self, model, boolValue):
 
     try:
+      self.cursor = self.conn.cursor()
       # self.cursor.execute("SELECT * from model where name='" + model + "'")
       self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
     except Exception, e:
