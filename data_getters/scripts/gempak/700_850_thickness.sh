@@ -45,7 +45,7 @@ foreach TIME ($times:q)
 
   set gdFile = ${runTime}"f"${TIME}".gem"
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
     # Reset line color!
     set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
     mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}

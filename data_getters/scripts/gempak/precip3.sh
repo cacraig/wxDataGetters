@@ -69,7 +69,7 @@ foreach TIME ($times:q)
   #   set gdFile = ${runTime}"_1.gem"
   # endif
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
     set regionName = ${REGION}
     set proj = "MER//NM"
     

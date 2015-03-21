@@ -109,7 +109,7 @@ foreach level (250 500 850)
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
- foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+ foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
 
   set proj = "MER//NM"
   set regionName = ${REGION}

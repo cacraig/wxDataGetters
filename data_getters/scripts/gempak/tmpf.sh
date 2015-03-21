@@ -76,7 +76,7 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
- foreach REGION ("WA" "NC")
+ foreach REGION ("WA" "NC" "OK")
      set regionName = ${REGION}
      set proj = "MER//NM"
 

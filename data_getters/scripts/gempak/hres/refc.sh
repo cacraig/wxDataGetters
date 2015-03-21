@@ -108,7 +108,7 @@ EOFD
  #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
  # endif 
 
- foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+ foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
     set regionName = ${REGION}
     set proj = "MER//NM"
 

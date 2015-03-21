@@ -75,7 +75,7 @@ foreach level (250 500 850)
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  #cd ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
    set proj = "MER//NM"
    set regionName = ${REGION}
    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
