@@ -117,13 +117,15 @@ class Grib2Plot:
 
         # TURNING OFF MESHGRID FOR GFS FOR NOW. DAMN SHAPE BUG yo.
         if proj != 'merc' and model != 'gfs':
-          cs = m.pcolormesh(x, y, temp2m, cmap=plt.cm.jet)
+          cs = m.pcolormesh(x, y, temp2m, cmap=plt.cm.jet, vmin=-25, vmax=115)
         else:
-          cs = m.contourf(x,y,temp2m,20,cmap=plt.cm.jet)
+          CLEVELS= [(c*5)-25 for c in range(29)]
+          cs = m.contourf(x,y,temp2m,CLEVELS,cmap=plt.cm.jet, vmin=-25, vmax=115)
 
         # m.drawcoastlines()
         m.drawmapboundary()
-
+        # Overlay 32 degree isotherm
+        cc = m.contour(x,y,temp2m, [32], cmap=plt.cm.winter, vmin=32, vmax=32)
 
         # m.drawstates()
         # m.drawcountries()
@@ -131,7 +133,7 @@ class Grib2Plot:
         # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
 
         # FOR SETTING COLOR BARS!!!!!
-        # cb = plt.colorbar(cs, orientation='vertical')
+        # cb = plt.colorbar(cs, orientation='vertical', ticks=[(c*10)-25 for c in range(29)])
         # cb.outline.set_color('white')
 
         # axes_obj = plt.getp(ax,'axes')                        #get the axes' property handler
@@ -140,10 +142,10 @@ class Grib2Plot:
                        
         # plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color='w') # set colorbar  
         #                                                                 # yticklabels color
-        ##### two new lines ####
+        # #### two new lines ####
         # cb.outline.set_color('w')                   #set colorbar box color
         # cb.ax.yaxis.set_tick_params(color='w')      #set colorbar ticks color 
-        ##### two new lines ####
+        # cb.ax.set_yticklabels([(c*10)-25 for c in range(29)])# vertically oriented colorbar        #### two new lines ####
         # fig.set_facecolor('black')
         # END COLORBARS
         
@@ -155,7 +157,7 @@ class Grib2Plot:
 
         print "pngquant -o "+ os.getcwd()+ "/" + tempFileName + " --force --quality=70-80 "+ os.getcwd()+ "/" + tempFileName
         fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0, facecolor=fig.get_facecolor())
-        call("pngquant -o "+ tempFileName + " --force --quality=45-60 "+ tempFileName, shell=True)
+        call("pngquant -o "+ tempFileName + " --force --quality=50-65 "+ tempFileName, shell=True)
         #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
         call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
         call("rm " + tempFileName, shell=True)
