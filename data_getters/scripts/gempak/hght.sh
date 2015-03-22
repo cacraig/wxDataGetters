@@ -111,12 +111,29 @@ foreach level (250 500 850)
 
  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
 
-  set proj = "MER//NM"
-  set regionName = ${REGION}
-  if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+    set regionName = ${REGION}
     set proj = "STR/90;-100;0"
-    set regionName = "CONUS"
-  endif
+
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+    if (${REGION} == "NC") then
+      set proj = "lea/35.50;-79.25;0/NM"
+      set regionName = "NC"
+    endif
+
+    if (${REGION} == "OK") then
+      set proj = "lea/35.75;-97.25;0/NM"
+      set regionName = "OK"
+    endif
+
+    if (${REGION} == "WA") then
+      set proj = "lea/47.25;-120.00;0/NM"
+      set regionName = "WA"
+    endif
+
 
 gdplot2_gf << EOF 
          

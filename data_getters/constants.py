@@ -256,8 +256,8 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015031718/" # TEST
-    #latestRunDir  = "nam.20150317/" # TEST
+    #latestRunDir  = "gfs.2015032112/" # TEST
+    #latestRunDir  = "nam.20150321/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -298,7 +298,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[0:3] # test!
+    #runFileList = runFileList[10:15] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
