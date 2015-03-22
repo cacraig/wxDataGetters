@@ -256,7 +256,7 @@ class GemData:
 
     self.processGrib2(model, savePath, fileName)
 
-    return ''
+    return True
 
   def timeoutHttpRead(self, response, timeout = 60):
     def murha(resp):
