@@ -7,8 +7,7 @@ import errno
 import psycopg2
 import redis
 import concurrent.futures
-
-
+import socket, threading
 # TODO: Speed up download, and require less RAM. 
 #         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
 # Class for downloading data, and cleaning data directories.
@@ -137,7 +136,7 @@ class GemData:
 
   def setRunCompletionFlag(self, model):
 
-    f = open('/home/vagrant/logs/output.log','w')
+    f = open(self.constants.execLog, 'w')
     f.write('Trying: ' + model + '-complete')
     for item in self.constants.modelTimes[model]:
       f.write("Hour: " + item)
@@ -227,16 +226,54 @@ class GemData:
     # if os.path.isfile(grib2File):
     #   print "File already downloaded. Skipping..."
     #   return
-
+    
     # File does not already exist, download it.
-    gemFile = urllib2.urlopen(url).read()
-    fp = open(grib2File, 'w')
-    fp.write(gemFile)
-    fp.close()
+    # try:
+    maxSocketTime = 300 # Max time a download read() can take.
+    maxUrlOpenTime = 15 # Max time to open a URL
+    gemFile = urllib2.urlopen(url)
+    success,gemFile = self.timeoutHttpRead(gemFile, maxSocketTime)
+
+    # If the blocking urllib2.read() took longer than maxSocketTime, Abandon Ship!
+    # Return False, otherwise download file.
+    if success and gemFile is not None:
+      fp = open(grib2File, 'w')
+      fp.write(gemFile)
+      fp.close()
+    else:
+      print "Socket timed out! Time exceeded "
+      f = open(self.constants.errorLog,'w')
+      f.write("\n A socket Timed out in GemData.saveFilesThread() . We must exit this program execution, and attempt again.")
+      f.write("\n URL: " + url)
+      f.write("\n MODEL: " + model)
+      f.write("\n SAVE_PATH: " + savePath)
+      f.close()
+      # Exit call. Give up, get the hell out!
+      return False
+
+    # except socket.error:
+    #   print "There was a timeout"
 
     self.processGrib2(model, savePath, fileName)
 
     return ''
+
+  def timeoutHttpRead(self, response, timeout = 60):
+    def murha(resp):
+        os.close(resp.fileno())
+        resp.close()
+
+    # set a timer to yank the carpet underneath the blocking read() by closing the os file descriptor
+    t = threading.Timer(timeout, murha, (response,))
+    try:
+        t.start()
+        body = response.read()
+        t.cancel()
+    except socket.error as se:
+        if se.errno == errno.EBADF: # murha happened
+            return (False, None)
+        raise
+    return (True, body)
 
   def getDataThreaded(self, files, key):
     savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
@@ -255,7 +292,10 @@ class GemData:
       args.append(arg)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-      result = ''.join(executor.map(self.saveFilesThread, args))
+      for res in executor.map(self.saveFilesThread, args):
+        if res == False:
+          print "Exiting... See error.log for details."
+          exit(1)
     print "Done with Threads."
 
     return

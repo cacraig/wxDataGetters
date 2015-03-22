@@ -7,4 +7,11 @@ GEMPAK_DIR = gempak/GEMPAK7/gempak/
 DATA_DIR = data/model/
 WEB_DIR = /var/www/ngwips/client
 DIST_DIR = /var/www/ngwips/client/dist
-DB_CONN = dbname=xxx user=xxx password=xxx host=xxx port=xxx
+DB_CONN = dbname=xxx user=xxx password=xxx host=xxx port=5432
+IMAGE_HOST = ubuntu@54.186.9.28
+IMAGE_DIR = /var/www/ngwips/client/dist/src/assets
+PRODUCTION_DIR = /var/www/ngwips/client/dist/src
+BEANSTALKD_HOST = 192.168.33.10
+REDIS_HOST = 192.168.33.10
+ERROR_LOG = /home/cacraig/logs/error.log
+EXEC_LOG = /home/cacraig/logs/exec.log
