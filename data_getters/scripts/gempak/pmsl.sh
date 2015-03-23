@@ -69,10 +69,9 @@ foreach TIME ($times:q)
   
  # Reset line color!
  set lineColor = 13
- set level = 1000
- set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+ set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  echo imgDir
- mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
+ mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
 
  if (${model} == "ecmwf") then
@@ -157,7 +156,7 @@ gdplot2_gf << EOF
   MSCALE   = "0"
   LATLON   = 
   STNPLT   =  
-  DEVICE   = "gif|init_${model}_1000_${variable}_f${TIME}.gif|1280;1024| C"
+  DEVICE   = "gif|init_${model}_sfc_${variable}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -166,8 +165,8 @@ EOF
    rm last.nts
    rm gemglb.nts
    # convert to a transparent image layer.
-   convert init_${model}_1000_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
-   rm init_${model}_1000_${variable}_f${TIME}.gif
+   convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_sfc_${variable}_f${TIME}.gif
  end
 
 end
