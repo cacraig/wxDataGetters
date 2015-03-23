@@ -70,7 +70,7 @@ foreach TIME ($times:q)
   #   set gdFile = ${runTime}"_1.gem"
   # endif
 
-foreach level (250 500 850 1000)
+foreach level (250 500 700 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}

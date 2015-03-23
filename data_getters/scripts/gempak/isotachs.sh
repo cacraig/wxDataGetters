@@ -69,7 +69,7 @@ foreach TIME ($times:q)
 
 
 
-foreach level (250 500 850)
+foreach level (250 500 700 850)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
