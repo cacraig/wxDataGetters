@@ -18,17 +18,13 @@ class GemData:
     print "Creating Connection to DB & Redis..."
     self.conn = psycopg2.connect(self.constants.dbConnStr)
     self.cursor = self.conn.cursor()
-    self.dbRunTimes = self.getCurrentRuns()
     self.redisConn = redis.Redis(self.constants.redisHost)
     self.updated = True
     self.DEBUG = debug
     self.complete = False
     self.updatingDir = "/updating"
 
-    # If DEBUG is True, clear all model times so they aren't skipped.
-    if self.DEBUG:
-      for model,time in self.dbRunTimes.items():
-        self.dbRunTimes[model] = ""
+
 
     return
 
@@ -46,6 +42,13 @@ class GemData:
         del self.constants.runTimes[key]
         print "Skipping: " + key + "... Model not updated."
         continue
+
+      # If DEBUG is True, clear all model times so they aren't skipped.
+      if self.DEBUG:
+        for model,time in self.dbRunTimes.items():
+          self.dbRunTimes[model] = ""
+
+      self.dbRunTimes = self.getCurrentRuns(key)
 
       if(self.DEBUG == False):
         if key in self.dbRunTimes:
@@ -357,9 +360,15 @@ class GemData:
     print cmd
     return call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
 
-  def getCurrentRuns(self):
+  def getCurrentRuns(self, model):
+    '''''
+    Get latest run time from database for model.
+    @return String
+    '''''
     print "Getting Current Runs from DB..."
-    self.cursor.execute("SELECT name,current_run from model")
+    selectQuery = "select model.name as name, run_time from model_runtime JOIN model ON (model.id = model_runtime.model_id) WHERE model.name='" + \
+                     model + "' ORDER BY run_time DESC LIMIT 1"
+    self.cursor.execute(selectQuery)
     rows = self.cursor.fetchall()
     print rows
     dbRunTimes = {}
@@ -375,8 +384,11 @@ class GemData:
       return
 
     try:
-      # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET current_run ='" + time + "', previous_run= '" + self.dbRunTimes[model] + "', updating=1 WHERE name='" + model+"'")
+      insertStr = "INSERT INTO model_runtime (model_id, run_time) " + \
+                   "VALUES ((SELECT id FROM model WHERE model.name ='" + model +"'),'" + time + "')"
+
+      self.cursor.execute(insertStr)
+      self.cursor.execute("UPDATE model SET updating=1 WHERE name='" + model+"'")
     except Exception, e:
       print e
 
@@ -386,8 +398,11 @@ class GemData:
   def setUpdatingFlag(self, model, boolValue):
 
     try:
-      # self.cursor.execute("SELECT * from model where name='" + model + "'")
-      self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
+      #updateStr = "UPDATE model_runtime SET updating=" + str(boolValue) + \
+      #            " WHERE model_id = (SELECT id FROM model WHERE model.name = '" + model + "') AND run_time='" + self.dbRunTimes[model] + "'"
+      updateStr = "UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'"
+      self.cursor.execute(updateStr)
+      #self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
     except Exception, e:
       print e
 
