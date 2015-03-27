@@ -56,15 +56,21 @@ class Gempak:
           if len(self.constants.modelTimes[key]) >0:
             self.constants.modelTimes[key].sort()
             # Do TempF plotting in Matplotlib...
-            #self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
+            self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
           
+          # Do gddiag. (Mutable, cannot thread this.)
+          for file in glob.glob("gempak/grids/*.sh"):
+            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
+            print "Doing: " + file + " =>  " + cmd
+            self.runCmd(cmd)
+
           # Do gempak stuff.
           for file in glob.glob("gempak/hres/*.sh"):
             print "Executing HiRes gempak scripts."
             # Customized Gempak scripts for High resolution data in scripts/gempak/hres
             cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            #cmdList.append(cmd)
-            self.runCmd(cmd)
+            cmdList.append(cmd)
+            #self.runCmd(cmd)
             print cmd
         else:
           print "Executing Non-HiRes gempak scripts."

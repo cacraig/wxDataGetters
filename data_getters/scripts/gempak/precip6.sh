@@ -96,7 +96,7 @@ foreach TIME ($times:q)
    set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
    mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
 
-gdplot_gf << EOF 
+gdplot2_gf << EOF 
        
   GDFILE  = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM = "f${TIME}"
@@ -105,11 +105,11 @@ gdplot_gf << EOF
   PANEL   = 0 
   SKIP    = 
   SCALE   = 0 
-  GFUNC   = p06i 
-  CTYPE   = c/f
+  GDPFUN   = p06i 
+  CTYPE   = f
   CONTUR  = 1 
   CINT    = 0.25;0.5;0.75;1;1.5;2.0;3.0
-  TYPE    = c/f
+  TYPE    = f
   LINE    = 16/10/1/1 
   FINT    = 0.01;0.1;0.25;0.5;0.75;1;1.5;2.0;3.0
   FLINE   = 0;21;22;23;20;17;15;2;7 
@@ -118,6 +118,7 @@ gdplot_gf << EOF
   GVECT   = 
   WIND    = bm32/0.8 
   REFVEC  = 
+  CLRBAR  = 1/H/LR/.75;.05/
   GAREA  = ${REGION}
   PROJ   = ${proj}    
   CLEAR   = yes 

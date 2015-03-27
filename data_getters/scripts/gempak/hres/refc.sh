@@ -48,57 +48,57 @@ foreach TIME ($times:q)
  set shortTime = ${TIME}
 
 
-gddiag << EOFD
-glevel = 2
-garea = 
-gvcord = hght
-gdattim = "f${TIME}"
-gdfile = "${MODEL_PATH}/${model}/${gdFile}"
-gdoutf = "${MODEL_PATH}/${model}/${gdFile}"
-gpack = none
-!
-gfunc = sgt(tmpk,272)
-GRDNAM = rain1@0%none
-r
+# gddiag << EOFD
+# glevel = 2
+# garea = 
+# gvcord = hght
+# gdattim = "f${TIME}"
+# gdfile = "${MODEL_PATH}/${model}/${gdFile}"
+# gdoutf = "${MODEL_PATH}/${model}/${gdFile}"
+# gpack = none
+# !
+# gfunc = sgt(tmpk,272)
+# GRDNAM = rain1@0%none
+# r
 
-gfunc = sgt(tmpk@30:0%pdly,272)
-grdnam = rain2@0%none
-r
+# gfunc = sgt(tmpk@30:0%pdly,272)
+# grdnam = rain2@0%none
+# r
 
-glevel = 0
-gvcord = none
-gfunc = mask(rain1,rain2)
-grdnam = rain@0%none
-r
+# glevel = 0
+# gvcord = none
+# gfunc = mask(rain1,rain2)
+# grdnam = rain@0%none
+# r
 
-glevel = 2
-gvcord = hght
-gfunc = sle(tmpk,276)
-grdnam = snow1@0%none
-r
+# glevel = 2
+# gvcord = hght
+# gfunc = sle(tmpk,276)
+# grdnam = snow1@0%none
+# r
 
-gfunc = sle(tmpk@30:0%pdly,273)
-grdnam = snow2@0%none
-r
+# gfunc = sle(tmpk@30:0%pdly,273)
+# grdnam = snow2@0%none
+# r
 
-glevel = 0
-gvcord = none
-gfunc = mask(snow1,snow2)
-grdnam = snow
-r
+# glevel = 0
+# gvcord = none
+# gfunc = mask(snow1,snow2)
+# grdnam = snow
+# r
 
-glevel = 2
-gvcord = hght
-gfunc = sle(tmpk,273.1)
-grdnam = frzn1@0%none
-r
+# glevel = 2
+# gvcord = hght
+# gfunc = sle(tmpk,273.1)
+# grdnam = frzn1@0%none
+# r
 
-gfunc = mask(frzn1@0%none,rain2@0%none)
-grdnam = frzn@0%none
-r
+# gfunc = mask(frzn1@0%none,rain2@0%none)
+# grdnam = frzn@0%none
+# r
 
-e
-EOFD
+# e
+# EOFD
 
  # if (${model} == "nam12km") then
  #   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
