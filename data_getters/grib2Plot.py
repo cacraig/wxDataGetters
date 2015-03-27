@@ -49,6 +49,11 @@ class Grib2Plot:
     self.regions   = ['NC','WA','CONUS','OK'] 
     self.constants = constants
     self.isPng = ['CONUS']
+    self.snowSum = None
+    self.snowSum12 = None
+    self.snowSum24 = None
+    self.snowSum72 = None
+    self.snowSum120 = None
     return
 
   def plot2mTemp(self, model, times, runTime, modelDataPath):
@@ -177,21 +182,9 @@ class Grib2Plot:
     variable = "snow"
     baseDir = "data"
     imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable
-    imgDir24 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "24"
-    imgDir72 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "72"
-    imgDir120 = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "120"
+    imgDirAccumTotal = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "_accum"
     call("mkdir -p " + imgDir, shell=True)
-
-    # if model == "gfs":
-    #   for region in regions:
-    #     for time in times:
-    #       runHour = runTime[-2:]
-    #       startFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2.0p25.f"+ previous 
-    #       endFile = modelDataPath + model + "/" + "gfs.t" + runHour + "z.pgrb2.0p25.f"+ time
-    #       tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-    #       saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
-    #       self.doSnowPlot(startFile, endFile, region, model,tempFileName, saveFileName, True)
-    #       previous = time
+    call("mkdir -p " + imgDirAccumTotal, shell=True)
 
     # nam.t18z.awip3281.tm00.grib2
     for region in self.regions:
@@ -206,82 +199,26 @@ class Grib2Plot:
           runHour = runTime[-2:]
           startFile = self.getGrib2File(modelDataPath, runHour, model, shortTimePrevious)
           endFile = self.getGrib2File(modelDataPath, runHour, model, shortTime)
-          tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-          saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
-          self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-
-          # Get 24 hour snowfall totals
-          if int(time) % 24 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(24, time)
-            variableAccum = variable + "24"
-            #save to model/snow24/*
-            call("mkdir -p " + imgDir24, shell=True)
-            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime[-2:])
-            endFile = self.getGrib2File(modelDataPath, runHour, model, shortTime)
-            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-            saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
-            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-          # Get 72 hour snowfall totals
-          if int(time) % 72 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(72, time)
-            variableAccum = variable + "72"
-            #save to model/snow24/*
-            call("mkdir -p " + imgDir72, shell=True)
-            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime[-2:])
-            endFile = self.getGrib2File(modelDataPath, runHour, model, shortTime)
-            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-            saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
-            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
 
         if model == "gfs":
           runHour = runTime[-2:]
           startFile = self.getGrib2File(modelDataPath, runHour, model, previous)
           endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-          tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
-          saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
-          self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-
-          # Get 24 hour snowfall totals
-          if int(time) % 24 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(24, time)
-            variableAccum = variable + "24"
-            #save to model/snow24/*
-            call("mkdir -p " + imgDir24, shell=True)
-            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-            saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
-            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-          # Get 72 hour snowfall totals
-          if int(time) % 72 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(72, time)
-            variableAccum = variable + "72"
-            #save to model/snow72/*
-            call("mkdir -p " + imgDir72, shell=True)
-            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-            saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
-            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
-          # Get 120 hour snowfall totals
-          if int(time) % 120 == 0 and int(time) > 0:
-            startTime = self.getAccumulationStartTime(120, time)
-            variableAccum = variable + "120"
-            #save to model/snow120/*
-            call("mkdir -p " + imgDir120, shell=True)
-            startFile = self.getGrib2File(modelDataPath, runHour, model, startTime)
-            endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-            tempFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
-            saveFileName = imgDir120 + "/" + region +"_f" + time + ".gif"
-            self.doSnowPlot(startFile, endFile, region, model, tempFileName, saveFileName)
+          self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
 
         # Set the previous time for next iteration.
         previous = time
 
     return
 
-  def doSnowPlot(self, startFile, endFile, region, model, tempFileName, saveFileName, isGFS0p25 = False):
+  def doSnowPlot(self, startFile, endFile, region, model, level, variable, time, imgDir):
 
+    variableAccum = variable + "_accum"
+    tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
+    saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
+    accumTmpFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
+    accumSaveFileName = imgDir + "_accum" + "/" + region +"_f" + time + ".gif"
     borderBottomCmd = "" # Reset bottom border.
 
     try:
@@ -333,6 +270,32 @@ class Grib2Plot:
     dtot.clip(0)
 
     snow = swemAccum/25.4 * 10
+
+    # Set Hour accumulation
+    if self.snowSum is None:
+      self.snowSum = snow
+    else:
+      self.snowSum += snow
+
+    if self.snowSum120 is None:
+      self.snowSum120 = snow
+    else:
+      self.snowSum120 += snow
+
+    if self.snowSum72 is None:
+      self.snowSum72 = snow
+    else:
+      self.snowSum72 += snow
+
+    if self.snowSum24 is None:
+      self.snowSum24 = snow
+    else:
+      self.snowSum24 += snow
+
+    if self.snowSum12 is None:
+      self.snowSum12 = snow
+    else:
+      self.snowSum12 += snow
 
     m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
 
@@ -396,14 +359,94 @@ class Grib2Plot:
     # fig.set_facecolor('black')
     # END COLORBARS
 
-
     print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + borderBottomCmd + " " + saveFileName
     fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
     call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
     call("rm " + tempFileName, shell=True)
 
     fig.clf()
+
+    ax = fig.add_axes([1,1,1,1],axisbg='k')
+    cs = plt.contourf(x,y,self.snowSum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
+    m.drawmapboundary()
+
+    fig.savefig(accumTmpFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+    call("convert -background none "+ accumTmpFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + accumSaveFileName, shell=True)
+    call("rm " + accumTmpFileName, shell=True)
+
+    fig.clf()
+
+    if int(time) % 120 == 0 and int(time) > 0:
+      # do plot
+      #save to model/snow120/*
+      imgDir120 = imgDir + "120"
+      call("mkdir -p " + imgDir120, shell=True)
+      tempFileName = "init_" + model + "_" + level + "_" + variable + "120" + "_f" + time + ".png"
+      saveFileName = imgDir120 + "/" + region +"_f" + time + ".gif"
+      ax = fig.add_axes([1,1,1,1],axisbg='k')
+      cs = plt.contourf(x, y, self.snowSum120, SNOWP_LEVS, extend='max', cmap=coltbls.snow2())
+      m.drawmapboundary()
+
+      fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+      call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+      call("rm " + tempFileName, shell=True)
+      self.snowSum120 = None
+      fig.clf()
+
+    if int(time) % 72 == 0 and int(time) > 0:
+      # do plot
+      #save to model/snow72/*
+      imgDir72 = imgDir + "72"
+      call("mkdir -p " + imgDir72, shell=True)
+      tempFileName = "init_" + model + "_" + level + "_" + variable + "72" + "_f" + time + ".png"
+      saveFileName = imgDir72 + "/" + region +"_f" + time + ".gif"
+      ax = fig.add_axes([1,1,1,1],axisbg='k')
+      cs = plt.contourf(x, y, self.snowSum72, SNOWP_LEVS, extend='max', cmap=coltbls.snow2())
+      m.drawmapboundary()
+
+      fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+      call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+      call("rm " + tempFileName, shell=True)
+      self.snowSum72 = None
+      fig.clf()
+
+    if int(time) % 24 == 0 and int(time) > 0:
+      # do plot
+      #save to model/snow24/*
+      imgDir24 = imgDir + "24"
+      call("mkdir -p " + imgDir24, shell=True)
+      tempFileName = "init_" + model + "_" + level + "_" + variable + "24" + "_f" + time + ".png"
+      saveFileName = imgDir24 + "/" + region +"_f" + time + ".gif"
+      ax = fig.add_axes([1,1,1,1],axisbg='k')
+      cs = plt.contourf(x, y, self.snowSum24, SNOWP_LEVS, extend='max', cmap=coltbls.snow2())
+      m.drawmapboundary()
+
+      fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+      call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+      call("rm " + tempFileName, shell=True)
+      self.snowSum24 = None
+      fig.clf()
+
+    if int(time) % 12 == 0 and int(time) > 0:
+      # do plot
+      #save to model/snow12/*
+      imgDir12 = imgDir + "12"
+      call("mkdir -p " + imgDir12, shell=True)
+      tempFileName = "init_" + model + "_" + level + "_" + variable + "12" + "_f" + time + ".png"
+      saveFileName = imgDir12 + "/" + region +"_f" + time + ".gif"
+      ax = fig.add_axes([1,1,1,1],axisbg='k')
+      cs = plt.contourf(x, y, self.snowSum12, SNOWP_LEVS, extend='max', cmap=coltbls.snow2())
+      m.drawmapboundary()
+
+      fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+      call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
+      call("rm " + tempFileName, shell=True)
+      self.snowSum12 = None
+      fig.clf()
+    
     plt.close()
+
+
 
     return
 
