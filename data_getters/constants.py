@@ -261,8 +261,8 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    latestRunDir  = "gfs.2015032612/" # TEST
-    #latestRunDir  = "nam.20150325/" # TEST
+    #latestRunDir  = "gfs.2015032612/" # TEST
+    latestRunDir  = "nam.20150326/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 

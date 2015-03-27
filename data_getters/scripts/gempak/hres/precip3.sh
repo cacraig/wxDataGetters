@@ -44,16 +44,6 @@ foreach TIME ($times:q)
  
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
- 
- set shortTime = ${TIME}
-
- if (${model} == "nam12km") then
-   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
- endif 
-
- if (${model} == "nam4km") then
-   set shortTime = `echo ${TIME} | awk '{print substr($0,2,3)}'`
- endif 
 
  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
     set regionName = ${REGION}
@@ -107,7 +97,7 @@ gdplot2_gf << EOF
   CLEAR   = yes 
   MAP     = 0
   TITLE   = 
-  DEVICE = "gif|init_${model}_sfc_${variable}_f${shortTime}.gif|1280;1024| C"
+  DEVICE = "gif|init_${model}_sfc_${variable}_f${TIME}.gif|1280;1024| C"
   run
  exit
 EOF
@@ -118,8 +108,8 @@ EOF
    rm gemglb.nts
 
    # convert to a transparent image layer.
-   convert init_${model}_sfc_${variable}_f${shortTime}.gif -transparent black ${imgDir}/${regionName}_f${shortTime}.gif
-   rm init_${model}_sfc_${variable}_f${shortTime}.gif
+   convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_sfc_${variable}_f${TIME}.gif
  end
 
 end
