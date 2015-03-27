@@ -84,7 +84,7 @@ class Constants:
                 "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90", \
 
       'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
-                "&lev_500_mb=on&lev_700_mb=on&lev_1000-0_m_above_ground=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
+                "&lev_500_mb=on&lev_700_mb=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
                 "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
                 "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
                 "&var_CAPE=on&var_HLCY=on" + \
@@ -92,7 +92,7 @@ class Constants:
 
       "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_150_mb=on&lev_200_mb=on&lev_250_mb=on&lev_2_hybrid_level=on" + \
                 "&lev_2_m_above_ground=on&lev_500-1000_mb=on&lev_500_mb=on&lev_650_mb=on&lev_700_mb=on&lev_725_mb=on&lev_750_mb=on&lev_925_mb=on&lev_950_mb=on&lev_975_mb=on" + \
-                "&var_CAPE=on&var_CIN=on&var_HLCY=on&lev_1000-0_m_above_ground=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
+                "&var_CAPE=on&var_CIN=on&var_HLCY=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
                 "&lev_cloud_base=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_max_wind=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on" + \
                 "&lev_surface=on&lev_850_mb=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on" + \
                 "&var_DZDT=on&var_EVP=on&var_GUST=on&var_HGT=on&var_ICEC=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_REFC=on&var_RH=on&var_TMAX=on" + \
@@ -261,7 +261,7 @@ class Constants:
       if model == modelType and int(date) > int(latestRun):
         latestRunDir = dir
 
-    #latestRunDir  = "gfs.2015032112/" # TEST
+    latestRunDir  = "gfs.2015032612/" # TEST
     #latestRunDir  = "nam.20150325/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
@@ -303,7 +303,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[15:17] # test!
+    runFileList = runFileList[15:17] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))

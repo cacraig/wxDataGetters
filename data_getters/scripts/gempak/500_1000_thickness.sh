@@ -13,7 +13,7 @@ set model  = $1
 set times  = `echo $2:q | sed 's/,/ /g'`
 set runTime = $3 
 
-set variable = "850_1000_thickness"
+set variable = "500_1000_thickness"
 set level = "500"
 
 set gdFile = ${model}".gem"

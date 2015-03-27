@@ -40,7 +40,7 @@ foreach TIME ($times:q)
   set gdFile = ${runTime}"f"${TIME}".gem"
   
 
-foreach level (1000 3000)
+foreach level (3000)
  set variable = 0_${level}_"EHI"
  set imgDir = ${baseDir}/${model}/${timeStamp}/comp/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/comp/${variable}
