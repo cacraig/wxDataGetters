@@ -136,37 +136,55 @@ if (${model} == "ukmet") then
       set regionName = "WA"
     endif
 
-gdplot_gf << EOF 
+gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
   GDATTIM  = "f${TIME}"
-  CLEAR    = "n"
-  GLEVEL   = "${level}"
-  GVCORD   = "PRES"
-  PANEL    = "0"
-  SKIP  =  "1/2"  
-  SCALE =  "0"                                                              
-  GFUNC =                                             
-  CTYPE =                                                                    
-  CONTUR =      
-  GVECT = "WND"
-  WIND = "bm${barbColor}//2"                                                         
-  CINT   =                                       
-  LINE   =                                                
-  FINT   =                                                   
-  FLINE  = 
-  HILO   =                                                                    
-  HLSYM  =                                                                        
-  REFVEC =       
-  TITLE =                                                                       
-  CLEAR =  "yes" 
-  IJSKIP   = "0"
   GAREA  = ${REGION}
   PROJ   = ${proj}    
-  MAP      = "0"
-  STNPLT   =
+  GDPFUN   = wnd 
+  CLEAR    = n
+  GLEVEL   = 500
+  GVCORD   = PRES
+  PANEL    = 0
+  SKIP  =  1/2  
+  GLEVEL   = "${level}"
+  GVCORD   = pres 
+  TYPE     = b 
+  CINT     = 0/32/32
+  FINT     = 15;20;30;35;40;45;50;55;60;65;70;75;80
+  FLINE    = 32;30-19
+  CLRBAR   = 31 
+  PANEL    = 0
+  SKIP     = 0                 
+  SCALE    = 0                
+  CONTUR   = 0      
+  MAP      = 0            
+  HILO     =   
+  LATLON   = 
+  STNPLT   =  
+  SATFIL   =  
+  RADFIL   = 
+  LUTFIL   =  
+  STREAM   =  
+  POSN     = 4
+  COLORS   = 2
+  MARKER   = 2
+  GRDLBL   = 5
+  FILTER   = YES 
+  LINE     = 4/1/5
+  HLSYM    = 1/3/23//HW 
+  WIND     = ${barbColor}/.6/2
+  TXTCOL   =  31
+  TXTYPE   = 1.25///221//l/
+  TXTFIL   =  
+  INFO     =  
+  LOCI     =  .09
+  ANOTLN   =  15///25
+  ANOTYP   =  f
+  IJSKIP   = 1
   DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
-  run
+  run   
  exit
 EOF
      # clean output buffer/gifs, and cleanup
