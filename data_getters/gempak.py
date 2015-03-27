@@ -56,7 +56,7 @@ class Gempak:
           if len(self.constants.modelTimes[key]) >0:
             self.constants.modelTimes[key].sort()
             # Do TempF plotting in Matplotlib...
-            self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
+            #self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
           
           # Do gempak stuff.
           for file in glob.glob("gempak/hres/*.sh"):

@@ -19,6 +19,7 @@ class GemData:
     self.conn = psycopg2.connect(self.constants.dbConnStr)
     self.cursor = self.conn.cursor()
     self.redisConn = redis.Redis(self.constants.redisHost)
+    self.dbRunTimes = {}
     self.updated = True
     self.DEBUG = debug
     self.complete = False
