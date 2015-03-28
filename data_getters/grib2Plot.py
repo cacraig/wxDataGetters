@@ -270,32 +270,32 @@ class Grib2Plot:
     dtot.clip(0)
 
     snow = swemAccum/25.4 * 10
+    if int(time) > 0:
+      # Set Hour accumulation
+      if self.snowSum is None:
+        self.snowSum = snow
+      else:
+        self.snowSum += snow
 
-    # Set Hour accumulation
-    if self.snowSum is None:
-      self.snowSum = snow
-    else:
-      self.snowSum += snow
+      if self.snowSum120 is None:
+        self.snowSum120 = snow
+      else:
+        self.snowSum120 += snow
 
-    if self.snowSum120 is None:
-      self.snowSum120 = snow
-    else:
-      self.snowSum120 += snow
+      if self.snowSum72 is None:
+        self.snowSum72 = snow
+      else:
+        self.snowSum72 += snow
 
-    if self.snowSum72 is None:
-      self.snowSum72 = snow
-    else:
-      self.snowSum72 += snow
+      if self.snowSum24 is None:
+        self.snowSum24 = snow
+      else:
+        self.snowSum24 += snow
 
-    if self.snowSum24 is None:
-      self.snowSum24 = snow
-    else:
-      self.snowSum24 += snow
-
-    if self.snowSum12 is None:
-      self.snowSum12 = snow
-    else:
-      self.snowSum12 += snow
+      if self.snowSum12 is None:
+        self.snowSum12 = snow
+      else:
+        self.snowSum12 += snow
 
     m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
 
