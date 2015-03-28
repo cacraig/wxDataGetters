@@ -188,6 +188,11 @@ class Grib2Plot:
 
     # nam.t18z.awip3281.tm00.grib2
     for region in self.regions:
+      self.snowSum = None
+      self.snowSum12 = None
+      self.snowSum24 = None
+      self.snowSum72 = None
+      self.snowSum120 = None
       for time in times:
         # skip the 0th hour.
         if int(time) == 0:

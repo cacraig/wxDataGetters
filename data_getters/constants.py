@@ -303,7 +303,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[12:15] # test!
+    #runFileList = runFileList[0:17] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
