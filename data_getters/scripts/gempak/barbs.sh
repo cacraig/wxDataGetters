@@ -175,14 +175,14 @@ gdplot2_gf << EOF
   LINE     = 4/1/5
   HLSYM    = 1/3/23//HW 
   WIND     = ${barbColor}/.6/2
-  TXTCOL   =  31
-  TXTYPE   = 1.25///221//l/
+  TXTCOL   = 
+  TXTYPE   = 
   TXTFIL   =  
   INFO     =  
-  LOCI     =  .09
-  ANOTLN   =  15///25
-  ANOTYP   =  f
-  IJSKIP   = 1
+  LOCI     =  
+  ANOTLN   =  
+  ANOTYP   = 
+  IJSKIP   = 
   DEVICE = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
   run   
  exit
