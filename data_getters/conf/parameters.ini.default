@@ -15,3 +15,4 @@ BEANSTALKD_HOST = 192.168.33.10
 REDIS_HOST = 192.168.33.10
 ERROR_LOG = /home/cacraig/logs/error.log
 EXEC_LOG = /home/cacraig/logs/exec.log
+NP_TMP_DIR = /vagrant/tmp

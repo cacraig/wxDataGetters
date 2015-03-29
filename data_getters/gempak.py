@@ -83,7 +83,6 @@ class Gempak:
             self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
             # Do Snowfall plotting in Matplotlib...
             self.grib2Plotter.plotSnowFall(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv, previousTime)
-
             # Do gddiag. (Mutable, cannot thread this.)
             # for file in glob.glob("gempak/grids/*.sh"):
             #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime

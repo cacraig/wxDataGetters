@@ -48,6 +48,7 @@ class Grib2Plot:
     }
     self.regions   = ['NC','WA','CONUS','OK'] 
     self.constants = constants
+    call("mkdir -p " + self.constants.numPyTmpDir, shell=True)
     self.isPng = ['CONUS']
     self.snowSum = None
     self.snowSum12 = None
@@ -185,14 +186,19 @@ class Grib2Plot:
     imgDirAccumTotal = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable + "_accum"
     call("mkdir -p " + imgDir, shell=True)
     call("mkdir -p " + imgDirAccumTotal, shell=True)
+    
+    # If the inital timestep (0th hour) is in the times set.
+    self.hasInitalTime = 0 in map(int, times)
 
     # nam.t18z.awip3281.tm00.grib2
     for region in self.regions:
-      self.snowSum = None
-      self.snowSum12 = None
-      self.snowSum24 = None
-      self.snowSum72 = None
-      self.snowSum120 = None
+      # Load previously calculated accumulation data.
+      self.snowSum    = self.loadAccumulationData(variable, region, model, 'snowSum')
+      self.snowSum12  = self.loadAccumulationData(variable, region, model, 'snowSum12')
+      self.snowSum24  = self.loadAccumulationData(variable, region, model, 'snowSum24')
+      self.snowSum72  = self.loadAccumulationData(variable, region, model, 'snowSum72')
+      self.snowSum120 = self.loadAccumulationData(variable, region, model, 'snowSum120')
+
       for time in times:
         # skip the 0th hour.
         if int(time) == 0:
@@ -214,6 +220,8 @@ class Grib2Plot:
 
         # Set the previous time for next iteration.
         previous = time
+      # Save accumulation data.
+      self.saveAccumulationData(variable, region, model)
 
     return
 
@@ -547,3 +555,48 @@ class Grib2Plot:
       fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
 
     return (m,fig, borderWidth, proj, borderBottom)
+
+  def saveAccumulationData(self, var, region, model):
+    if var is "snow":
+
+      outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum.npy"
+      print "Saving snow accumulation data to: " + outFile
+      np.save(outFile, self.snowSum)
+
+      outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum12.npy"
+      print "Saving snow accumulation data to: " + outFile
+      np.save(outFile, self.snowSum12)
+
+      outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum24.npy"
+      print "Saving snow accumulation data to: " + outFile
+      np.save(outFile, self.snowSum24)
+
+      outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum72.npy"
+      print "Saving snow accumulation data to: " + outFile
+      np.save(outFile, self.snowSum72)
+
+      outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum120.npy"
+      print "Saving snow accumulation data to: " + outFile
+      np.save(outFile, self.snowSum120 )
+
+    elif var is "precip":
+      print "saving precip."
+    return
+
+  def loadAccumulationData(self, var, region, model, name=""):
+    dat = None
+    # Don't load files if the 0th hour is in Set.
+    if self.hasInitalTime:
+      print "Not loading previous data, because this is a new run."
+      return dat
+
+    if var is "snow":
+      try:
+        inFile = self.constants.numPyTmpDir + "/" + model + "_" + region +"_" + name +".npy"
+        print "Loading snow accumulation data: " + inFile
+        dat = np.load(inFile)
+      except Exception, e:
+        print e
+    elif var is "precip":
+      print "loading precip."
+    return dat

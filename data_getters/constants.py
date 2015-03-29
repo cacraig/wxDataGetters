@@ -35,6 +35,7 @@ class Constants:
     self.redisHost = config.get('DEFAULT', 'REDIS_HOST')
     self.errorLog = config.get('DEFAULT', 'ERROR_LOG')
     self.execLog = config.get('DEFAULT', 'EXEC_LOG')
+    self.numPyTmpDir =  config.get('DEFAULT', 'NP_TMP_DIR')
 
     self.expectedNumberOfFiles = {
       "nam": 28,
@@ -262,7 +263,7 @@ class Constants:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015032612/" # TEST
-    #latestRunDir  = "nam.20150327/" # TEST
+    #latestRunDir  = "nam.20150328/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -303,7 +304,7 @@ class Constants:
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
-    #runFileList = runFileList[0:17] # test!
+    #runFileList = runFileList[10:30] # test!
     print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
