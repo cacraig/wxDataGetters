@@ -323,6 +323,14 @@ class GemData:
       self.rmFile(directory)
 
   '''''
+  Clear saved npy files.
+  '''''
+  def clearNpyDat(self, model):
+    self.runCmd("rm " + self.constants.NP_TMP_DIR + "/" + model + "_*")
+    return
+
+
+  '''''
   rmFile just removes a file, and throws an exception. Shut up.
 
   @param String filePath - File to remove.

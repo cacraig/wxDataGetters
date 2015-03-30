@@ -20,6 +20,8 @@ class DataGetter:
         dataGetter.scrubTreeData(dataGetter.constants.dataDirEnv + "/" + self.model)
         # Model is complete. Reset updating flag to 0;
         dataGetter.setUpdatingFlag(self.model, 0)
+        # Clear accumulation data.
+        # dataGetter.clearNpyDat(self.model)
       dataGetter.transferFilesToProd(self.model)
 
     dataGetter.closeConnection()

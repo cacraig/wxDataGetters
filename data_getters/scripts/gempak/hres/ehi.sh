@@ -101,13 +101,14 @@ gdplot2_gf << EOF
   MARKER   = 0
   GRDLBL   = 0
   FILTER   = 0
-  LINE     = 32/1/1
+  LINE     = 32/1/1!4/1/1
   HLSYM    = 0
   WIND     = 0
   INFO     =  
   LOCI     =  
   ANOTLN   =  
   ANOTYP   =  
+  TITLE    = 
   DEVICE = "gif|init_${model}_0_${level}_${variable}_f${TIME}.gif|1280;1024| C"
   run   
  exit
