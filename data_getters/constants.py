@@ -304,7 +304,7 @@ class Constants:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
 
     #runFileList = runFileList[10:30] # test!
-    print runFileList
+    #print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
 
@@ -374,7 +374,7 @@ class Constants:
     alias = self.getAlias(model)
 
     contentListUrl = self.highResDataHttp + alias + "/prod/"
-    print contentListUrl
+    #print contentListUrl
     contentList = urllib2.urlopen(contentListUrl).read()
 
     filesList = self.getLatestHiresFiles(contentList, model, alias)
@@ -401,7 +401,7 @@ class Constants:
     # A list of all Download urls.
     dataDict['files'] = runDict
 
-    print files
+    #print files
 
     return dataDict
 
