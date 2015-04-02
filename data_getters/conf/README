@@ -40,8 +40,31 @@ sudo pip install futures
 # Install beanstalkd
 
 # Install supervisor
+sudo apt-get install supervisor
+sudo service supervisor restart
+
+Example:
+
+$: /etc/supervisor/conf.d/gfs-checker.conf
+
+[program:gfs-checker]
+directory=/home/vagrant/wxDataGetters/data_getters
+command=python -u /home/vagrant/wxDataGetters/data_getters/dataChecker.py --model=gfs
+autostart=true
+autorestart=true
+redirect_stderr=true
+stderr_logfile=/home/vagrant/logs/gfs.log
+stdout_logfile=/home/vagrant/logs/gfs.log
+
+sudo supervisorctl reread
+
+sudo supervisorctl update
+
+sudo supervisorctl restart all
+
 
 # Install Redis
+
 
 # Set up Data Checkers
 

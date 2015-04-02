@@ -10,6 +10,8 @@ if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
 endif
 
 set model  = $1
+
+
 set times  = `echo $2:q | sed 's/,/ /g'`
 set runTime = $3 
 

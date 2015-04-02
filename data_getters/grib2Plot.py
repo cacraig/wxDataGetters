@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+
 import pygrib
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap, shiftgrid,cm
@@ -38,6 +41,7 @@ class Grib2Plot:
   @return void
   '''''
   def __init__(self, constants):
+
     self.regionBounds = {
       #                              CENLAT  CENLON   LLLAT   LLLON   URLAT   URLON PROJ
       # NC      NORTH CAROLINA       35.50  -79.25   30.00  -87.25   41.00  -71.25  laea

@@ -2,7 +2,6 @@ import time
 from bs4 import BeautifulSoup
 import urllib2
 import datetime, re, os
-from subprocess import call
 import ConfigParser
 
 '''''

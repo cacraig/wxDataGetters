@@ -296,7 +296,7 @@ class GemData:
         self.constants.modelTimes[key].append(fHour)
       args.append(arg)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
       for res in executor.map(self.saveFilesThread, args):
         if res == False:
           print "Exiting... See error.log for details."

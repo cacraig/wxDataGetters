@@ -39,7 +39,7 @@ def main():
       
     print "Currently Processing: " + currentlyProcessing
 
-    if currentlyProcessing != "1":
+    if int(currentlyProcessing) == 0:
       # If it has new hourly data, or it is a new run altogether. Put it in the Queue.
       if hasNewData(constants, model, redisConn) or db.isNewRun(model, constants.runTimes[model]):
         # Run has been updated. Put into queue.
