@@ -37,7 +37,7 @@ class Gempak:
       # Flag all forecast hours as processed.
       if self.DEBUG == False:
         # Set to not processing status.
-        self.redisConn.set(key, "0")
+        #self.redisConn.set(key, "0")
         for fHour in self.constants.modelTimes[key]:
           # Set all forecast hours processed.
           self.redisConn.set(key + '-' + fHour, "1")
@@ -106,7 +106,7 @@ class Gempak:
       # Flag all forecast hours as processed.
       if self.DEBUG == False:
         # Set to not processing status.
-        self.redisConn.set(key, "0")
+        #self.redisConn.set(key, "0")
         for fHour in self.constants.modelTimes[key]:
           # Set all forecast hours processed.
           self.redisConn.set(key + '-' + fHour, "1")

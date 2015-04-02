@@ -86,6 +86,10 @@ xset +fp /usr/share/fonts/X11/100dpi/
 000 016 198 008 Hrly Max Sim Refl at 1km AGL     dB                   MAXREF           0  -9999.00
 
 ! Other Moisture.
+000 001 060 000 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 001 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 011 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 000 Snow Depth Water Equivalent      kg m -2              SDWE             0  -9999.00
 000 001 195 000 Categorical snow                 0,1                  WXTS             0  -9999.00
 000 001 192 000 Categorical rain                 0,1                  WXTR             0  -9999.00
 000 001 192 001 Categorical rain                 0,1                  WXTR             0  -9999.00
@@ -115,23 +119,23 @@ xset +fp /usr/share/fonts/X11/100dpi/
 000 001 195 008 Categorical snow                 0,1                  WXTS             0  -9999.00
 000 001 195 011 Categorical snow                 0,1                  WXTS             0  -9999.00
 000 001 195 012 Categorical snow                 0,1                  WXTS             0  -9999.00
+000 001 060 000 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 001 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 011 Water equiv of accum snow depth  kg m**-2             WEASD            0  -9999.00
+000 001 060 000 Snow Depth Water Equivalent      kg m -2              SDWE             0  -9999.00
+000 001 011 000 Snow depth                       m                    SNDM             0  -9999.00
+000 001 011 001 Snow depth                       m                    SNDM             0  -9999.00
+000 001 011 002 Snow depth                       m                    SNDM             0  -9999.00
+000 001 011 008 Snow depth                       m                    SNDM             0  -9999.00
+000 001 012 008 Snowfall rate water equiv        kg m**-2 s**-1       SR--             0  -9999.00
+000 001 013 000 Wat equiv of accum snow dep      kg m**-2             SWEM             0  -9999.00
+000 001 013 001 Wat equiv of accum snow dep      kg m**-2             SWEM             0  -9999.00
+000 001 013 002 Wat equiv of accum snow dep      kg m**-2             SWEM             0  -9999.00
+000 001 013 008 Wat equiv of accum snow dep      kg m**-2             SWEM             0  -9999.00
+
 
 
 # Make better gif processing programs
 cd $NAWIPS
 make programs_gf
 make install programs_gf
-
-
-
-######################################################
-#
-# Data Getting/ Viewing
-#
-######################################################
-# Be sure to run . ~/gempak/GEMPAK7/Gemenviron.profile 
-# This will set the env. vars adn allow you to use nmap2, gdplot, etc.
-
-# Make all the data directories. /data/model/nam ...etc. 
-
-/home/cacraig/gempak/GEMPAK7/gempak/data/model/nam/2014021006_f000_nam221.gem

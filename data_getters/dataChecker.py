@@ -25,13 +25,17 @@ def main():
   resetHourKeys(constants, model, redisConn)
   # redisConn.set(model + '-complete', db.getCurrentRun(model))
 
+  currentlyProcessing = redisConn.get(model)
+
+  print "Currently Processing: " + currentlyProcessing
+
+  # If key is not set in Redis... Set it.
+  if currentlyProcessing is None:
+    redisConn.set(model, "0")
+
   while True:
     constants = Constants(model)
     currentlyProcessing = redisConn.get(model)
-
-    # If key is not set in Redis... Set it.
-    if currentlyProcessing is None:
-      redisConn.set(model, "0")
       
     print "Currently Processing: " + currentlyProcessing
 
@@ -44,13 +48,14 @@ def main():
         # 1 = Currently processing
         # 0 = Not currently processing
         redisConn.set(model, "1")
+        print "Currently processing : " + redisConn.get(model)
         cmd = "python dataGetter.py -b --model=" + model + " --clean"
         cmdObj = {"model": model, "command": cmd}
         beanstalkdConn.put(json.dumps(cmdObj))
 
     print "doing nothing... Waiting 5 mins."
-    # Sleep for 5 mins.
-    time.sleep(300)
+    # Sleep for 3 mins.
+    time.sleep(180)
   
 
   return

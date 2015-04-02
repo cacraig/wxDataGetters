@@ -26,16 +26,22 @@ def main():
 
   while True:
     # To receive a job:
-    job = beanstalkdConn.reserve(timeout=None)
+    job = beanstalkdConn.reserve()
     # Work with the job:
     print "Doing job:: " + job.body
     cmdObj = json.loads(job.body)
+    print "Currently Processing:  " +  redisConn.get(cmdObj['model'])
     dataGetter = DataGetter(cmdObj['model'])
-    dataGetter.run()
-
-    #call(cmdObj['command'], shell=True)
-    redisConn.set(cmdObj['model'], "0")
     job.delete()
+    # If this throws an Exception ...like socket timed out or w/e.
+    # Reset updating flag, and allow job to spawn again.
+    try:
+      dataGetter.run()
+      print "Releasing LOCK!"
+      redisConn.set(cmdObj['model'], "0")
+    except Exception, e:
+      print e
+      redisConn.set(cmdObj['model'], "0")
 
   # Delete the job: 
   job.delete()

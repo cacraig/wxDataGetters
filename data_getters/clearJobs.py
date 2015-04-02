@@ -33,8 +33,8 @@ def main():
 
   # reset cache  
   for model in modelCache:
-    print "Re-Setting model-cache: " + model
-    redisConn.set(model, "0")
+     print "Re-Setting model-cache: " + model
+     redisConn.set(model, "0")
 
   print "Done clearing jobs."
 

@@ -44,3 +44,7 @@ sudo pip install futures
 # Install Redis
 
 # Set up Data Checkers
+
+# Set up ssh
+/etc/ssh/sshd_config
+Set: PasswordAuthentication no
