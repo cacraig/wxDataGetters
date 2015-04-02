@@ -37,7 +37,7 @@ class GemData:
     os.chdir(self.constants.dataDirEnv)
 
     for key,http in self.constants.modelGems.items():
-      print http
+      #print http
 
       # If it is empty for any reason, skip!
       if not http:
