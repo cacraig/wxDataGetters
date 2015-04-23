@@ -24,9 +24,6 @@ class GemData:
     self.DEBUG = debug
     self.complete = False
     self.updatingDir = "/updating"
-
-
-
     return
 
   '''''
@@ -37,7 +34,6 @@ class GemData:
     os.chdir(self.constants.dataDirEnv)
 
     for key,http in self.constants.modelGems.items():
-      #print http
 
       # If it is empty for any reason, skip!
       if not http:
@@ -64,59 +60,30 @@ class GemData:
             continue
 
       if 'files' in http:
-        # download all files in http['files'].
-        print "PROCESSING MANY"
-        files = http['files']
+        if key in self.constants.nonNCEPSources:
+          # Download files.
+          print http
+          print "PROCESSING MANY"
+          files = http['files']
 
-        savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+          savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+          self.getDataNoThreads(files, key)
+          # Combine if nesc.
+        else:
+          # download all files in http['files'].
+          print "PROCESSING MANY"
+          files = http['files']
 
-        # Get all data. Spawn multiple threads.
-        self.getDataThreaded(files, key)
+          savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
 
-        # for file,url in files.items():
-        #   savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-        #   print "downloading " + savePath  + file
-        #   self.saveFile(savePath, url, file, key)
-        #   self.processGrib2(key, savePath, file)
+          # Get all data. Spawn multiple threads.
+          self.getDataThreaded(files, key)
 
-        #   # Append forecast hour to times to be processed... No prefixes also.
-        #   fHour = self.constants.getForecastHour(key, file, True)
-
-        #   if(self.DEBUG == False):
-        #     if self.redisConn.get(key + '-' + fHour) != "1":
-        #       self.constants.modelTimes[key].append(fHour)
-        #   else:
-        #     self.constants.modelTimes[key].append(fHour)
-
-        # After data has been sucessfully retrieved, and no errors thrown update model run time.
-        if(self.DEBUG == False):
-          self.updateModelTimes(key, self.constants.runTimes[key])
-          print "SETTING COMPLETION FLAG  " + key + "-complete" 
-          self.setRunCompletionFlag(key)
-
-        #self.updated = True
-      # else:
-      #   savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-      #   self.constants.setDefaultHours()
-        
-      #   try:
-      #     print "Saving: " + http['url'] + " to " + savePath + http['file']
-      #     gemFile = urllib2.urlopen(http['url']).read()
-      #     #fp = open(savePath + self.constants.runTimes[key] + ".gem", 'w')
-      #     fp = open(savePath + key + ".gem", 'w') # save as model.gem
-      #     fp.write(gemFile)
-      #     fp.close()
-      #     # After data has been sucessfully retrieved, and no errors thrown update model run time.
-      #     self.updateModelTimes(key, self.constants.runTimes[key])
-      #     self.updated = True
-      #   except Exception, e:
-      #     print "Could not get Model *.gem " + http['file'] + " with url: " + http['url']
-      #     print " with exception %s" % e
-      #     pass
-
-      # END FOR Set model's redis key to not processing.
-      # if(self.DEBUG == False):
-      #   self.redisConn.set(key, "0")
+          # After data has been sucessfully retrieved, and no errors thrown update model run time.
+          if(self.DEBUG == False):
+            self.updateModelTimes(key, self.constants.runTimes[key])
+            print "SETTING COMPLETION FLAG  " + key + "-complete" 
+            self.setRunCompletionFlag(key)
 
     # Jump back to present WD
     os.chdir(currentDir)
@@ -209,6 +176,42 @@ class GemData:
     fp.close()
     return
 
+  # Saves file. Skips saving if file already exists.
+  # timeout after 15 mins.
+  @timeout(900, os.strerror(errno.ETIMEDOUT))
+  def saveFilesAndCat(self, savePath, urls, fileName, model = None):
+
+    grib2File = savePath + fileName
+
+    # If model is specified, check for a decoded .gem file.
+    # if model is not None:
+    #   gemFile = self.getGemFileName(model, savePath, fileName)
+    #   if os.path.isfile(gemFile):
+    #     print "Decoded GEM file:" + gemFile + " already exists...skipping..."
+    #     return
+
+
+    # If file exists, don't download again!
+    # if os.path.isfile(grib2File):
+    #   print "File already downloaded. Skipping..."
+    #   return
+    if isinstance(urls, list):
+      # File does not already exist, download it.
+      for url in urls:
+        print "Downloading: " + url + " to " + grib2File
+        gemFile = urllib2.urlopen(url).read()
+        fp = open(grib2File, 'a')
+        fp.write(gemFile)
+        fp.close()
+    else:
+      print "Downloading: " + url + " to " + grib2File
+      gemFile = urllib2.urlopen(url).read()
+      fp = open(grib2File, 'a')
+      fp.write(gemFile)
+      fp.close()
+
+    return
+
   def saveFilesThread(self, arg):
     # (model, savePath, fileName, url)
     model = arg[0]
@@ -265,35 +268,39 @@ class GemData:
 
   def timeoutHttpRead(self, response, timeout = 60):
     def murha(resp):
+      try:
         os.close(resp.fileno())
         resp.close()
+      except Exception, e:
+        print e
+        return (False, None)
 
     # set a timer to yank the carpet underneath the blocking read() by closing the os file descriptor
     t = threading.Timer(timeout, murha, (response,))
     try:
-        t.start()
-        body = response.read()
-        t.cancel()
+      t.start()
+      body = response.read()
+      t.cancel()
     except socket.error as se:
-        if se.errno == errno.EBADF: # murha happened
-            return (False, None)
-        raise
+      if se.errno == errno.EBADF: # murha happened
+        return (False, None)
+      raise
     return (True, body)
 
-  def getDataThreaded(self, files, key):
-    savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
+  def getDataThreaded(self, files, model):
+    savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
     args = []
     for file,url in files.items():
       grib2File = savePath + file
-      arg = (key, savePath, file, url)
+      arg = (model, savePath, file, url)
       # Append forecast hour to times to be processed... No prefixes also.
-      fHour = self.constants.getForecastHour(key, file, True)
+      fHour = self.constants.getForecastHour(model, file, True)
 
       if(self.DEBUG == False):
-        if self.redisConn.get(key + '-' + fHour) != "1":
-          self.constants.modelTimes[key].append(fHour)
+        if self.redisConn.get(model + '-' + fHour) != "1":
+          self.constants.modelTimes[model].append(fHour)
       else:
-        self.constants.modelTimes[key].append(fHour)
+        self.constants.modelTimes[model].append(fHour)
       args.append(arg)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
@@ -302,6 +309,24 @@ class GemData:
           print "Exiting... See error.log for details."
           exit(1)
     print "Done with Threads."
+
+    return
+
+  def getDataNoThreads(self, files, model):
+    savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
+    args = []
+    for file,urls in files.items():
+      grib2File = savePath + file
+      # Append forecast hour to times to be processed... No prefixes also.
+      fHour = self.constants.getForecastHour(model, file, True)
+      self.saveFilesAndCat(savePath, urls, file, model)
+      if(self.DEBUG == False):
+        if self.redisConn.get(model + '-' + fHour) != "1":
+          self.constants.modelTimes[model].append(fHour)
+      else:
+        self.constants.modelTimes[model].append(fHour)
+        
+      self.processGrib2(model, savePath, file)
 
     return
 
@@ -360,9 +385,9 @@ class GemData:
   def transferFilesToProd(self, model = None):
 
     if model is None:
-      self.runCmd("rsync -vPr " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
+      self.runCmd("rsync -a -vPr " + self.constants.imageDir + " " + self.constants.imageHost + ":" + self.constants.prodBaseDir)
     else:
-      self.runCmd("rsync -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir + self.updatingDir)
+      self.runCmd("rsync -a -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir + self.updatingDir)
 
   def runCmd(self, cmd):
     FNULL = open(os.devnull, 'w')

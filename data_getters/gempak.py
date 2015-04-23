@@ -51,7 +51,7 @@ class Gempak:
     os.chdir("scripts")
     for key,http in self.constants.modelGems.items():
       if key in self.constants.runTimes:
-        if 'files' in http and key != "gfs" and key != "nam":
+        if 'files' in http and key != "gfs" and key != "nam" and key != "ecmwf":
           # Do matplot stuff.
           if len(self.constants.modelTimes[key]) >0:
             self.constants.modelTimes[key].sort()
@@ -79,10 +79,13 @@ class Gempak:
           if len(self.constants.modelTimes[key]) >0:
             self.constants.modelTimes[key].sort()
             previousTime = self.constants.getPreviousTime(key, self.constants.modelTimes[key][0])
-            # Do TempF plot
-            self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
-            # Do Snowfall plotting in Matplotlib...
-            self.grib2Plotter.plotSnowFall(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv, previousTime)
+            if key != "ecmwf":
+              # Do TempF plot
+              self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
+              # Do Snowfall plotting in Matplotlib...
+              # Only plot snowfall if the run has completed.
+              if self.constants.lastForecastHour[key] in self.constants.modelTimes[key]:
+                self.grib2Plotter.plotSnowFall(key,self.constants.getDefaultHours(key), self.constants.runTimes[key], self.constants.dataDirEnv, self.constants.getDefaultHours(key)[0])
             # Do gddiag. (Mutable, cannot thread this.)
             # for file in glob.glob("gempak/grids/*.sh"):
             #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime

@@ -5,6 +5,7 @@ import ConfigParser
 import json
 import redis
 from dataGetterModule import DataGetter
+import os
 
 def main():
 
@@ -35,13 +36,20 @@ def main():
     job.delete()
     # If this throws an Exception ...like socket timed out or w/e.
     # Reset updating flag, and allow job to spawn again.
+    wd = os.getcwd()
     try:
       dataGetter.run()
       print "Releasing LOCK!"
       redisConn.set(cmdObj['model'], "0")
+      dataGetter = None
     except Exception, e:
       print e
+      print os.getcwd()
+      # assert we are in the appropriate dir.
+      os.chdir(wd)
       redisConn.set(cmdObj['model'], "0")
+      print "Releasing LOCK!"
+      dataGetter = None
 
   # Delete the job: 
   job.delete()

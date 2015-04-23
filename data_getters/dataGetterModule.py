@@ -1,6 +1,7 @@
 from gemData import GemData
 from gempak import Gempak
 import ConfigParser
+import os
 
 class DataGetter:
 

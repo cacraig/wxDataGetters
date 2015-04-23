@@ -60,6 +60,8 @@ class Constants:
       "nam4km" : "nam" \
     }
 
+    self.nonNCEPSources = ['ecmwf']
+
     self.highResModelList = ['nam4km', "gfs","nam"]
 
     # Intructions:
@@ -98,25 +100,31 @@ class Constants:
                 "&var_DZDT=on&var_EVP=on&var_GUST=on&var_HGT=on&var_ICEC=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_REFC=on&var_RH=on&var_TMAX=on" + \
                 "&var_TMIN=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&var_WEASD=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
     }
+
+    self.alternateUrls = {
+      'ecmwf':'data-portal.ecmwf.int/', \
+      'ukmet': '', \
+      'CMC'  : '' \
+    }
     
     # Full path of data directory.
     self.dataDirEnv = self.baseDir + self.gempakDir + self.dataDir
-
-    # self.modelTimes = {
-    #  'ruc': '00,01,02,03,04,05,06,07,08,09,10,11,12', \
-    #  'gfs': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,' + \
-    #         '081,084,087,090,093,096,099,102,105,108,111,114,117,120,123,126,129,132,135,138,141,144,147,'+ \
-    #         '150,153,156,159,162,165,168,171,174,177,180,183,186,189,192,195,198,201,204,207,210,213,216,219,222,225,' +\
-    #         '228,231,234,237,240,252,264,276,' + \
-    #         '288,300,312,324,336,348,360,372,384', \
-    #  'nam': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
-    #  'hrrr': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023', \
-    #  #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
-    #  'ukmet' : '00,06,12,18,24,30,36,42,48,54,60', \
-    #  'rap': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023', \
-    #  'ecmf1': '00,24,48,72,96,120,144,168,240', \
-    #  'nam4km': '000,001,002,003,004,005,006,007,008,009,010,011,012,013,014,015,016,017,018,019,020,021,022,023,024,025,026,027,028,029,030,031,032,033,034,035,036,039,042,045,048,051,054,057,060'\
-    # }
+    self.defaultTimes = {
+      'ruc': ['00','01','02','03','04','05','06','07','08','09','10','11','12'], \
+      'gfs': ['000','003','006','009','012','015','018','021','024','027','030','033','036','039','042','045','048','051','054','057','060','063','066','069','072','075','078', \
+            '081','084','087','090','093','096','099','102','105','108','111','114','117','120','126','132','138','144', \
+            '150','156','162','168','174','180','186','192','198','204','210','216','222', \
+            '228','234','240','252','264','276', \
+            '288','300','312','324','336','348','360','372','384'], \
+      'nam': ['000','003','006','009','012','015','018','021','024','027','030','033','036','039','042','045','048','051','054','057','060','063','066','069','072','075','078','081','084'], \
+      'hrrr': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023'], \
+      #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
+      'ukmet' : ['00','06','12','18','24','30','36','42','48','54','60'], \
+      'rap': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023'], \
+      'ecmwf': ['000','024','048','072','096','120','144','168','240'], \
+      'nam4km': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023','024','025', \
+                '026','027','028','029','030','031','032','033','034','035','036','039','042','045','048','051','054','057','060'] \
+    }
 
     # Default times.
     self.modelTimes = {
@@ -127,12 +135,12 @@ class Constants:
      #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
      'ukmet' : [], \
      'rap': [], \
-     'ecmf1': [], \
+     'ecmwf': [], \
      'nam4km': [] \
     }
 
     # Define domain/resolution to obtain.
-    self.modelTypes = {'ecmf1': '', 'gfs': '211', 'nam':'212', 'ruc': '236', 'ukmet': '','nam12km':'218','nam4km':''}
+    self.modelTypes = {'ecmwf': '', 'gfs': '211', 'nam':'212', 'ruc': '236', 'ukmet': '','nam12km':'218','nam4km':''}
 
     # HTTP DATA SOURCES.
     # Link List base Url.
@@ -152,7 +160,7 @@ class Constants:
       # Get all current run files!
       self.modelGems = {
          'gfs'  : self.getRun('gfs'), \
-         'ecmf1': self.getRun('ecmf1'), \
+         'ecmwf': self.getRun('ecmwf'), \
          'ruc'  : self.getRun('ruc'), \
          'nam'  : self.getRun('nam'), \
          'ukmet': self.getRun('ukmet'), \
@@ -167,23 +175,15 @@ class Constants:
   '''''
   def setDefaultHours(self):
     # Default times.
-    self.modelTimes = {
-     'ruc': ['00','01','02','03','04','05','06','07','08','09','10','11','12'], \
-     'gfs': ['000','003','006','009','012','015','018','021','024','027','030','033','036','039','042','045','048','051','054','057','060','063','066','069','072','075','078', \
-            '081','084','087','090','093','096','099','102','105','108','111','114','117','120','123','126','129','132','135','138','141','144','147', \
-            '150','153','156','159','162','165','168','171','174','177','180','183','186','189','192','195','198','201','204','207','210','213','216','219','222','225', \
-            '228','231','234','237','240','252','264','276', \
-            '288','300','312','324','336','348','360','372','384'], \
-     'nam': ['000','003','006','009','012','015','018','021','024','027','030','033','036','039','042','045','048','051','054','057','060','063','066','069','072','075','078','081','084'], \
-     'hrrr': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023'], \
-     #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
-     'ukmet' : ['00','06','12','18','24','30','36','42','48','54','60'], \
-     'rap': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023'], \
-     'ecmf1': ['00','24','48','72','96','120','144','168','240'], \
-     'nam4km': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023','024','025', \
-                '026','027','028','029','030','031','032','033','034','035','036','039','042','045','048','051','054','057','060'] \
-    }
+    self.modelTimes = self.defaultTimes
     return
+
+    '''''
+  Intialze all of our models hour stamp data to defaults.
+  '''''
+  def getDefaultHours(self, model):
+    # Default times.
+    return self.defaultTimes[model]
 
   '''''
   Intialze all of our models hour stamp data to defaults.
@@ -202,7 +202,7 @@ class Constants:
      #'nam12km': '000,003,006,009,012,015,018,021,024,027,030,033,036,039,042,045,048,051,054,057,060,063,066,069,072,075,078,081,084', \
      'ukmet' : ['00','06','12','18','24','30','36','42','48','54','60'], \
      'rap': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023'], \
-     'ecmf1': ['00','24','48','72','96','120','144','168','240'], \
+     'ecmwf': ['000','024','048','072','096','120','144','168','240'], \
      'nam4km': ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023','024','025', \
                 '026','027','028','029','030','031','032','033','034','035','036','039','042','045','048','051','054','057','060'] \
     }
@@ -263,6 +263,8 @@ class Constants:
 
     #latestRunDir  = "gfs.2015032612/" # TEST
     #latestRunDir  = "nam.20150328/" # TEST
+    # if model == 'nam':
+    #   latestRunDir  = "nam.20150328/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
 
@@ -302,13 +304,147 @@ class Constants:
       runFileList = self.filterGFSFiles(runFileList)
     else:
       self.runTimes[modelType] = latestRunDir.split('/')[0].split('.')[1] + latestHour
-
+    # if model == 'nam':
+    #   runFileList = runFileList[0:1]
     #runFileList = runFileList[10:30] # test!
     #print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
 
     return (latestRunDir[:-1],runFileList)
+
+  def getECMWF(self, model):
+
+    username = 'wmo'
+    password = 'essential'
+    modelRunUrl = ''
+    modelListUrl = "ftp://wmo:essential@" + self.alternateUrls[model]
+    runTime = ''
+
+    # Parse it, get model run time.
+    from datetime import datetime, timedelta
+    dateUTC = datetime.utcnow()
+    currentHour = int(dateUTC.hour)
+
+    # If we haven't crossed the 6th hour, we should look at the previous day's output.
+    if currentHour <= 5:
+      dateUTC = dateUTC - timedelta(days=1)
+
+    month = str(dateUTC.month)
+    year  = str(dateUTC.year)
+    day   = str(dateUTC.day)
+    ddhh  = ""
+
+    if int(day) < 10:
+      day = '0' + day
+
+    if int(month) < 10:
+      month = '0' + month
+
+    # Get model Run Dir.
+    if currentHour >= 18 or currentHour <= 5:
+      runTime = year + month + day + "12"
+      ddhh = day + "12"
+      # Get 12z run.
+      modelRunUrl = modelListUrl + year + month + day + "120000/"
+    elif currentHour >=6:
+      runTime = year + month + day + "00"
+      ddhh = day + "00"
+      # Get 0Z run.
+      modelRunUrl = modelListUrl + year + month + day + "000000/"
+
+    # content = urllib2.urlopen(modelRunUrl).read()
+    
+    wmoLevels = ['500hPa', 'msl', '850hPa']
+    wmoVars   = ['t', 'ws', 'u','v','gh']
+
+    runFileList = []
+
+    files = [
+      "A_HHXA50ECMF*_C_ECMF_^_an_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXE50ECMF*_C_ECMF_^_24h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXI50ECMF*_C_ECMF_^_48h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXK50ECMF*_C_ECMF_^_72h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXM50ECMF*_C_ECMF_^_96h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXO50ECMF*_C_ECMF_^_120h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXQ50ECMF*_C_ECMF_^_144h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXS50ECMF*_C_ECMF_^_168h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXT50ECMF*_C_ECMF_^_240h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXW50ECMF*_C_ECMF_^_192h_gh_500hPa_global_0p5deg_grib2.bin", \
+      "A_HHXY50ECMF*_C_ECMF_^_216h_gh_500hPa_global_0p5deg_grib2.bin", \
+      # "A_HPXA89ECMF*_C_ECMF_^_an_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXE89ECMF*_C_ECMF_^_24h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXI89ECMF*_C_ECMF_^_48h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXK89ECMF*_C_ECMF_^_72h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXM89ECMF*_C_ECMF_^_96h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXO89ECMF*_C_ECMF_^_120h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXQ89ECMF*_C_ECMF_^_144h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXS89ECMF*_C_ECMF_^_168h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXT89ECMF*_C_ECMF_^_240h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXW89ECMF*_C_ECMF_^_192h_msl_global_0p5deg_grib2.bin", \
+      # "A_HPXY89ECMF*_C_ECMF_^_216h_msl_global_0p5deg_grib2.bin", \
+      # "A_HTXA85ECMF*_C_ECMF_^_an_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXE85ECMF*_C_ECMF_^_24h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXI85ECMF*_C_ECMF_^_48h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXK85ECMF*_C_ECMF_^_72h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXM85ECMF*_C_ECMF_^_96h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXO85ECMF*_C_ECMF_^_120h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXQ85ECMF*_C_ECMF_^_144h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXS85ECMF*_C_ECMF_^_168h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXT85ECMF*_C_ECMF_^_240h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXW85ECMF*_C_ECMF_^_192h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HTXY85ECMF*_C_ECMF_^_216h_t_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXA85ECMF*_C_ECMF_^_an_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXE85ECMF*_C_ECMF_^_24h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXI85ECMF*_C_ECMF_^_48h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXK85ECMF*_C_ECMF_^_72h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXM85ECMF*_C_ECMF_^_96h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXO85ECMF*_C_ECMF_^_120h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXQ85ECMF*_C_ECMF_^_144h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXS85ECMF*_C_ECMF_^_168h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXT85ECMF*_C_ECMF_^_240h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXW85ECMF*_C_ECMF_^_192h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HUXY85ECMF*_C_ECMF_^_216h_u_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXA85ECMF*_C_ECMF_^_an_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXE85ECMF*_C_ECMF_^_24h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXI85ECMF*_C_ECMF_^_48h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXK85ECMF*_C_ECMF_^_72h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXM85ECMF*_C_ECMF_^_96h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXO85ECMF*_C_ECMF_^_120h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXQ85ECMF*_C_ECMF_^_144h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXS85ECMF*_C_ECMF_^_168h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXT85ECMF*_C_ECMF_^_240h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXW85ECMF*_C_ECMF_^_192h_v_850hPa_global_0p5deg_grib2.bin", \
+      # "A_HVXY85ECMF*_C_ECMF_^_216h_v_850hPa_global_0p5deg_grib2.bin" \
+    ]
+
+    runDict = {}
+    for f in files:
+      parts = f.split('*')
+      newStr = parts[0] + ddhh + "00" + parts[1]
+
+      parts = newStr.split('^')
+      newStr = parts[0] + runTime + "0000" + parts[1]
+
+      forecastHour = newStr.split('_')[5]
+      if forecastHour == "an":
+        forecastHour = "00h"
+      forecastHour = forecastHour[:-1]
+      if int(forecastHour) < 100:
+        forecastHour = "0" + forecastHour
+      gribFile = runTime + forecastHour + ".grib2"
+      if gribFile not in runDict:
+        runDict[gribFile] = []
+      url = modelRunUrl + newStr
+      runDict[gribFile].append(url)
+    
+    dataDict = {}
+
+    # A list of all Download urls.
+    dataDict['files'] = runDict
+    self.runTimes["ecmwf"] = runTime
+
+    return dataDict
 
   '''''
   This method gets the url for the latest model run of the model type requested.
@@ -319,13 +455,13 @@ class Constants:
   '''''
   def getRun(self, type):
 
-    if self.isHighRes(type):
-      return self.getHighResRun(type)
-
     model = type
 
-    if model == 'ecmf1':
-      model = 'ecmwf'
+    if self.isHighRes(model):
+      return self.getHighResRun(model)
+
+    if model == "ecmwf":
+      return self.getECMWF(model)
 
     # Set our model List url.
     modelListUrl = self.baseDataHttp + model + '/'
@@ -425,7 +561,7 @@ class Constants:
 
   Reduces number of files, Data + Memory usage, and Processing time.
   Additional timesteps aren't really necessary anyways. After 240th hour
-  shit hits the fan in terms of choas and inaccuracy.
+  shit hits the fan in terms of chaos and inaccuracy.
 
   Expected Filtered file count: 73
   '''''
@@ -466,6 +602,9 @@ class Constants:
     elif model == 'nam4km':
       # for nam.t06z.blahblah.hiresf07.blah -> forecastHour = "007"
       forecastHour = prefix + "0" + fileName.split('.')[3][6:8]
+    elif model == 'ecmwf':
+      # for 20150422120192.grib2 -> forecastHour = "192"
+      forecastHour = prefix + fileName.split('.')[0][-3:]
 
     return forecastHour
 

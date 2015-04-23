@@ -27,18 +27,18 @@ def main():
 
   currentlyProcessing = redisConn.get(model)
 
-  print "Currently Processing: " + currentlyProcessing
-
   # If key is not set in Redis... Set it.
   if currentlyProcessing is None:
     redisConn.set(model, "0")
+
+  print "Currently Processing: " + currentlyProcessing
 
   while True:
     constants = Constants(model)
     currentlyProcessing = redisConn.get(model)
       
     print "Currently Processing: " + currentlyProcessing
-
+    currentlyProcessing = 0
     if int(currentlyProcessing) == 0:
       # If it has new hourly data, or it is a new run altogether. Put it in the Queue.
       if hasNewData(constants, model, redisConn) or db.isNewRun(model, constants.runTimes[model]):
@@ -70,13 +70,13 @@ def hasNewData(constants, model, redisConn):
   for model,http in constants.modelGems.items():
     if not http:
       return False
-  if 'files' in http:
-    files = http['files']
-    for file,url in files.items():
-      fHour = constants.getForecastHour(model, file, True)
-      redisHourKey = redisConn.get(model + '-' + fHour)
-      if redisHourKey == "0":
-        return True
+    if 'files' in http:
+      files = http['files']
+      for file,url in files.items():
+        fHour = constants.getForecastHour(model, file, True)
+        redisHourKey = redisConn.get(model + '-' + fHour)
+        if redisHourKey == "0":
+          return True
 
   return False
 

@@ -167,9 +167,9 @@ class Grib2Plot:
         # pngquant -o lossy.png --force --quality=70-80 input.png
         # optipng -o1 -strip all -out out.png -clobber input.png
 
-        print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
+        #print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
 
-        print "pngquant -o "+ os.getcwd()+ "/" + tempFileName + " --force --quality=70-80 "+ os.getcwd()+ "/" + tempFileName
+        #print "pngquant -o "+ os.getcwd()+ "/" + tempFileName + " --force --quality=70-80 "+ os.getcwd()+ "/" + tempFileName
         fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0, facecolor=fig.get_facecolor())
         call("pngquant -o "+ tempFileName + " --force --quality=50-65 "+ tempFileName, shell=True)
         #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
@@ -192,16 +192,20 @@ class Grib2Plot:
     call("mkdir -p " + imgDirAccumTotal, shell=True)
     
     # If the inital timestep (0th hour) is in the times set.
-    self.hasInitalTime = 0 in map(int, times)
+    self.hasInitialTime = 0 in map(int, times)
+    # dont do anything on the 0th hour (if it's the only time being processed)
+    if self.hasInitialTime and len(times) <= 1:
+      print "Passed 0th Hour only... skipping snowfall stuff"
+      return
 
     # nam.t18z.awip3281.tm00.grib2
     for region in self.regions:
-      # Load previously calculated accumulation data.
-      self.snowSum    = self.loadAccumulationData(variable, region, model, 'snowSum')
-      self.snowSum12  = self.loadAccumulationData(variable, region, model, 'snowSum12')
-      self.snowSum24  = self.loadAccumulationData(variable, region, model, 'snowSum24')
-      self.snowSum72  = self.loadAccumulationData(variable, region, model, 'snowSum72')
-      self.snowSum120 = self.loadAccumulationData(variable, region, model, 'snowSum120')
+      # Clear snow sums for each region.
+      self.snowSum    = None
+      self.snowSum12  = None
+      self.snowSum24  = None
+      self.snowSum72  = None
+      self.snowSum120 = None
 
       for time in times:
         # skip the 0th hour.
@@ -214,18 +218,24 @@ class Grib2Plot:
           runHour = runTime[-2:]
           startFile = self.getGrib2File(modelDataPath, runHour, model, shortTimePrevious)
           endFile = self.getGrib2File(modelDataPath, runHour, model, shortTime)
-          self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+          try:
+            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+          except Exception, e:
+            print e
 
         if model == "gfs":
           runHour = runTime[-2:]
           startFile = self.getGrib2File(modelDataPath, runHour, model, previous)
           endFile = self.getGrib2File(modelDataPath, runHour, model, time)
-          self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+          try:
+            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+          except Exception, e:
+            print e
 
         # Set the previous time for next iteration.
         previous = time
       # Save accumulation data.
-      self.saveAccumulationData(variable, region, model)
+      #self.saveAccumulationData(variable, region, model)
 
     return
 
@@ -237,6 +247,15 @@ class Grib2Plot:
     accumTmpFileName = "init_" + model + "_" + level + "_" + variableAccum + "_f" + time + ".png"
     accumSaveFileName = imgDir + "_accum" + "/" + region +"_f" + time + ".gif"
     borderBottomCmd = "" # Reset bottom border.
+
+    print "Region: " + region
+    print "TIME: " + time
+    print "START FILE: " + startFile
+    print "END FILE: " + endFile
+
+    # if int(time) == 3:
+    #   # skip third hour.
+    #   return
 
     try:
       grbs=pygrib.open(startFile)
@@ -286,34 +305,42 @@ class Grib2Plot:
     swemAccum.clip(0)
     dtot.clip(0)
 
+
     snow = swemAccum/25.4 * 10
-    if int(time) > 0:
+    if int(time) > 3:
       # Set Hour accumulation
+
       if self.snowSum is None:
         self.snowSum = snow
       else:
         self.snowSum += snow
+      
+      print "MAX SNOW: " + str(np.max(snow))
 
+      # 120 hour accum.
       if self.snowSum120 is None:
         self.snowSum120 = snow
       else:
         self.snowSum120 += snow
 
+      # 72 hour accum.
       if self.snowSum72 is None:
         self.snowSum72 = snow
       else:
         self.snowSum72 += snow
 
+      # 24 hour accum
       if self.snowSum24 is None:
         self.snowSum24 = snow
       else:
         self.snowSum24 += snow
 
+      # 12 hour accum
       if self.snowSum12 is None:
         self.snowSum12 = snow
       else:
         self.snowSum12 += snow
-
+    
     m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
 
     if borderBottom > 1.0:
@@ -376,22 +403,24 @@ class Grib2Plot:
     # fig.set_facecolor('black')
     # END COLORBARS
 
-    print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + borderBottomCmd + " " + saveFileName
+    #print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + borderBottomCmd + " " + saveFileName
     fig.savefig(tempFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
     call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
     call("rm " + tempFileName, shell=True)
 
     fig.clf()
-
-    ax = fig.add_axes([1,1,1,1],axisbg='k')
-    cs = plt.contourf(x,y,self.snowSum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
-    m.drawmapboundary()
-
-    fig.savefig(accumTmpFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
-    call("convert -background none "+ accumTmpFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + accumSaveFileName, shell=True)
-    call("rm " + accumTmpFileName, shell=True)
-
-    fig.clf()
+    if self.snowSum is not None:
+      print "---------------------------------------------------------------------------"
+      print "--------------Drawing snow Accum plot for time: " + time + "---------------"
+      print "--------------SAVING TO: " + accumSaveFileName
+      print "----------------------------------------------------------------------------"
+      ax = fig.add_axes([1,1,1,1],axisbg='k')
+      cs = plt.contourf(x,y,self.snowSum, SNOWP_LEVS, extend='max',cmap=coltbls.snow2())
+      m.drawmapboundary()
+      fig.savefig(accumTmpFileName, dpi=200, bbox_inches='tight', pad_inches=0,facecolor=fig.get_facecolor())
+      call("convert -background none "+ accumTmpFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + accumSaveFileName, shell=True)
+      call("rm " + accumTmpFileName, shell=True)
+      fig.clf()
 
     if int(time) % 120 == 0 and int(time) > 0:
       # do plot
@@ -562,6 +591,8 @@ class Grib2Plot:
 
   def saveAccumulationData(self, var, region, model):
     if var is "snow":
+      if self.snowSum is None:
+        return
 
       outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum.npy"
       print "Saving snow accumulation data to: " + outFile
@@ -569,10 +600,9 @@ class Grib2Plot:
 
       outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum12.npy"
       print "Saving snow accumulation data to: " + outFile
-      np.save(outFile, self.snowSum12)
 
       outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum24.npy"
-      print "Saving snow accumulation data to: " + outFile
+      print "Saving snow accumulation data to: " + outFile 
       np.save(outFile, self.snowSum24)
 
       outFile =  self.constants.numPyTmpDir + "/" + model + "_" + region +"_snowSum72.npy"
@@ -590,7 +620,7 @@ class Grib2Plot:
   def loadAccumulationData(self, var, region, model, name=""):
     dat = None
     # Don't load files if the 0th hour is in Set.
-    if self.hasInitalTime:
+    if self.hasInitialTime:
       print "Not loading previous data, because this is a new run."
       return dat
 

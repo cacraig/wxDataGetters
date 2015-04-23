@@ -29,7 +29,7 @@ def main():
     job.delete()
     redisConn.set(cmdObj['model'], "0")
 
-  modelCache = ['nam','gfs','nam4km','ruc','ecmf1','ukmet']
+  modelCache = ['nam','gfs','nam4km','ruc','ecmwf','ukmet']
 
   # reset cache  
   for model in modelCache:
