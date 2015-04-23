@@ -55,7 +55,7 @@ def main():
 
     print "doing nothing... Waiting 5 mins."
     # Sleep for 3 mins.
-    time.sleep(180)
+    time.sleep(60)
   
 
   return
