@@ -1,4 +1,4 @@
-from gemData import GemData
+from dataProcessor import DataProcessor
 from gempak import Gempak
 from optparse import OptionParser
 from argparse import ArgumentParser
@@ -30,19 +30,19 @@ def main():
   args = parser.parse_args()
 
   if args.model:
+    modelClass = getModelObj(args.model)
+    modelLinks = modelClass.getRun()
     # initalize for only one model.
-    dataGetter = GemData(args.model, True) # Second parameter enables DEBUG mode.
-  else:
-    # Initialize data getter
-    dataGetter = GemData(None, False) # Second parameter enables DEBUG mode.
+    dataGetter = DataProcessor(modelClass, True) # Second parameter enables DEBUG mode.
+    dataGetter.getData(modelLinks)
 
   # # Retrieve and save data.
-  dataGetter.getData()
+  
   print "Trying batch"
   # Image Generation Block.
   if args.batch:
       gempak = Gempak(dataGetter)
-      gempak.doThreadedGempakScripts()
+      gempak.doThreadedGempakScripts(modelLinks)
 
   # Scrub all of our model data.
   if args.clean:
@@ -63,8 +63,20 @@ def main():
   #   dataGetter.rebuild('dev')
 
   #dataGetter.transferFilesToProd()
-
+def getModelObj(model):
+  model = model.capitalize() # Capitalize for classname.
+  import_module_ = "models." + model
+  model_class = model
+  module = __import__(import_module_, fromlist = [model])
+  try:
+    class_ = getattr(module, model_class)()
+  except AttributeError:
+    print 'Class does not exist'
+  return class_
 
 
 if __name__ == "__main__":
   main()
+
+
+

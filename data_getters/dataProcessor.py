@@ -11,10 +11,11 @@ import socket, threading
 # TODO: Speed up download, and require less RAM. 
 #         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
 # Class for downloading data, and cleaning data directories.
-class GemData:
+class DataProcessor:
 
-  def __init__(self, models=None, debug=False):
-    self.constants = Constants(models)
+  def __init__(self, modelClass, debug=False):
+    self.modelClass = modelClass
+    self.constants = Constants()
     print "Creating Connection to DB & Redis..."
     self.conn = psycopg2.connect(self.constants.dbConnStr)
     self.cursor = self.conn.cursor()
@@ -27,63 +28,71 @@ class GemData:
     return
 
   '''''
-  getData loops through our model download paths, and saves them to our specified save paths in self.constants.
+  getData loops through our model download paths, and saves them to our specified save paths in self.modelClass.
   '''''
-  def getData(self):
+  def getData(self, modelLinks):
     currentDir = os.getcwd()
     os.chdir(self.constants.dataDirEnv)
+    model = self.modelClass.getName()
+    http  = modelLinks[model]
 
-    for key,http in self.constants.modelGems.items():
+    # If it is empty for any reason, skip!
+    if not http:
+      del self.modelClass.runTime
+      print "Skipping: " + model + "... Model not updated."
+      # Jump back to present WD
+      os.chdir(currentDir)
+      if self.DEBUG == True:
+        self.closeConnection()
+      return
 
-      # If it is empty for any reason, skip!
-      if not http:
-        del self.constants.runTimes[key]
-        print "Skipping: " + key + "... Model not updated."
-        continue
+    # If DEBUG is True, clear all model times so they aren't skipped.
+    if self.DEBUG:
+      for model,time in self.dbRunTimes.items():
+        self.dbRunTimes[model] = ""
 
-      # If DEBUG is True, clear all model times so they aren't skipped.
-      if self.DEBUG:
-        for model,time in self.dbRunTimes.items():
-          self.dbRunTimes[model] = ""
+    self.dbRunTimes = self.getCurrentRuns(model)
 
-      self.dbRunTimes = self.getCurrentRuns(key)
+    if(self.DEBUG == False):
+      if model in self.dbRunTimes:
+        if self.modelClass.runTime != self.dbRunTimes[model]:
+          print "Resetting Hour keys for Mode ->" + model
+          self.resetHourKeys(key)
+        lastCompletedRun = self.redisConn.get(model + "-complete")
+        if self.modelClass.runTime == lastCompletedRun:
+          del self.modelClass.runTime
+          print "Skipping: " + model + "... Model not updated."
+          # Jump back to present WD
+          os.chdir(currentDir)
+          if self.DEBUG == True:
+            self.closeConnection()
+          return
 
+    if 'files' in http:
+      if not self.modelClass.isNCEPSource:
+        # Download files.
+        print http
+        print "PROCESSING MANY"
+        files = http['files']
+
+        savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
+        self.getDataNoThreads(files, model)
+        # Combine if nesc.
+      else:
+        # download all files in http['files'].
+        print "PROCESSING MANY"
+        files = http['files']
+
+        savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
+
+        # Get all data. Spawn multiple threads.
+        self.getDataThreaded(files, model)
+
+      # After data has been sucessfully retrieved, and no errors thrown update model run time.
       if(self.DEBUG == False):
-        if key in self.dbRunTimes:
-          if self.constants.runTimes[key] != self.dbRunTimes[key]:
-            print "Resetting Hour Keys for Mode ->" + key
-            self.resetHourKeys(key)
-          lastCompletedRun = self.redisConn.get(key + "-complete")
-          if self.constants.runTimes[key] == lastCompletedRun:
-            del self.constants.runTimes[key]
-            print "Skipping: " + key + "... Model not updated."
-            continue
-
-      if 'files' in http:
-        if key in self.constants.nonNCEPSources:
-          # Download files.
-          print http
-          print "PROCESSING MANY"
-          files = http['files']
-
-          savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-          self.getDataNoThreads(files, key)
-          # Combine if nesc.
-        else:
-          # download all files in http['files'].
-          print "PROCESSING MANY"
-          files = http['files']
-
-          savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + key + '/'
-
-          # Get all data. Spawn multiple threads.
-          self.getDataThreaded(files, key)
-
-        # After data has been sucessfully retrieved, and no errors thrown update model run time.
-        if(self.DEBUG == False):
-          self.updateModelTimes(key, self.constants.runTimes[key])
-          print "SETTING COMPLETION FLAG  " + key + "-complete" 
-          self.setRunCompletionFlag(key)
+        self.updateModelTimes(model, self.modelClass.runTime)
+        print "SETTING COMPLETION FLAG  " + model + "-complete" 
+        self.setRunCompletionFlag(model)
 
     # Jump back to present WD
     os.chdir(currentDir)
@@ -101,7 +110,7 @@ class GemData:
     return self.conn.close()
 
   def resetHourKeys(self, model):
-    hourKeys = self.constants.getDefaultHoursByModel(model)
+    hourKeys = self.modelClass.getDefaultHoursByModel(model)
     for hour in hourKeys:
       self.redisConn.set(model + '-' + hour, "0")
     return
@@ -110,16 +119,16 @@ class GemData:
 
     f = open(self.constants.execLog, 'w')
     f.write('Trying: ' + model + '-complete')
-    for item in self.constants.modelTimes[model]:
+    for item in self.modelClass.modelTimes:
       f.write("Hour: " + item)
 
-    if self.constants.lastForecastHour[model] in self.constants.modelTimes[model]:
-      self.redisConn.set(model + '-complete', self.constants.runTimes[model])
+    if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+      self.redisConn.set(model + '-complete', self.modelClass.runTime)
       self.complete = True
       # Set updating directory to empty string.
       # When model is complete, copy images to completed directory
       self.updatingDir = ""
-      f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.constants.runTimes[model])
+      f.write("COMPLETION! SETTING KEY: " + model + "-complete to " + self.modelClass.runTime)
 
     f.close() # you can omit in most cases as the destructor will call if
     return
@@ -141,9 +150,9 @@ class GemData:
     return
 
   def getGemFileName(self, model, savePath, fileName):
-      forecastHour = self.constants.getForecastHour(model,fileName)
+      forecastHour = self.modelClass.getForecastHour(fileName)
 
-      currentRun = self.constants.runTimes[model]
+      currentRun = self.modelClass.runTime
 
       outFile = model + '/' + currentRun + forecastHour + '.gem'
 
@@ -251,7 +260,7 @@ class GemData:
       fp.close()
     else:
       print "Socket timed out! Time exceeded "
-      f = open(self.constants.errorLog,'w')
+      f = open(self.modelClass.errorLog,'w')
       f.write("\n A socket Timed out in GemData.saveFilesThread() . We must exit this program execution, and attempt again.")
       f.write("\n URL: " + url)
       f.write("\n MODEL: " + model)
@@ -295,13 +304,13 @@ class GemData:
       grib2File = savePath + file
       arg = (model, savePath, file, url)
       # Append forecast hour to times to be processed... No prefixes also.
-      fHour = self.constants.getForecastHour(model, file, True)
+      fHour = self.modelClass.getForecastHour(file, True)
 
       if(self.DEBUG == False):
         if self.redisConn.get(model + '-' + fHour) != "1":
-          self.constants.modelTimes[model].append(fHour)
+          self.modelClass.modelTimes.append(fHour)
       else:
-        self.constants.modelTimes[model].append(fHour)
+        self.modelClass.modelTimes.append(fHour)
       args.append(arg)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
@@ -319,13 +328,13 @@ class GemData:
     for file,urls in files.items():
       grib2File = savePath + file
       # Append forecast hour to times to be processed... No prefixes also.
-      fHour = self.constants.getForecastHour(model, file, True)
+      fHour = self.modelClass.getForecastHour(file, True)
       self.saveFilesAndCat(savePath, urls, file, model)
       if(self.DEBUG == False):
         if self.redisConn.get(model + '-' + fHour) != "1":
-          self.constants.modelTimes[model].append(fHour)
+          self.modelClass.modelTimes.append(fHour)
       else:
-        self.constants.modelTimes[model].append(fHour)
+        self.modelClass.modelTimes.append(fHour)
         
       self.processGrib2(model, savePath, file)
 
@@ -370,12 +379,13 @@ class GemData:
     return
 
   def mvAssets(self):
+    model = self.modelClass.getName()
+    runTime = self.modelClass.runTime
     # Remove and move over only updated data.
-    for model,runTime in self.constants.runTimes.items():
-      assetsDir = self.constants.webDir + "/src/assets/" + model
-      cleanWebDirCmd = "sudo rm -r " + assetsDir + "/*/"
-      self.runCmd(cleanWebDirCmd)
-      self.runCmd("sudo mv " + os.getcwd() +"/scripts/data/" + model + "/* " + assetsDir)
+    assetsDir = self.constants.webDir + "/src/assets/" + model
+    cleanWebDirCmd = "sudo rm -r " + assetsDir + "/*/"
+    self.runCmd(cleanWebDirCmd)
+    self.runCmd("sudo mv " + os.getcwd() +"/scripts/data/" + model + "/* " + assetsDir)
 
   def rebuild(self, env):
     os.chdir(self.constants.webDir)

@@ -9,110 +9,115 @@ from grib2Plot import Grib2Plot
 class Gempak:
 
   def __init__(self, dataGetter):
-    self.constants = dataGetter.constants
-    self.redisConn = dataGetter.redisConn
+    self.modelClass =  dataGetter.modelClass
+    self.constants  = dataGetter.constants
+    self.redisConn  = dataGetter.redisConn
     self.DEBUG = dataGetter.DEBUG
     self.grib2Plotter = Grib2Plot(self.constants)
     return
 
-  def runGempakScripts(self):
+  def runGempakScripts(self, modelLinks):
     prevWd = os.getcwd()
     os.chdir("scripts")
-    for key,http in self.constants.modelGems.items():
-      if key in self.constants.runTimes:
-        if 'files' in http and key != "gfs" and key != "nam":
-          for file in glob.glob("gempak/hres/*.sh"):
-            print "Executing HiRes gempak scripts."
-            # Customized Gempak scripts for High resolution data in scripts/gempak/hres
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            self.runCmd(cmd)
-            print cmd
-        else:
-          print "Executing Non-HiRes gempak scripts."
-          for file in glob.glob("gempak/*.sh"):
-            # Non High-Res scripts
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            print cmd
-            self.runCmd(cmd)
-      # Flag all forecast hours as processed.
-      if self.DEBUG == False:
-        # Set to not processing status.
-        #self.redisConn.set(key, "0")
-        for fHour in self.constants.modelTimes[key]:
-          # Set all forecast hours processed.
-          self.redisConn.set(key + '-' + fHour, "1")
+
+    model = self.modelClass.getName()
+    http  = modelLinks[model]
+    
+    if 'files' in http and model != "gfs" and model != "nam":
+      for file in glob.glob("gempak/hres/*.sh"):
+        print "Executing HiRes gempak scripts."
+        # Customized Gempak scripts for High resolution data in scripts/gempak/hres
+        cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv
+        self.runCmd(cmd)
+        print cmd
+    else:
+      print "Executing Non-HiRes gempak scripts."
+      for file in glob.glob("gempak/*.sh"):
+        # Non High-Res scripts
+        cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv
+        print cmd
+        self.runCmd(cmd)
+    # Flag all forecast hours as processed.
+    if self.DEBUG == False:
+      # Set to not processing status.
+      #self.redisConn.set(model, "0")
+      for fHour in self.modelClass.modelTimes:
+        # Set all forecast hours processed.
+        self.redisConn.set(model + '-' + fHour, "1")
 
     os.chdir(prevWd)
     return
 
-  def doThreadedGempakScripts(self):
+  def doThreadedGempakScripts(self, modelLinks):
     cmdList = []
     prevWd = os.getcwd()
     os.chdir("scripts")
-    for key,http in self.constants.modelGems.items():
-      if key in self.constants.runTimes:
-        if 'files' in http and key != "gfs" and key != "nam" and key != "ecmwf":
-          # Do matplot stuff.
-          if len(self.constants.modelTimes[key]) >0:
-            self.constants.modelTimes[key].sort()
-            # Do TempF plotting in Matplotlib...
-            self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
-          
-          # Do gddiag. (Mutable, cannot thread this.)
-          for file in glob.glob("gempak/grids/*.sh"):
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            print "Doing: " + file + " =>  " + cmd
-            self.runCmd(cmd)
 
-          # Do gempak stuff.
-          for file in glob.glob("gempak/hres/*.sh"):
-            print "Executing HiRes gempak scripts."
-            # Customized Gempak scripts for High resolution data in scripts/gempak/hres
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv
-            cmdList.append(cmd)
-            #self.runCmd(cmd)
-            print cmd
-        else:
-          print "Executing Non-HiRes gempak scripts."
-          # Do Matplot stuff!
-          previousTime = '000'
-          if len(self.constants.modelTimes[key]) >0:
-            self.constants.modelTimes[key].sort()
-            previousTime = self.constants.getPreviousTime(key, self.constants.modelTimes[key][0])
-            if key != "ecmwf":
-              # Do TempF plot
-              self.grib2Plotter.plot2mTemp(key,self.constants.modelTimes[key], self.constants.runTimes[key], self.constants.dataDirEnv)
-              # Do Snowfall plotting in Matplotlib...
-              # Only plot snowfall if the run has completed.
-              if self.constants.lastForecastHour[key] in self.constants.modelTimes[key]:
-                self.grib2Plotter.plotSnowFall(key,self.constants.getDefaultHours(key), self.constants.runTimes[key], self.constants.dataDirEnv, self.constants.getDefaultHours(key)[0])
-            # Do gddiag. (Mutable, cannot thread this.)
-            # for file in glob.glob("gempak/grids/*.sh"):
-            #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
-            #   print "Doing: " + file + " =>  " + cmd
-            #   self.runCmd(cmd)
+    model = self.modelClass.getName()
+    http  = modelLinks[model]
 
-          # Do gempak stuff.
-          for file in glob.glob("gempak/*.sh"):
-            # Non High-Res scripts
-            cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
-            # print cmd
-            cmdList.append(cmd)
-            #self.runCmd(cmd)
+    if 'files' in http and model != "gfs" and model != "nam" and model != "ecmwf":
+      # Do matplot stuff.
+      if len(self.modelClass.modelTimes) >0:
+        self.modelClass.modelTimes.sort()
+        # Do TempF plotting in Matplotlib...
+        self.grib2Plotter.plot2mTemp(model, self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
+      
+      # Do gddiag. (Mutable, cannot thread this.)
+      for file in glob.glob("gempak/grids/*.sh"):
+        cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv
+        print "Doing: " + file + " =>  " + cmd
+        self.runCmd(cmd)
 
-      if len(cmdList) > 0:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-          result = ''.join(executor.map(self.runCmd, cmdList))
+      # Do gempak stuff.
+      for file in glob.glob("gempak/hres/*.sh"):
+        print "Executing HiRes gempak scripts."
+        # Customized Gempak scripts for High resolution data in scripts/gempak/hres
+        cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv
+        cmdList.append(cmd)
+        #self.runCmd(cmd)
+        print cmd
+    else:
+      print "Executing Non-HiRes gempak scripts."
+      # Do Matplot stuff!
+      previousTime = '000'
+      if len(self.modelClass.modelTimes) >0:
+        self.modelClass.modelTimes.sort()
+        previousTime = self.modelClass.getPreviousTime(model, self.modelClass.modelTimes[0])
+        if model != "ecmwf":
+          # Do TempF plot
+          self.grib2Plotter.plot2mTemp(model,self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
+          # Do Snowfall plotting in Matplotlib...
+          # Only plot snowfall if the run has completed.
+          if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+            self.grib2Plotter.plotSnowFall(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv, self.modelClass.getDefaultHours()[0])
+        # Do gddiag. (Mutable, cannot thread this.)
+        # for file in glob.glob("gempak/grids/*.sh"):
+        #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
+        #   print "Doing: " + file + " =>  " + cmd
+        #   self.runCmd(cmd)
 
-      print "Done with Threads."
+      # Do gempak stuff.
+      for file in glob.glob("gempak/*.sh"):
+        # Non High-Res scripts
+        cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv + " " + previousTime
+        # print cmd
+        cmdList.append(cmd)
+        #self.runCmd(cmd)
 
-      # Flag all forecast hours as processed.
-      if self.DEBUG == False:
-        # Set to not processing status.
-        #self.redisConn.set(key, "0")
-        for fHour in self.constants.modelTimes[key]:
-          # Set all forecast hours processed.
-          self.redisConn.set(key + '-' + fHour, "1")
+    if len(cmdList) > 0:
+      with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        result = ''.join(executor.map(self.runCmd, cmdList))
+
+    print "Done with Threads."
+
+    # Flag all forecast hours as processed.
+    if self.DEBUG == False:
+      # Set to not processing status.
+      #self.redisConn.set(key, "0")
+      for fHour in self.modelClass.modelTimes:
+        # Set all forecast hours processed.
+        self.redisConn.set(key + '-' + fHour, "1")
 
     os.chdir(prevWd)
     return
