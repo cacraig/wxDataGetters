@@ -11,14 +11,14 @@ class Gfs(NCEPModel):
             '081','084','087','090','093','096','099','102','105','108','111','114','117','120','126','132','138','144', \
             '150','156','162','168','174','180','186','192','198','204','210','216','222', \
             '228','234','240','252','264','276', \
-            '288','300','312','324','336','348','360','372','384'], \
+            '288','300','312','324','336','348','360','372','384']
     self.modelTimes = []
     self.modelUrl = "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
                 "&lev_500_mb=on&lev_700_mb=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
                 "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
                 "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
                 "&var_CAPE=on&var_HLCY=on" + \
-                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&var_WEASD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
+                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&var_WEASD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20"
     self.modelAlias = "gfs"
     return
 
