@@ -43,7 +43,7 @@ def main():
     print "Currently Processing: " + currentlyProcessing
     if int(currentlyProcessing) == 0:
       # If it has new hourly data, or it is a new run altogether. Put it in the Queue.
-      if hasNewData(modelLinks, redisConn) or db.isNewRun(model, modelClass.runTime):
+      if hasNewData(modelLinks, model, modelClass,redisConn) or db.isNewRun(model, modelClass.runTime):
         # Run has been updated. Put into queue.
         print "Putting into Queue..."
         # Set Currently processing 
@@ -68,16 +68,15 @@ def resetHourKeys(modelClass, model, redisConn):
     redisConn.set(model + '-' + hour, "0")
   return
 
-def hasNewData(modelLinks, redisConn):
+def hasNewData(modelLinks, model, modelClass, redisConn):
 
-  model = self.modelClass.getName()
   http  = modelLinks[model]
   if not http:
     return False
   if 'files' in http:
     files = http['files']
     for file,url in files.items():
-      fHour = modelClass.getForecastHour(model, file, True)
+      fHour = modelClass.getForecastHour(file, True)
       redisHourKey = redisConn.get(model + '-' + fHour)
       if redisHourKey == "0":
         return True

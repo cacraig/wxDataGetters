@@ -8,17 +8,21 @@ class Ecmwf(NonNCEPModel):
     self.lastForecastHour = "240"
     self.name = "ecmwf"
     self.modelAlias = "ecmwf"
+    self.defaultTimes = ['000','024','048','072','096','120','144','168','240']
+    self.modelTimes = []
+    self.modelUrl = 'data-portal.ecmwf.int/'
     return
 
   '''''
   Returns model files grouped by forecast hour filename (grib2).
   '''''
-  def getFiles(self, model):
+  def getRun(self):
 
     username = 'wmo'
     password = 'essential'
+    model = self.name
     modelRunUrl = ''
-    modelListUrl = "ftp://wmo:essential@" + self.alternateUrls[model]
+    modelListUrl = "ftp://wmo:essential@" + self.modelUrl
     runTime = ''
 
     # Parse it, get model run time.
@@ -142,7 +146,9 @@ class Ecmwf(NonNCEPModel):
 
     # A list of all Download urls.
     dataDict['files'] = runDict
-    self.runTimes["ecmwf"] = runTime
+    self.runTime = runTime
+
+    dataDict = {self.name: dataDict}
 
     return dataDict
 
