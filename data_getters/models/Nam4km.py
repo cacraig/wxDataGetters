@@ -4,7 +4,7 @@ class Nam4km(NCEPModel):
 
   def __init__(self):
     NCEPModel.__init__(self)
-    self.lastForecastHour = "60"
+    self.lastForecastHour = "060"
     self.name = "nam4km"
     self.modelRegex = '^nam.t..z.(conus\w+).hiresf...tm...grib2$'
     self.defaultTimes = ['000','001','002','003','004','005','006','007','008','009','010','011','012','013','014','015','016','017','018','019','020','021','022','023','024','025', \

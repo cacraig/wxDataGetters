@@ -8,6 +8,7 @@ import psycopg2
 import redis
 import concurrent.futures
 import socket, threading
+
 # TODO: Speed up download, and require less RAM. 
 #         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
 # Class for downloading data, and cleaning data directories.
@@ -110,7 +111,7 @@ class DataProcessor:
     return self.conn.close()
 
   def resetHourKeys(self, model):
-    hourKeys = self.modelClass.getDefaultHoursByModel(model)
+    hourKeys = self.modelClass.getDefaultHours()
     for hour in hourKeys:
       self.redisConn.set(model + '-' + hour, "0")
     return
@@ -193,17 +194,12 @@ class DataProcessor:
     grib2File = savePath + fileName
 
     # If model is specified, check for a decoded .gem file.
-    # if model is not None:
-    #   gemFile = self.getGemFileName(model, savePath, fileName)
-    #   if os.path.isfile(gemFile):
-    #     print "Decoded GEM file:" + gemFile + " already exists...skipping..."
-    #     return
+    if model is not None:
+      gemFile = self.getGemFileName(model, savePath, fileName)
+      if os.path.isfile(gemFile):
+        print "Decoded GEM file:" + gemFile + " already exists...skipping..."
+        return
 
-
-    # If file exists, don't download again!
-    # if os.path.isfile(grib2File):
-    #   print "File already downloaded. Skipping..."
-    #   return
     if isinstance(urls, list):
       # File does not already exist, download it.
       for url in urls:
