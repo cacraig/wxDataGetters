@@ -12,7 +12,7 @@ class DataGetter:
 
   def run(self):
 
-    modelClass = self.getModelObj(args.model)
+    modelClass = self.getModelObj(self.model)
     modelLinks = modelClass.getRun()
 
     # initalize for only one model.

@@ -23,6 +23,82 @@ class Gfs(NCEPModel):
     return
 
   '''''
+  This method gets all conusnest High-Resolution model paths. These model paths are an array
+  of download paths for grib2 data (one for each time stamp).
+
+  @param list html   - List containing HTML content
+  @param String type - String containing model type. 
+  @return list
+  '''''
+  def getFiles(self, html, type, alias = None):
+    soup = BeautifulSoup(html)
+
+    modelType = alias
+
+    urlRegex = '(' + modelType + '.*)[^/]*$'
+    hrefList = soup.find_all('a', text=re.compile(urlRegex))
+
+    dirList = [i.get('href') for i in hrefList if i.get('href')]
+
+    # Assure that we have the latest run Date.
+    latestRun = 0
+    for dir in dirList:
+      date = dir.split('.')[1][:-1]
+      model = dir.split('.')[0]
+      if model == modelType and int(date) > int(latestRun):
+        latestRunDir = dir
+
+    #latestRunDir  = "gfs.2015032612/" # TEST
+    #latestRunDir  = "nam.20150425/" # TEST
+    # if model == 'nam':
+    #   latestRunDir  = "nam.20150328/" # TEST
+
+    modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
+    print modelDataUrl
+    content = urllib2.urlopen(modelDataUrl).read()
+
+    print modelDataUrl
+
+    soup = BeautifulSoup(content, 'html.parser')
+
+    urlRegex = self.modelRegex
+
+    hrefList = soup.find_all('a', text=re.compile(urlRegex))
+    fileList = [i.get('href') for i in hrefList]
+    # for each href, grab latest Run hour.
+    latestHour = "00"
+    runFileList = []
+
+    # Loop through file list. Build a list of files with latest run only.
+    for file in fileList:
+      runHour = file.split('.')[1][1:3]
+      if int(runHour) > int(latestHour):
+        latestHour = runHour
+        runFileList = []
+        runFileList.append(file)
+      else:
+        runFileList.append(file)
+
+    #latestHour = "00" # TEST for NAM and NAM4km
+
+    # Associate the current runTime with the model... nam4km => YYYYMMDDZZ
+    if modelType is not type:
+      # Use full name, and not alias.
+      modelType = type
+
+    self.runTime = latestRunDir.split('/')[0].split('.')[1]
+    runFileList = self.filterFiles(runFileList)
+
+    # if model == 'nam':
+    #   runFileList = runFileList[0:1]
+    #runFileList = runFileList[2:5] # test!
+    #print runFileList
+
+    print "Length of currently updated files: " + str(len(runFileList))
+
+    return (latestRunDir[:-1],runFileList)
+
+  '''''
   Filter GFS model file list:
   000-120 Hour (3 hour increment)
   120-240 Hour (6 hour increment)

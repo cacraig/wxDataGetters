@@ -136,11 +136,8 @@ class NCEPModel:
       # Use full name, and not alias.
       modelType = type
 
-    if modelType == "gfs":
-      self.runTime = latestRunDir.split('/')[0].split('.')[1]
-      runFileList = self.filterGFSFiles(runFileList)
-    else:
-      self.runTime = latestRunDir.split('/')[0].split('.')[1] + latestHour
+
+    self.runTime = latestRunDir.split('/')[0].split('.')[1] + latestHour
     # if model == 'nam':
     #   runFileList = runFileList[0:1]
     #runFileList = runFileList[2:5] # test!
@@ -250,11 +247,7 @@ class NCEPModel:
     return self.name
 
   def getAlias(self):
-    if self.modelAliases != "":
-      return self.modelAlias
-    else:
-      return self.name
-
+    return self.modelAlias
 
   def getForecastHour(self, fileName, noPrefix = False):
     return ""

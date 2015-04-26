@@ -57,7 +57,7 @@ class DataProcessor:
       if model in self.dbRunTimes:
         if self.modelClass.runTime != self.dbRunTimes[model]:
           print "Resetting Hour keys for Mode ->" + model
-          self.resetHourKeys(key)
+          self.resetHourKeys(model)
         lastCompletedRun = self.redisConn.get(model + "-complete")
         if self.modelClass.runTime == lastCompletedRun:
           del self.modelClass.runTime

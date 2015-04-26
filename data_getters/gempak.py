@@ -117,7 +117,7 @@ class Gempak:
       #self.redisConn.set(key, "0")
       for fHour in self.modelClass.modelTimes:
         # Set all forecast hours processed.
-        self.redisConn.set(key + '-' + fHour, "1")
+        self.redisConn.set(model + '-' + fHour, "1")
 
     os.chdir(prevWd)
     return
