@@ -47,12 +47,12 @@ class Ecmwf(NonNCEPModel):
       month = '0' + month
 
     # Get model Run Dir.
-    if currentHour >= 18 or currentHour <= 5:
+    if currentHour >= 20 or currentHour <= 5:
       runTime = year + month + day + "12"
       ddhh = day + "12"
       # Get 12z run.
       modelRunUrl = modelListUrl + year + month + day + "120000/"
-    elif currentHour >=6:
+    elif currentHour >=9:
       runTime = year + month + day + "00"
       ddhh = day + "00"
       # Get 0Z run.
