@@ -5,7 +5,9 @@ import datetime, re, os
 
 
 class NonNCEPModel:
-
+  '''''
+  Base Class for all Non-NCEP models.
+  '''''
   def __init__(self):
 
     self.modelUrls = ''

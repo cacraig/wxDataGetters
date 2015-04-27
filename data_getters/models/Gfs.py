@@ -1,5 +1,9 @@
 from NCEPModel import NCEPModel
-
+import time
+from bs4 import BeautifulSoup
+import urllib2
+import datetime, re, os
+    
 class Gfs(NCEPModel):
 
   def __init__(self):
@@ -31,6 +35,7 @@ class Gfs(NCEPModel):
   @return list
   '''''
   def getFiles(self, html, type, alias = None):
+
     soup = BeautifulSoup(html)
 
     modelType = alias

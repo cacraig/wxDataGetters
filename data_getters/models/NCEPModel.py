@@ -5,7 +5,9 @@ import datetime, re, os
 
 
 class NCEPModel:
-
+  '''''
+  Base Class for all NCEP models.
+  '''''
   def __init__(self):
     self.name = ""
     self.modelRegex = ""

@@ -72,8 +72,6 @@ class DataProcessor:
     if 'files' in http:
       if not self.modelClass.isNCEPSource:
         # Download files.
-        print http
-        print "PROCESSING MANY"
         files = http['files']
 
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
@@ -81,7 +79,6 @@ class DataProcessor:
         # Combine if nesc.
       else:
         # download all files in http['files'].
-        print "PROCESSING MANY"
         files = http['files']
 
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
@@ -371,7 +368,7 @@ class DataProcessor:
       print "Removing" + filePath
       os.unlink(filePath)
     except Exception, e:
-      print e
+      raise e
     return
 
   def mvAssets(self):
@@ -410,29 +407,30 @@ class DataProcessor:
     print "Getting Current Runs from DB..."
     selectQuery = "select model.name as name, run_time from model_runtime JOIN model ON (model.id = model_runtime.model_id) WHERE model.name='" + \
                      model + "' ORDER BY run_time DESC LIMIT 1"
+
     self.cursor.execute(selectQuery)
     rows = self.cursor.fetchall()
-    print rows
+
     dbRunTimes = {}
     for row in rows:
       dbRunTimes[row[0]] = row[1]
-    print dbRunTimes
+
     return dbRunTimes
 
   # Insert/update our current model run times.
   def updateModelTimes(self, model, time):
-    # If the current run = run being processed...skip
-    if self.dbRunTimes[model] == time:
-      return
 
     try:
+      # If the current run = run being processed...skip
+      if model in self.dbRunTimes:
+        if self.dbRunTimes[model] == time:
+          return
       insertStr = "INSERT INTO model_runtime (model_id, run_time) " + \
                    "VALUES ((SELECT id FROM model WHERE model.name ='" + model +"'),'" + time + "')"
-
       self.cursor.execute(insertStr)
       self.cursor.execute("UPDATE model SET updating=1 WHERE name='" + model+"'")
     except Exception, e:
-      print e
+      raise e
 
     self.conn.commit()
     return
@@ -446,7 +444,7 @@ class DataProcessor:
       self.cursor.execute(updateStr)
       #self.cursor.execute("UPDATE model SET updating =" + str(boolValue) + " WHERE name='" + model+"'")
     except Exception, e:
-      print e
+      raise e
 
     self.conn.commit()
     return
