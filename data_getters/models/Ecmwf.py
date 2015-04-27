@@ -11,6 +11,7 @@ class Ecmwf(NonNCEPModel):
     self.defaultTimes = ['000','024','048','072','096','120','144','168','240']
     self.modelTimes = []
     self.modelUrl = 'data-portal.ecmwf.int/'
+    self.runTime = ''
     return
 
   '''''
