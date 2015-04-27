@@ -57,6 +57,9 @@ class Ecmwf(NonNCEPModel):
       ddhh = day + "00"
       # Get 0Z run.
       modelRunUrl = modelListUrl + year + month + day + "000000/"
+    else:
+      # Just return nothing. Not time to download anything yet.
+      return {self.name: {}}
 
     # content = urllib2.urlopen(modelRunUrl).read()
     
