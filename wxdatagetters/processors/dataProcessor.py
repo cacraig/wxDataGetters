@@ -9,11 +9,13 @@ import redis
 import concurrent.futures
 import socket, threading
 
-# TODO: Speed up download, and require less RAM. 
-#         -> http://stackoverflow.com/questions/1517616/stream-large-binary-files-with-urllib2-to-file
-# Class for downloading data, and cleaning data directories.
-class DataProcessor:
 
+class DataProcessor:
+  '''''
+  Downloads all files for modelClass. Converts into *.gem files if nescessary, and handles updating database runtimes (and redis keys).
+  @param object modelClass
+  @param boolean debug
+  '''''
   def __init__(self, modelClass, debug=False):
     self.modelClass = modelClass
     self.constants = Constants()
@@ -29,7 +31,11 @@ class DataProcessor:
     return
 
   '''''
+  public function getData(modelLinks)
+
   getData loops through our model download paths, and saves them to our specified save paths in self.modelClass.
+  
+  @param dictionary modelLinks
   '''''
   def getData(self, modelLinks):
     currentDir = os.getcwd()
@@ -98,21 +104,54 @@ class DataProcessor:
       self.closeConnection()
     return
 
+  '''''
+  public functon isUpdated()
+
+  Returns true if the model differs from that in the DB, 
+  or there are new forecast hours to process for current run.
+  @return boolean 
+  '''''
   def isUpdated(self):
     return self.updated
 
+  '''''
+  public functon isComplete()
+
+  Returns model downloading status. 
+  True if the model run is completely downloaded. (Last forecast hour encountered)
+  @return boolean 
+  '''''
   def isComplete(self):
     return self.complete
 
+  '''''
+  public functon closeConnection()
+
+  Closes open DB connection.
+  @return boolean 
+  '''''
   def closeConnection(self):
     return self.conn.close()
 
+  '''''
+  public function resetHourKeys(model)
+  Resets all redis keys for a model to 0 (not yet processed).
+  
+  @param String model
+  '''''
   def resetHourKeys(self, model):
     hourKeys = self.modelClass.getDefaultHours()
     for hour in hourKeys:
       self.redisConn.set(model + '-' + hour, "0")
     return
 
+  '''''
+  public function setRunCompletionFlag(model)
+  Sets redis key model-complete to 1 if the model is completely processed (downloaded).
+
+  @param String model
+  @retrun void
+  '''''
   def setRunCompletionFlag(self, model):
 
     f = open(self.constants.execLog, 'w')
@@ -131,6 +170,15 @@ class DataProcessor:
     f.close() # you can omit in most cases as the destructor will call if
     return
   
+  '''''
+  public function processGrib2(model, savePath, fileName)
+
+  Turns a *.grib2 file into a *.gem file. (Dependancy: dcgrib2)
+  @param String model    - Name of model
+  @param String savePath - Save path of all model files.
+  @param String fileName - File name of *.gem file.
+  @return void
+  '''''
   # Convert grib2 files into gem files.
   def processGrib2(self, model, savePath, fileName):
     
@@ -147,6 +195,15 @@ class DataProcessor:
     self.runCmd(cmd)
     return
 
+  '''''
+  public function getGemFileName(model, savePath, fileName)
+
+  Gets a *.gem file name in format model/{runTime}{forecastHour}.gem
+  @param String model    - Name of model
+  @param String savePath - Save path of all model files.
+  @param String fileName - File name of *.gem file.
+  @return String outFile - *.gem file name to use.
+  '''''
   def getGemFileName(self, model, savePath, fileName):
       forecastHour = self.modelClass.getForecastHour(fileName)
 
@@ -156,6 +213,18 @@ class DataProcessor:
 
       return outFile
 
+  '''''
+  public function saveFile(savePath, url, fileName, model = None)
+
+  Saves a file. NON-THREADED. Skips download if file already exists.
+  Times out after some time.
+
+  @param String savePath - Path to save file to.
+  @param String url      - URL to download file from.
+  @param String fileName - Name of file to download.
+  @param String model    - Name of model.
+  @return void
+  '''''
   # Saves file. Skips saving if file already exists.
   # timeout after 15 mins.
   @timeout(900, os.strerror(errno.ETIMEDOUT))
@@ -183,6 +252,18 @@ class DataProcessor:
     fp.close()
     return
 
+  '''''
+  public function saveFilesAndCat(savePath, url, fileName, model = None)
+
+  Saves a file. NON-THREADED. Skips download if file already exists.
+  Times out after some time.
+
+  @param String savePath - Path to save file to.
+  @param String url      - URL to download file from.
+  @param String fileName - Name of file to download.
+  @param String model    - Name of model.
+  @return void
+  '''''
   # Saves file. Skips saving if file already exists.
   # timeout after 15 mins.
   @timeout(120, os.strerror(errno.ETIMEDOUT))
@@ -215,6 +296,13 @@ class DataProcessor:
 
     return
 
+  '''''
+  private function saveFilesThread(arg)
+  Thread worker function for Threaded saving of files.
+
+  @param Tuple arg
+  @return boolean - True if successful, otherwise False.
+  '''''
   def saveFilesThread(self, arg):
     # (model, savePath, fileName, url)
     model = arg[0]
@@ -269,6 +357,15 @@ class DataProcessor:
 
     return True
 
+  '''''
+  private function timeoutHttpRead(response, timeout=60)
+
+  Time out function for Threads.
+
+  @param object response
+  @param int timeout
+  @return Tuple
+  '''''
   def timeoutHttpRead(self, response, timeout = 60):
     def murha(resp):
       try:
@@ -290,6 +387,15 @@ class DataProcessor:
       raise
     return (True, body)
 
+  '''''
+  public function getDataThreaded(files, model)
+
+  Gets data with Threads!
+  
+  @param dictionary files
+  @param String model
+  @return void
+  '''''
   def getDataThreaded(self, files, model):
     savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
     args = []
@@ -315,6 +421,15 @@ class DataProcessor:
 
     return
 
+  '''''
+  public function getDataNoThreads(files, model)
+
+  Gets data WITHOUT Threads!
+  
+  @param dictionary files
+  @param String model
+  @return void
+  '''''
   def getDataNoThreads(self, files, model):
     savePath = self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
     args = []
@@ -380,6 +495,14 @@ class DataProcessor:
     self.runCmd(cleanWebDirCmd)
     self.runCmd("sudo mv " + os.getcwd() +"/scripts/data/" + model + "/* " + assetsDir)
 
+  '''''
+  public function transferFilesToProd(model = None)
+
+  Transfers files to production webservers via. Rsync.
+
+  @param String model
+  @return void
+  '''''
   def transferFilesToProd(self, model = None):
 
     if model is None:
@@ -387,17 +510,30 @@ class DataProcessor:
     else:
       self.runCmd("rsync -a -vPr " + os.getcwd() +"/scripts/data/" + model + " " + self.constants.imageHost + ":" + self.constants.imageDir + self.updatingDir)
 
+  '''''
+  private function runCmd(cmd)
+
+  Runs a shell command.
+
+  @param String cmd - Command to run.
+  @return boolean
+  '''''
   def runCmd(self, cmd):
     FNULL = open(os.devnull, 'w')
     print "Currently executing..."
     print cmd
     return call(cmd, shell=True, stdout=FNULL, stderr=STDOUT)
 
+  '''''
+  public function getCurrentRuns(model)
+
+  Get latest run time from database for model.
+
+  @param String model
+  @return dictionary dbRunTimes - a dictionary of runtimes for model.
+  '''''
   def getCurrentRuns(self, model):
-    '''''
-    Get latest run time from database for model.
-    @return String
-    '''''
+
     print "Getting Current Runs from DB..."
     selectQuery = "select model.name as name, run_time from model_runtime JOIN model ON (model.id = model_runtime.model_id) WHERE model.name='" + \
                      model + "' ORDER BY run_time DESC LIMIT 1"
@@ -411,6 +547,15 @@ class DataProcessor:
 
     return dbRunTimes
 
+  '''''
+  public function updateModelTimes(model)
+
+  Updates model run time in DB.
+  
+  @param String model
+  @param String time  - Time of model run.
+  @return void
+  '''''
   # Insert/update our current model run times.
   def updateModelTimes(self, model, time):
 
@@ -429,6 +574,15 @@ class DataProcessor:
     self.conn.commit()
     return
 
+  '''''
+  public function setUpdatingFlag(model)
+
+  Sets updating flag -> Sets the "model currently updating" status in DB.
+  
+  @param String model
+  @param int boolValue
+  @return void
+  '''''
   def setUpdatingFlag(self, model, boolValue):
 
     try:

@@ -5,8 +5,6 @@
 # Basemap coding from David John Gagne II
 # Written by Luke Madaus for use with operational WRF domains
 
-#import sys,getopt
-#sys.path.append('/home/disk/pvort/lmadaus/nobackup/pylibs')
 from matplotlib.colors import LinearSegmentedColormap
 
 

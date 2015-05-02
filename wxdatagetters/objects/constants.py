@@ -10,7 +10,7 @@ class Constants:
 
   @return void
   '''''
-  def __init__(self, modelsOverride=None):
+  def __init__(self):
 
     # Open our parameters.ini file, and get defined constants.
     config = ConfigParser.SafeConfigParser()
