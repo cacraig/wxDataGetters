@@ -1,0 +1,115 @@
+echo "checking for params..."
+if( $1 == "" || $2 == "" || $3 == "" || $4 == "") then
+    echo "All 3 paremeters must be defined!"
+    echo "Usage ./precip3.sh  <model>  <time1,time2,...>  <runTime> <MODEL path>"
+    exit( 1 )
+endif
+
+set model  = $1
+set times  = `echo $2:q | sed 's/,/ /g'`
+set runTime = $3 
+
+set timeStamp = `echo $3 | sed 's/_/ /g'`
+# Get run timeStamp YYYYMMDDHH
+set timeStamp = ${timeStamp[1]}
+
+set lineColor = 2
+
+set baseDir = "data"
+set variable = "precip3"
+
+#Set output Directory = Timestamp_model
+set outDir = ${baseDir}/${model}/${timeStamp}
+set MODEL_PATH  = $4
+set proj = "MER//NM"
+
+
+# Make our run directory.
+if !(-e ${outDir}) then
+  mkdir -p ${baseDir}/${model}/${timeStamp}
+  chmod 777 -R ${baseDir}/${model}/${timeStamp}
+endif
+
+if (${model} == 'nam12km') then
+  set extension = ".gem"
+endif
+
+if (${model} == 'nam4km') then
+  set extension = ".gem"
+endif
+
+foreach TIME ($times:q)
+
+ set gdFile = ${runTime}"f"${TIME}".gem"
+ 
+ set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
+ mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
+
+ foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
+    set regionName = ${REGION}
+    set proj = "STR/90;-100;0"
+
+    if (${REGION} == "19.00;-119.00;50.00;-56.00") then
+      set proj = "STR/90;-100;0"
+      set regionName = "CONUS"
+    endif
+
+    if (${REGION} == "NC") then
+      set proj = "lea/35.50;-79.25;0/NM"
+      set regionName = "NC"
+    endif
+
+    if (${REGION} == "OK") then
+      set proj = "lea/35.75;-97.25;0/NM"
+      set regionName = "OK"
+    endif
+
+    if (${REGION} == "WA") then
+      set proj = "lea/47.25;-120.00;0/NM"
+      set regionName = "WA"
+    endif
+ 
+gdplot2_gf << EOF 
+         
+  GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
+  GDATTIM  = "f${TIME}"
+  GLEVEL  = 0 
+  GVCORD  = none 
+  PANEL   = 0 
+  SKIP    = 
+  SCALE   = 0 
+  GDPFUN   = QUO(p03m, 25.4)
+  CTYPE   = f
+  CONTUR  = 1
+  CINT    = 0.25;0.5;0.75;1;1.5;2.0;3.0
+  TYPE    = f
+  LINE    = 16/10/1/1  
+  FINT    = 0.01;0.1;0.25;0.5;0.75;1;1.5;2.0;3.0
+  FLINE   = 0;21;22;23;20;17;15;2;7 
+  HILO    = 
+  HLSYM   = 
+  GVECT   = 
+  CLRBAR  = 1/H/LR/.75;.05/
+  WIND    = bm32/0.8 
+  REFVEC  = 
+  GAREA  = ${REGION}
+  PROJ   = ${proj}    
+  CLEAR   = yes 
+  MAP     = 0
+  TITLE   = 
+  DEVICE = "gif|init_${model}_sfc_${variable}_f${TIME}.gif|1280;1024| C"
+  run
+ exit
+EOF
+
+   # clean output buffer/gifs, and cleanup
+   gpend
+   rm last.nts
+   rm gemglb.nts
+
+   # convert to a transparent image layer.
+   convert init_${model}_sfc_${variable}_f${TIME}.gif -transparent black ${imgDir}/${regionName}_f${TIME}.gif
+   rm init_${model}_sfc_${variable}_f${TIME}.gif
+ end
+
+end
