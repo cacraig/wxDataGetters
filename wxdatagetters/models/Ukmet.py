@@ -3,15 +3,21 @@ from NonNCEPModel import NonNCEPModel
 class Ukmet(NonNCEPModel):
 
   def __init__(self):
+    '''''
+    The UKMET model is strange because hours 0-72 must be downloaded (*.gem Decoded only) from COD Motherlode, and 96-120 from NOAA-NCEP (grib2 only).
+
+    This makes coming up with a standard paradigm very difficult. Ugh. I'll do this one at a later date.
+    '''''
     # super(NonNCEPModel, self).__init__()
     NonNCEPModel.__init__(self)
-    self.lastForecastHour = "240"
+    self.lastForecastHour = "120"
     self.name = "ukmet"
     self.modelAlias = "ukmet"
     self.runTime = ''
-    self.defaultTimes = ['000','024','048','072','096','120','144','168','240']
+    self.defaultTimes = ['000','006','012','018','024','030','036','042','048','054','060','066','072','096','120']
     self.modelTimes = []
-    self.modelUrl = ''
+    # --user=unidata --password=lotzodata
+    self.modelUrl = 'ftp://motherlode.ucar.edu/decoded/gempak/model/ukmet/' # or http://metfs1.agron.iastate.edu/data/gempak/model/ukmet/
     return
 
   '''''
