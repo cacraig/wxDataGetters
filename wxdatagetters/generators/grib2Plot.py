@@ -8,6 +8,7 @@ import numpy as np
 from pylab import rcParams
 from matplotlib.colors import LinearSegmentedColormap
 from objects import coltbls
+from objects.gribMap import GribMap
 from subprocess import call, STDOUT
 import concurrent.futures
 import os
@@ -19,10 +20,15 @@ import os
 # !------------------------------------------------------------------------------
 # NC      NORTH CAROLINA       35.50  -79.25   30.00  -87.25   41.00  -71.25 NPS
 # WA      WASHINGTON           47.25 -120.00   41.75 -128.00   52.75 -112.00 NPS
-# WWE     WINTER WX AREA       36.00  -78.00   18.00 -106.00   54.00  -50.00 NPS
+# WWE     WINTER WX AREA       36.00  -78.00   18.00 -106.00   54.00  -50.00 NPS (LABELED EASTUS)
 # OK      OKLAHOMA             35.75  -97.25   30.25 -105.25   41.25  -89.25 NPS
 # MA      MASSACHUSETTS        42.25  -72.25   36.75  -80.25   47.75  -64.25 NPS (LABELED NEUS)
 # CENTUS  CENTRAL US           36.15  -91.20   24.70 -105.40   47.60  -77.00 STR/90;-95;0
+# TATL    TROPICAL ATLANTIC    15.00  -50.00  -10.00  -90.00   35.00  -15.00 MER
+# EPAC    E PACIFIC            40.00 -130.60   12.00 -134.00   75.00 -110.00 STR/90;-100;1
+# CHIFA   CHICAGO FA AREA      42.00  -93.00   34.00 -108.00   50.00  -75.00 LCC
+# CA      CALIFORNIA           37.00 -119.75   31.50 -127.75   42.50 -111.75 NPS
+# WSIG    PACIFIC              38.00 -160.00   18.00  155.00   58.00 -115.00 CED
 
 # setup north polar stereographic basemap.
 # The longitude lon_0 is at 6-o'clock, and the
@@ -42,17 +48,66 @@ class Grib2Plot:
   '''''
   def __init__(self, constants):
 
-    self.regionBounds = {
+    # "CA" : (37.00, -119.75, 31.50, -127.75, 42.50, -111.75, "laea"), br: 45px;bb: 0px
+    # "CENTUS" : (36.15, -91.20, 24.70, -105.40, 47.60, -77.00, "laea"),br:134px ; bb: 0px
+    # "CHIFA": (42.00, -93.00, 34.00, -108.00, 50.00, -75.00, "laea"), br:0px ; bb: 76px
+    # "NEUS": (42.25, -72.25, 36.75, -80.25, 47.75, -64.25, "laea"), br: 18px ; bb: 0px
+    # "EASTUS": (36.00, -78.00, 18.00, -106.00, 54.00, -50.00, "laea") br: 91px ; bb: 0px
+
+    self.regionMaps = {
       #                              CENLAT  CENLON   LLLAT   LLLON   URLAT   URLON PROJ
       # NC      NORTH CAROLINA       35.50  -79.25   30.00  -87.25   41.00  -71.25  laea
-      "CONUS": (None, None, 19,-119, 50, -56, "stere"), \
-      "NC" : (35.50, -79.25, 30.00, -87.25, 41.00, -71.25, "laea"), \
-      "WA" : (47.25, -120.00, 41.75, -128.00, 52.75, -112.00, "laea"), \
-      "OK" : (35.75, -97.25,30.25, -105.25, 41.25,  -89.25, "laea"), \
+      "CONUS": GribMap(llcrnrlat=19,urcrnrlat=50,\
+                       llcrnrlon=-119,urcrnrlon=-56, \
+                       resolution='l',projection="stere",\
+                       lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False, \
+                       borderX=61., borderY=40.), \
+      "CENTUS" : GribMap(llcrnrlat=24.70,urcrnrlat=47.60,\
+                       llcrnrlon=-105.40,urcrnrlon=-77.00, \
+                       resolution='l',projection="laea",\
+                       lat_ts=20,lat_0=36.15,lon_0=-91.20, fix_aspect=False, \
+                       borderX=134.), \
+      "CHIFA" : GribMap(llcrnrlat=34.00,urcrnrlat=50.00,\
+                       llcrnrlon=-108.00,urcrnrlon=-75.00, \
+                       resolution='l',projection="laea",\
+                       lat_ts=20,lat_0=42.00,lon_0=-93.00, fix_aspect=False, \
+                       borderY=76.), \
+      "NEUS" : GribMap(llcrnrlat=42.25,urcrnrlat=47.75,\
+                       llcrnrlon=-80.25,urcrnrlon=-64.25, \
+                       resolution='l',projection="laea",\
+                       lat_ts=20,lat_0=42.25,lon_0=-72.25, fix_aspect=False, \
+                       borderX=18.), \
+      "EASTUS" : GribMap(llcrnrlat=18.00,urcrnrlat=54.00,\
+                       llcrnrlon=-106.00,urcrnrlon=-50.00, \
+                       resolution='l',projection="laea",\
+                       lat_ts=20,lat_0=42.25,lon_0=-72.25, fix_aspect=False, \
+                       borderX=91.), \
+      "NC" : GribMap(llcrnrlat=30.00,urcrnrlat=41.00,\
+                     llcrnrlon=-87.25,urcrnrlon=-71.25, \
+                     resolution='l',projection="laea",\
+                     lat_ts=20,lat_0=36.00,lon_0=-78.00, fix_aspect=False, \
+                     borderX=35.), \
+      "WA" : GribMap(llcrnrlat=41.75,urcrnrlat=52.75,\
+                     llcrnrlon=-128.00,urcrnrlon=-112.00, \
+                     resolution='l',projection="laea",\
+                     lat_ts=50,lat_0=47.25,lon_0=-120.00, fix_aspect=False, \
+                     borderX=135.), \
+      "OK" : GribMap(llcrnrlat=30.25,urcrnrlat=41.25,\
+                     llcrnrlon=-105.25,urcrnrlon=-89.25, \
+                     resolution='l',projection="laea",\
+                     lat_ts=50,lat_0=35.75,lon_0=-97.25, fix_aspect=False, \
+                     borderX=37.), \
+      "CA" : GribMap(llcrnrlat=31.50,urcrnrlat=42.50,\
+                     llcrnrlon= -127.75,urcrnrlon=-111.75, \
+                     resolution='l',projection="laea",\
+                     lat_ts=50,lat_0=37.00,lon_0= -119.75, fix_aspect=False, \
+                     borderX=45.) \
     }
-    self.regions   = ['NC','WA','CONUS','OK'] 
+
+
+    self.regions   = ['NC','WA','CONUS','OK','CA', 'CENTUS', 'CHIFA', 'NEUS', 'EASTUS']
+    self.borderPadding = {}
     self.constants = constants
-    call("mkdir -p " + self.constants.numPyTmpDir, shell=True)
     self.isPng = ['CONUS']
     self.snowSum = None
     self.snowSum12 = None
@@ -60,7 +115,7 @@ class Grib2Plot:
     self.snowSum72 = None
     self.snowSum120 = None
     return
-
+  
   def plot2mTemp(self, model, times, runTime, modelDataPath):
     level = "sfc"
     variable = "tmpf"
@@ -69,8 +124,8 @@ class Grib2Plot:
     call("mkdir -p " + imgDir, shell=True)
     runHour = runTime[-2:]
 
-    for region in self.regions:
-
+    #for region in self.regions:
+    for region, gribmap in self.regionMaps.items():
       borderBottomCmd = '' # Reset any bottom border.
 
       # Sub regions (contourf is broken right now for global models Sub regions. Use gempak...)
@@ -105,7 +160,8 @@ class Grib2Plot:
 
         # Convert Kelvin to (F)
         temp2m = ((temp2m- 273.15)* 1.8000) + 32.00
-        m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
+        fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
+        m = gribmap.getBaseMap()
 
         lat, lon = gTemp2m.latlons()
 
@@ -199,7 +255,7 @@ class Grib2Plot:
       return
 
     # nam.t18z.awip3281.tm00.grib2
-    for region in self.regions:
+    for region,gribmap in self.regionMaps.items():
       # Clear snow sums for each region.
       self.snowSum    = None
       self.snowSum12  = None
@@ -219,7 +275,7 @@ class Grib2Plot:
           startFile = self.getGrib2File(modelDataPath, runHour, model, shortTimePrevious)
           endFile = self.getGrib2File(modelDataPath, runHour, model, shortTime)
           try:
-            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir, gribmap)
           except Exception, e:
             print e
 
@@ -228,7 +284,7 @@ class Grib2Plot:
           startFile = self.getGrib2File(modelDataPath, runHour, model, previous)
           endFile = self.getGrib2File(modelDataPath, runHour, model, time)
           try:
-            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir)
+            self.doSnowPlot(startFile, endFile, region, model, level, variable, time, imgDir, gribmap)
           except Exception, e:
             print e
 
@@ -239,7 +295,7 @@ class Grib2Plot:
 
     return
 
-  def doSnowPlot(self, startFile, endFile, region, model, level, variable, time, imgDir):
+  def doSnowPlot(self, startFile, endFile, region, model, level, variable, time, imgDir, gribmap):
 
     variableAccum = variable + "_accum"
     tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
@@ -340,8 +396,9 @@ class Grib2Plot:
         self.snowSum12 = snow
       else:
         self.snowSum12 += snow
-    
-    m, fig, borderWidth, proj, borderBottom = self.getRegionProjection(region)
+
+    fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
+    m = gribmap.getBaseMap()
 
     if borderBottom > 1.0:
       borderBottomCmd = " -gravity south -splice 0x" + str(int(borderBottom))
@@ -531,60 +588,20 @@ class Grib2Plot:
       g2file = modelDataPath + model + "/" + "nam.t" + runHour + "z.conusnest.hiresf"+ time +".tm00.grib2"
     return g2file
 
-  def getRegionProjection(self, region):
-    borderWidth = 1.
+  def getRegionFigure(self, gribmap):
     frameWidth = 6.402
     frameHieght = 5.121
     fig = None
-    proj = None
-    borderBottom = 1.
 
-    if region == "CONUS":
-      proj = 'stere'
-      m = Basemap(llcrnrlat=19,urcrnrlat=50,\
-                  llcrnrlon=-119,urcrnrlon=-56, \
-                  resolution='l',projection=proj,\
-                  lat_ts=50,lat_0=90,lon_0=-100., fix_aspect=False)
-      # fig = plt.figure(figsize=(6.402,5.121))
-      borderWidth = 61. # In Pixels. Should match that generated by Gempak.
-      borderBottom = 40.
-      frameWidth = frameWidth - ((borderWidth*2.)/200.)
+    borderWidth = gribmap.getBorderX() # In Pixels. Should match that generated by Gempak.
+    borderBottom = gribmap.getBorderY()
+
+    if int(borderBottom) > 0:
       frameHieght = frameHieght - ((borderBottom)/200.)
-      fig = plt.figure(figsize=(frameWidth, frameHieght), dpi = 200)
-      
-    if region == "NC":
-      proj = 'laea'
-      # NC      NORTH CAROLINA       30.00  -87.25   41.00  -71.25  CLAT: 35.50 CLON: -79.25
-      m = Basemap(llcrnrlat=30.00,urcrnrlat=41.00,\
-            llcrnrlon=-87.25,urcrnrlon=-71.25, \
-            resolution='l',projection=proj,\
-            lat_ts=20,lat_0=35.50,lon_0=-79.25, fix_aspect=False)
+    if int(borderWidth) > 0:
+      frameWidth = frameWidth - ((borderWidth*2.)/200.)
 
-      #fig = plt.figure(figsize=(6.402,5.121))
-      borderWidth = 35. # In Pixels. Should match that generated by Gempak.
-      frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
-    if region == "WA":
-      proj = 'laea'
-      # WA      WASHINGTON   41.75 -128.00   52.75 -112.00  CLAT: 47.25 CLON: -120.00
-      m = Basemap(llcrnrlat=41.75,urcrnrlat=52.75,\
-            llcrnrlon=-128.00,urcrnrlon=-112.00, \
-            resolution='l',projection=proj,\
-            lat_ts=50,lat_0=47.25,lon_0=-120.00, fix_aspect=False)
-      #fig = plt.figure(figsize=(6.062,5.121))
-      borderWidth = 135. # In Pixels. Should match that generated by Gempak.
-      frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
-    if region == "OK":
-      proj = 'laea'
-      # OK      OKLAHOMA   30.25 -105.25   41.25  -89.25 CLAT: 35.75  CLON: -97.25
-      m = Basemap(llcrnrlat=30.25,urcrnrlat=41.25,\
-            llcrnrlon=-105.25,urcrnrlon=-89.25, \
-            resolution='l',projection=proj,\
-            lat_ts=50,lat_0=35.75,lon_0=-97.25, fix_aspect=False)
-      #fig = plt.figure(figsize=(6.062,5.121))
-      borderWidth = 37. # In Pixels. Should match that generated by Gempak.
-      frameWidth = frameWidth - ((borderWidth*2.)/200.)
-      fig = plt.figure(figsize=(frameWidth,frameHieght), dpi = 200)
+    fig = plt.figure(figsize=(frameWidth, frameHieght), dpi = 200)
 
-    return (m,fig, borderWidth, proj, borderBottom)
+
+    return (fig, borderWidth, borderBottom)

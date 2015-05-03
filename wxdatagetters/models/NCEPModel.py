@@ -101,7 +101,7 @@ class NCEPModel:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015032612/" # TEST
-    #latestRunDir  = "nam.20150425/" # TEST
+    #latestRunDir  = "nam.20150502/" # TEST
     # if model == 'nam':
     #   latestRunDir  = "nam.20150328/" # TEST
 
