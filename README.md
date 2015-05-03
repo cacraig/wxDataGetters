@@ -13,10 +13,12 @@ Dependencies:
 - Gempak >7.0.0
 
 To execute: 
-##### python dataGetter.py [--batch] [--model]
+##### python dataGetter.py [--batch] [--model=...]
 
      optional arguments:
 
        -h, --help   show this help message and exit
+
+       --model=...  Name of model to retrieve.
 
        -b, --batch  Execute Batch image generation
