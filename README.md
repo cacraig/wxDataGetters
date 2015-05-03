@@ -11,6 +11,7 @@ Dependencies:
 - BeautifulSoup
 - Matplotlib >1.2
 - Gempak >7.0.0
+- dcgrib2
 
 To execute: 
 ##### python dataGetter.py [--batch] [--model=...]
