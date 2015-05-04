@@ -548,9 +548,6 @@ class Grib2Plot:
       fig.clf()
     
     plt.close()
-
-
-
     return
 
   def getAccumulationStartTime(self, divisor, time):

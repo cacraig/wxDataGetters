@@ -75,7 +75,7 @@ foreach level (250 500 700 850)
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  #cd ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE" "WSIG" "TATL")
     set regionName = ${REGION}
     set proj = "STR/90;-100;0"
 
@@ -122,6 +122,16 @@ foreach level (250 500 700 850)
     if (${REGION} == "WWE") then
       set proj = "lea/36.00;-78.00;0/NM"
       set regionName = "EASTUS"
+    endif
+    
+    if (${REGION} == "WSIG") then
+      set proj = "MER//NM"
+      set regionName = "EPAC"
+    endif
+
+    if (${REGION} == "TATL") then
+      set proj = "MER//NM"
+      set regionName = "TATL"
     endif
 
 gdplot_gf << EOF 

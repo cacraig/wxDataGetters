@@ -44,7 +44,7 @@ foreach level (180)
  set imgDir = ${baseDir}/${model}/${timeStamp}/comp/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/comp/${variable}
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE")
     set regionName = ${REGION}
     set proj = "STR/90;-100;0"
 

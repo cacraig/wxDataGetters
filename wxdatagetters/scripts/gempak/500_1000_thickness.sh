@@ -45,7 +45,7 @@ foreach TIME ($times:q)
 
   set gdFile = ${runTime}"f"${TIME}".gem"
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE" "WSIG" "TATL")
     # Reset line color!
     set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
     mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
@@ -95,9 +95,17 @@ foreach TIME ($times:q)
 
     if (${REGION} == "WWE") then
       set proj = "lea/36.00;-78.00;0/NM"
-      set regionName = "NEUS"
+      set regionName = "EASTUS"
+    endif
+    if (${REGION} == "WSIG") then
+      set proj = "MER//NM"
+      set regionName = "EPAC"
     endif
 
+    if (${REGION} == "TATL") then
+      set proj = "MER//NM"
+      set regionName = "TATL"
+    endif
 
 gdplot2_gf << EOF 
          

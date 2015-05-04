@@ -119,6 +119,11 @@ foreach level (250 500 850)
       set regionName = "EASTUS"
     endif
 
+    if (${REGION} == "WSIG") then
+      set proj = "lea/36.00;-78.00;0/NM"
+      set regionName = "EPAC"
+    endif
+
 gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"

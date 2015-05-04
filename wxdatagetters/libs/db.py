@@ -9,6 +9,8 @@ class NgwipsDB:
 
   def isNewRun(self, model, currentRun):
     currentDbRun = self.getCurrentRun(model)
+    if currentRun == '':
+      currentRun = 0
     # If it is a new run... return True.
     if int(currentDbRun) < int(currentRun):
       return True
