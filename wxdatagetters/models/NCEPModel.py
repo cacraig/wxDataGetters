@@ -101,7 +101,7 @@ class NCEPModel:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015032612/" # TEST
-    latestRunDir  = "nam.20150502/" # TEST
+    #latestRunDir  = "nam.20150502/" # TEST
     # if model == 'nam':
     #   latestRunDir  = "nam.20150328/" # TEST
 
@@ -142,7 +142,7 @@ class NCEPModel:
     self.runTime = latestRunDir.split('/')[0].split('.')[1] + latestHour
     # if model == 'nam':
     #   runFileList = runFileList[0:1]
-    runFileList = runFileList[2:5] # test!
+    #runFileList = runFileList[2:5] # test!
     #print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
