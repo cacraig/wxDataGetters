@@ -1,4 +1,4 @@
-from constants import Constants
+from objects.constants import Constants
 from optparse import OptionParser
 from argparse import ArgumentParser
 from libs.db import NgwipsDB

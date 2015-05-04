@@ -73,6 +73,31 @@ foreach TIME ($times:q)
       set regionName = "WA"
     endif
 
+    if (${REGION} == "CA") then
+      set proj = "lea/37.00;-119.75;0/NM"
+      set regionName = "CA"
+    endif
+
+    if (${REGION} == "CHIFA") then
+      set proj = "lea/42.00;-93.00;0/NM"
+      set regionName = "CHIFA"
+    endif
+
+    if (${REGION} == "CENTUS") then
+      set proj = "lea/36.15;-91.20;0/NM"
+      set regionName = "CENTUS"
+    endif
+
+    if (${REGION} == "MA") then
+      set proj = "lea/42.25;-72.25;0/NM"
+      set regionName = "NEUS"
+    endif
+
+    if (${REGION} == "WWE") then
+      set proj = "lea/36.00;-78.00;0/NM"
+      set regionName = "NEUS"
+    endif
+
 
 gdplot2_gf << EOF 
          
