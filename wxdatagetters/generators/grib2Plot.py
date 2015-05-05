@@ -76,12 +76,12 @@ class Grib2Plot:
                        llcrnrlon=-80.25,urcrnrlon=-64.25, \
                        resolution='l',projection="laea",\
                        lat_ts=20,lat_0=42.25,lon_0=-72.25, fix_aspect=False, \
-                       borderX=18.), \
+                       borderX=91.), \
       "EASTUS" : GribMap(llcrnrlat=18.00,urcrnrlat=54.00,\
                        llcrnrlon=-106.00,urcrnrlon=-50.00, \
                        resolution='l',projection="laea",\
                        lat_ts=20,lat_0=36.00,lon_0=-78.00, fix_aspect=False, \
-                       borderX=91.), \
+                       borderX=18.), \
       "NC" : GribMap(llcrnrlat=30.00,urcrnrlat=41.00,\
                      llcrnrlon=-87.25,urcrnrlon=-71.25, \
                      resolution='l',projection="laea",\

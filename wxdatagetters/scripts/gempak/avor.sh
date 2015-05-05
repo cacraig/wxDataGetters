@@ -124,6 +124,11 @@ foreach level (250 500 850)
       set regionName = "EPAC"
     endif
 
+    if (${REGION} == "TATL") then
+      set proj = "MER//NM"
+      set regionName = "TATL"
+    endif
+
 gdplot_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
