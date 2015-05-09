@@ -52,7 +52,7 @@ foreach TIME ($times:q)
  endif
 
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "18.00;-92.00;54.00;-40.00" "WSIG" "TATL")
     set regionName = ${REGION}
     set proj = "STR/90;-100;0"
 
@@ -87,7 +87,7 @@ foreach TIME ($times:q)
     endif
 
     if (${REGION} == "CENTUS") then
-      set proj = "lea/36.15;-91.20;0/NM"
+      set proj = "LCC/36.15;-91.20;36.15/NM"
       set regionName = "CENTUS"
     endif
 
@@ -96,9 +96,19 @@ foreach TIME ($times:q)
       set regionName = "NEUS"
     endif
 
-    if (${REGION} == "WWE") then
-      set proj = "lea/36.00;-78.00;0/NM"
+    if (${REGION} == "18.00;-92.00;54.00;-40.00") then
+      set proj = "LCC/30;-85;30/NM"
       set regionName = "EASTUS"
+    endif
+
+    if (${REGION} == "WSIG") then
+      set proj = "MER//NM"
+      set regionName = "EPAC"
+    endif
+
+    if (${REGION} == "TATL") then
+      set proj = "MER//NM"
+      set regionName = "TATL"
     endif
 
 gdplot2_gf << EOF 

@@ -75,7 +75,7 @@ foreach level (250 500 700 850)
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  #cd ${baseDir}/${model}/${timeStamp}/${level}/${variable}
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "WWE" "WSIG" "TATL")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "18.00;-92.00;54.00;-40.00" "WSIG" "TATL")
     set regionName = ${REGION}
     set proj = "STR/90;-100;0"
 
@@ -110,7 +110,7 @@ foreach level (250 500 700 850)
     endif
 
     if (${REGION} == "CENTUS") then
-      set proj = "lea/36.15;-91.20;0/NM"
+      set proj = "LCC/36.15;-91.20;36.15/NM"
       set regionName = "CENTUS"
     endif
 
@@ -119,8 +119,8 @@ foreach level (250 500 700 850)
       set regionName = "NEUS"
     endif
 
-    if (${REGION} == "WWE") then
-      set proj = "lea/36.00;-78.00;0/NM"
+    if (${REGION} == "18.00;-92.00;54.00;-40.00") then
+      set proj = "LCC/30;-85;30/NM"
       set regionName = "EASTUS"
     endif
     

@@ -29,6 +29,7 @@ class GribMap:
     self.fix_aspect = None
     self.borderX = 0.
     self.borderY = 0.
+    self.hasDoubleYBorder = False
     
     # Dynamically set all object attributes from unpacked kwargs.
     for key, value in kwargs.items():
