@@ -17,9 +17,10 @@ class Nam4km(NCEPModel):
                "CSNOW:surface","CICEP:surface","CFRZR:surface","CRAIN:surface","PWAT:entire atmosphere (considered as a single layer)"\
                "HLCY:3000-0 m above ground", "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", \
                "TMP:surface", "REFC:entire atmosphere (considered as a single layer)", \
-               # "TMP:850 mb","RH:850 mb","DPT:850 mb", \
+               "TMP:850 mb", "TMP:500 mb", \
                "MAXUW:10 m above ground","MAXVW:10 m above ground", \
                "HLCY:3000-0 m above ground", "HLCY:1000-0 m above ground"]
+               # ,"RH:850 mb","DPT:850 mb"
     return
 
   '''''
