@@ -33,13 +33,18 @@ class Gempak:
     model = self.modelClass.getName()
     http  = modelLinks[model]
 
+    # Is nam4km...lol.
     if 'files' in http and model != "gfs" and model != "nam" and model != "ecmwf":
       # Do matplot stuff.
       if len(self.modelClass.modelTimes) >0:
         self.modelClass.modelTimes.sort()
         # Do TempF plotting in Matplotlib...
-        self.grib2Plotter.plot2mTemp(model, self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
-      
+        self.grib2Plotter.plot2mMPTemp(model, self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
+        if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+          # Plot Accum Precipitation.
+          self.grib2Plotter.plotPrecip(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv)
+          self.grib2Plotter.plotSnowFall(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv, self.modelClass.getDefaultHours()[0])
+
       # Do gddiag. (Mutable, cannot thread this.)
       for file in glob.glob("gempak/grids/*.sh"):
         cmd = "tcsh "+ file + " " + model + " " + ",".join(self.modelClass.modelTimes) + " " + self.modelClass.runTime + " " + self.constants.dataDirEnv
@@ -63,16 +68,13 @@ class Gempak:
         previousTime = self.modelClass.getPreviousTime(model, self.modelClass.modelTimes[0])
         if model != "ecmwf":
           # Do TempF plot
-          self.grib2Plotter.plot2mTemp(model,self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
+          self.grib2Plotter.plot2mMPTemp(model,self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
           # Do Snowfall plotting in Matplotlib...
           # Only plot snowfall if the run has completed.
           if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+            # Plot Accum Precipitation.
+            self.grib2Plotter.plotPrecip(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv)
             self.grib2Plotter.plotSnowFall(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv, self.modelClass.getDefaultHours()[0])
-        # Do gddiag. (Mutable, cannot thread this.)
-        # for file in glob.glob("gempak/grids/*.sh"):
-        #   cmd = "tcsh "+ file + " " + key + " " + ",".join(self.constants.modelTimes[key]) + " " + self.constants.runTimes[key] + " " + self.constants.dataDirEnv + " " + previousTime
-        #   print "Doing: " + file + " =>  " + cmd
-        #   self.runCmd(cmd)
 
       # Do gempak stuff.
       for file in glob.glob("gempak/*.sh"):

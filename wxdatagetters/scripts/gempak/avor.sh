@@ -150,7 +150,7 @@ gdplot_gf << EOF
   TITLE = 
   FINT   = 16;20;24;28;32;36;40;44
   FLINE  = 0;23-15
-  CTYPE  = c/f
+  CTYPE  = f
   WIND     = "0"
   REFVEC   =  
   TEXT     =  

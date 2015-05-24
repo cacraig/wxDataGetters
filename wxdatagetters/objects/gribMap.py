@@ -49,3 +49,18 @@ class GribMap:
 
   def getBaseMap(self):
     return self.basemap
+    
+  '''''
+  def convertLon180to360(lon)
+
+  Converts a [-180,180] longitude into a [0,360] longitude.
+  @param int lon
+  @return int
+  '''''
+  def convertLon180to360(self, lon):
+    newLon = 0
+    if int(lon) < 0:
+      newLon = 360 + int(lon)
+    else:
+      newLon = int(lon)
+    return newLon

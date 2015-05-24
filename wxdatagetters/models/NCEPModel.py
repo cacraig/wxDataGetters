@@ -12,42 +12,16 @@ class NCEPModel:
     self.name = ""
     self.modelRegex = ""
 
-    # Intructions:
-    #   curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl
-    #          ?file=gfs.t12z.pgrbf12.grib2&lev_500_mb=on&var_TMP=on
-    #          &leftlon=0&rightlon=360&toplat=90&bottomlat=-90&showurl=&dir=%2Fgfs.2009020612"
-    #         -o my_file
-    # Each value contains a url to obtain a specific subset of the grib2 data.
-    # This is done to reduce file size and processing/download time.
-    self.modelUrls = {
-      'nam4km': "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?lev_0C_isotherm=on&lev_1000_mb=on&lev_10_m_above_ground=on" + \
-                "&lev_2_m_above_ground=on&lev_850_mb=on&lev_cloud_base=on" + \
-                "&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_180-0_mb_above_ground=on" + \
-                "&var_CAPE=on&var_CIN=on&var_HLCY=on&lev_1000-0_m_above_ground=on&lev_3000-0_m_above_ground=on" + \
-                # "&lev_convective_cloud_top_level=on&lev_deep_convective_cloud_bottom_level=on&lev_deep_convective_cloud_top_level=on" + \
-                # "&lev_shallow_convective_cloud_bottom_level=on&lev_shallow_convective_cloud_top_level=on&lev_convective_cloud_bottom_level=on" + \
-                "&lev_30-0_mb_above_ground=on" + \
-                "&lev_max_wind=on&lev_mean_sea_level=on" + \
-                "&lev_surface=on&var_ABSV=on" + \
-                "&var_APCP=on&var_PRMSL=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on&var_GUST=on" + \
-                "&var_MSLET=on&var_NCPCP=on&var_REFC=on&var_RH=on&var_SNOWC=on&var_TMP=on&var_TSOIL=on&var_UGRD=on&var_VGRD=on&var_VVEL=on" + \
-                "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90", \
-
-      'gfs'   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_250_mb=on&lev_2_m_above_ground=on" + \
-                "&lev_500_mb=on&lev_700_mb=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
-                "&lev_850_mb=on&lev_mean_sea_level=on&lev_surface=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on" + \
-                "&var_CIN=on&var_RH=on&var_CRAIN=on&var_CSNOW=on&var_CWAT=on&var_DPT=on&var_GUST=on&var_HGT=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_TMP=on&var_VVEL=on" + \
-                "&var_CAPE=on&var_HLCY=on" + \
-                "&var_UGRD=on&var_U-GWD=on&var_VGRD=on&var_V-GWD=on&var_WEASD=on&leftlon=-120&rightlon=-65&toplat=40&bottomlat=20", \
-
-      "nam"   : "http://nomads.ncep.noaa.gov/cgi-bin/filter_nam_na.pl?lev_1000_mb=on&lev_10_m_above_ground=on&lev_150_mb=on&lev_200_mb=on&lev_250_mb=on&lev_2_hybrid_level=on" + \
-                "&lev_2_m_above_ground=on&lev_500-1000_mb=on&lev_500_mb=on&lev_650_mb=on&lev_700_mb=on&lev_725_mb=on&lev_750_mb=on&lev_925_mb=on&lev_950_mb=on&lev_975_mb=on" + \
-                "&var_CAPE=on&var_CIN=on&var_HLCY=on&lev_3000-0_m_above_ground=on&lev_180-0_mb_above_ground=on" + \
-                "&lev_cloud_base=on&lev_entire_atmosphere_%5C%28considered_as_a_single_layer%5C%29=on&lev_max_wind=on&lev_mean_sea_level=on&lev_planetary_boundary_layer=on" + \
-                "&lev_surface=on&lev_850_mb=on&var_ABSV=on&var_ACPCP=on&var_APCP=on&var_CAPE=on&var_CFRZR=on&var_CICE=on&var_CICEP=on&var_CRAIN=on&var_CSNOW=on&var_DPT=on" + \
-                "&var_DZDT=on&var_EVP=on&var_GUST=on&var_HGT=on&var_ICEC=on&var_PRES=on&var_PRMSL=on&var_PWAT=on&var_REFC=on&var_RH=on&var_TMAX=on" + \
-                "&var_TMIN=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_VVEL=on&var_WEASD=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
-    }
+    self.gribVars = ["PRMSL:mean sea level", "ABSV:250 mb", "ABSV:500 mb", "ABSV:850 mb","ABSV:700 mb", \
+                   "PRES:surface","HGT:surface","TMP:2 m above ground","DPT:2 m above ground","RH:2 m above ground", \
+                   "UGRD:10 m above ground","VGRD:10 m above ground", "APCP:surface","ACPCP:surface","WEASD:surface", \
+                   "CSNOW:surface","CICEP:surface","CFRZR:surface","CRAIN:surface","PWAT:entire atmosphere (considered as a single layer)"\
+                   "HLCY:3000-0 m above ground", "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", "TMP:850 mb", \
+                   "TMP:750 mb","TMP:surface", "REFC:entire atmosphere (considered as a single layer)", "HGT:500 mb", "HGT:850 mb","HGT:700 mb", \
+                   "HGT:1000 mb","TMP:500 mb","RH:500 mb","DPT:500 mb","TMP:700 mb","RH:700 mb","DPT:700 mb","TMP:850 mb","RH:850 mb","DPT:850 mb", \
+                   "RH:1000 mb","DPT:1000 mb","UGRD:500 mb","VGRD:500 mb","UGRD:850 mb","VGRD:850 mb","UGRD:1000 mb","VGRD:1000 mb", \
+                   "UGRD:700 mb","VGRD:700 mb", "UGRD:250 mb","VGRD:250 mb","MAXUW:10 m above ground","MAXVW:10 m above ground", "HGT:250 mb", \
+                   "HLCY:3000-0 m above ground", "HLCY:1000-0 m above ground"]
 
     # Default times.
     self.modelTimes = []
@@ -101,15 +75,16 @@ class NCEPModel:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015032612/" # TEST
-    #latestRunDir  = "nam.20150505/" # TEST
+    #latestRunDir  = "nam.20150520/" # TEST
     # if model == 'nam':
     #   latestRunDir  = "nam.20150328/" # TEST
 
     modelDataUrl = self.highResDataHttp + modelType + "/prod/" + latestRunDir
-    print modelDataUrl
+
     content = urllib2.urlopen(modelDataUrl).read()
 
-    print modelDataUrl
+    self.latestRunDir = latestRunDir
+
 
     soup = BeautifulSoup(content, 'html.parser')
 
@@ -142,12 +117,15 @@ class NCEPModel:
     self.runTime = latestRunDir.split('/')[0].split('.')[1] + latestHour
     # if model == 'nam':
     #   runFileList = runFileList[0:1]
-    #runFileList = runFileList[2:5] # test!
+    #runFileList = runFileList[-5:] # test!
     #print runFileList
 
     print "Length of currently updated files: " + str(len(runFileList))
 
     return (latestRunDir[:-1],runFileList)
+
+  def getDataUrl(self):
+    return self.highResDataHttp + self.modelAlias + "/prod/" + self.latestRunDir
 
 
   '''''
@@ -176,18 +154,11 @@ class NCEPModel:
     latestRun = filesList[0]
     files = filesList[1]
 
-    # Skip if this run has not finished updating yet.
-    # if len(files) < self.expectedNumberOfFiles[type]:
-    #   print "NUMBER OF FILES: " + str(len(files))
-    #   return {}
-
-    scriptUrl = self.modelUrl
-
     # Set file download paths, along with desired vars/levels.
     gribDir = latestRun
 
     for file in files:
-      runDict[file] = scriptUrl + "&dir=/" + gribDir + "&file=" + file
+      runDict[file] = file
 
     dataDict = {}
 

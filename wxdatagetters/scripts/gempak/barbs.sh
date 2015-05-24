@@ -70,7 +70,7 @@ foreach TIME ($times:q)
   #   set gdFile = ${runTime}"_1.gem"
   # endif
 
-foreach level (250 500 700 850 1000)
+foreach level (250 500 850 1000)
 
  set imgDir = ${baseDir}/${model}/${timeStamp}/${level}/${variable}
  mkdir -p ${baseDir}/${model}/${timeStamp}/${level}/${variable}
@@ -112,7 +112,7 @@ if (${model} == "ukmet") then
   @ barbColor = $barbColor + 3
  endif
 
-  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "18.00;-92.00;54.00;-40.00")
+  foreach REGION ("WA" "19.00;-119.00;50.00;-56.00" "NC" "OK" "CA" "CHIFA" "CENTUS" "MA" "18.00;-92.00;54.00;-40.00" "WSIG" "TATL")
     set regionName = ${REGION}
     set proj = "STR/90;-100;0"
 
@@ -161,6 +161,16 @@ if (${model} == "ukmet") then
       set regionName = "EASTUS"
     endif
 
+    if (${REGION} == "WSIG") then
+      set proj = "MER//NM"
+      set regionName = "EPAC"
+    endif
+
+    if (${REGION} == "TATL") then
+      set proj = "MER//NM"
+      set regionName = "TATL"
+    endif
+
 gdplot2_gf << EOF 
          
   GDFILE   = "${MODEL_PATH}/${model}/${gdFile}"
@@ -172,7 +182,8 @@ gdplot2_gf << EOF
   GLEVEL   = 500
   GVCORD   = PRES
   PANEL    = 0
-  SKIP  =  1/2  
+  SKIP     =  1/2  
+  IJSKIP   = 30
   GLEVEL   = "${level}"
   GVCORD   = pres 
   TYPE     = b 

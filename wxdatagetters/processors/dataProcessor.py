@@ -9,6 +9,8 @@ import redis
 import concurrent.futures
 import socket, threading
 
+from objects.gribInventory import GribInventory
+
 
 class DataProcessor:
   '''''
@@ -86,6 +88,7 @@ class DataProcessor:
       else:
         # download all files in http['files'].
         files = http['files']
+        self.gribInventory = GribInventory(self.modelClass, files)
 
         savePath =  self.constants.baseDir + self.constants.gempakDir + self.constants.dataDir + model + '/'
 
@@ -245,11 +248,7 @@ class DataProcessor:
     #   print "File already downloaded. Skipping..."
     #   return
 
-    # File does not already exist, download it.
-    gemFile = urllib2.urlopen(url).read()
-    fp = open(grib2File, 'w')
-    fp.write(gemFile)
-    fp.close()
+    self.gribInventory.downloadFilteredFile(gemFile, grib2File)
     return
 
   '''''
@@ -330,62 +329,16 @@ class DataProcessor:
     # try:
     maxSocketTime = 300 # Max time a download read() can take.
     maxUrlOpenTime = 15 # Max time to open a URL
-    gemFile = urllib2.urlopen(url)
-    success,gemFile = self.timeoutHttpRead(gemFile, maxSocketTime)
 
-    # If the blocking urllib2.read() took longer than maxSocketTime, Abandon Ship!
-    # Return False, otherwise download file.
-    if success and gemFile is not None:
-      fp = open(grib2File, 'w')
-      fp.write(gemFile)
-      fp.close()
-    else:
-      print "Socket timed out! Time exceeded "
-      f = open(self.modelClass.errorLog,'w')
-      f.write("\n A socket Timed out in GemData.saveFilesThread() . We must exit this program execution, and attempt again.")
-      f.write("\n URL: " + url)
-      f.write("\n MODEL: " + model)
-      f.write("\n SAVE_PATH: " + savePath)
-      f.close()
-      # Exit call. Give up, get the hell out!
+    successful = self.gribInventory.downloadFilteredThread(fileName, grib2File)
+    
+    # Something bad happened. Likely a socket timeout. Bubble up error.
+    if not successful:
       return False
-
-    # except socket.error:
-    #   print "There was a timeout"
 
     self.processGrib2(model, savePath, fileName)
 
     return True
-
-  '''''
-  private function timeoutHttpRead(response, timeout=60)
-
-  Time out function for Threads.
-
-  @param object response
-  @param int timeout
-  @return Tuple
-  '''''
-  def timeoutHttpRead(self, response, timeout = 60):
-    def murha(resp):
-      try:
-        os.close(resp.fileno())
-        resp.close()
-      except Exception, e:
-        print e
-        return (False, None)
-
-    # set a timer to yank the carpet underneath the blocking read() by closing the os file descriptor
-    t = threading.Timer(timeout, murha, (response,))
-    try:
-      t.start()
-      body = response.read()
-      t.cancel()
-    except socket.error as se:
-      if se.errno == errno.EBADF: # murha happened
-        return (False, None)
-      raise
-    return (True, body)
 
   '''''
   public function getDataThreaded(files, model)
@@ -425,6 +378,7 @@ class DataProcessor:
   public function getDataNoThreads(files, model)
 
   Gets data WITHOUT Threads!
+  FOR NON NCEP filos
   
   @param dictionary files
   @param String model
@@ -464,14 +418,6 @@ class DataProcessor:
           self.rmFile(fileOrDirPath)
     else:
       self.rmFile(directory)
-
-  '''''
-  Clear saved npy files.
-  '''''
-  def clearNpyDat(self, model):
-    self.runCmd("rm " + self.constants.NP_TMP_DIR + "/" + model + "_*")
-    return
-
 
   '''''
   rmFile just removes a file, and throws an exception. Shut up.

@@ -74,10 +74,11 @@ foreach TIME ($times:q)
  set imgDir = ${baseDir}/${model}/${timeStamp}/sfc/${variable}
  echo imgDir
  mkdir -p ${baseDir}/${model}/${timeStamp}/sfc/${variable}
-
+ set param = "pmsl"
 
  if (${model} == "ecmwf") then
   @ lineColor = $lineColor
+  set param = "pres"
  endif
 
  if (${model} == "nam") then
@@ -163,7 +164,7 @@ gdplot2_gf << EOF
   GLEVEL   = "0"
   GVCORD   = "none"
   PANEL    = "0"
-  GDPFUN   = sm9s(pmsl)
+  GDPFUN   = sm9s(${param})
   HILO     =  
   HLSYM    =  
   CLEAR    = yes

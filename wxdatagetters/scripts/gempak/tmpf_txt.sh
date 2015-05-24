@@ -110,13 +110,13 @@ gdmap_gf << EOFD
  GDATTIM  = "f${TIME}"
  GAREA  = ${REGION}
  PROJ   = ${proj}  
- IJSKIP   = 3
- COLORS   = 1
+ IJSKIP   = 4
+ COLORS   = 31
  TITLE    = 
  SCALE    = 
  DEVICE   = "gif|init_${model}_${level}_${variable}_f${TIME}.gif|1280;1024| C"
  CLEAR    = y
- TEXT     = 1//1.5/
+ TEXT     = 1.1//1.8/
  GRDLBL   = 0
  MAP = 0
 run

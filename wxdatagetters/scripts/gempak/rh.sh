@@ -139,7 +139,7 @@ gdplot2_gf << EOF
   SKIP   = 0
   SCALE  = 0
   GDPFUN = relh
-  TYPE   = c/f
+  TYPE   = f
   CONTUR  =1                                                                       
   CINT   = 10;20;80;90
   LINE   = 32//2
@@ -153,7 +153,6 @@ gdplot2_gf << EOF
   TITLE  = 
   TEXT   =                                                             
   CLEAR  = yes                                                                     
-  DEVICE  =xw                                                                      
   STNPLT  =                                                                        
   SATFIL  =                                                                        
   RADFIL  =                                                                        

@@ -19,6 +19,9 @@ class DataGetter:
     dataGetter = DataProcessor(modelClass) # Second parameter enables DEBUG mode.
     dataGetter.getData(modelLinks)
 
+    # Get a list of the grib2 files!
+    # files  = modelLinks[modelClass.name]['files']
+
     gempak = Gempak(dataGetter)
     gempak.doThreadedGempakScripts(modelLinks)
 
