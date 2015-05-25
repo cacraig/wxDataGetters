@@ -282,6 +282,8 @@ class Grib2Plot:
 
 
     for region, gribmap in self.regionMaps.items():
+      borderWidth = 0.
+      borderBottom = 0.
       fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
       m = gribmap.getBaseMap()
       print time
@@ -465,7 +467,8 @@ class Grib2Plot:
 
     #for time in times:
     for region,gribmap in self.regionMaps.items():
-
+      borderWidth = 0.
+      borderBottom = 0.
       fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
 
 
