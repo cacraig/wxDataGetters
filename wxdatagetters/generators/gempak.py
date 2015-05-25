@@ -16,7 +16,7 @@ class Gempak:
     self.constants  = dataGetter.constants
     self.redisConn  = dataGetter.redisConn
     self.DEBUG = dataGetter.DEBUG
-    self.grib2Plotter = Grib2Plot(self.constants)
+    self.grib2Plotter = Grib2Plot(self.constants, self.modelClass)
     return
 
   '''''
@@ -41,6 +41,8 @@ class Gempak:
         # Do TempF plotting in Matplotlib...
         self.grib2Plotter.plot2mMPTemp(model, self.modelClass.modelTimes, self.modelClass.runTime, self.constants.dataDirEnv)
         if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+          # Load ALL the data.
+          self.grib2Plotter.preloadData(self.modelClass.getDefaultHours())
           # Plot Accum Precipitation.
           self.grib2Plotter.plotPrecip(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv)
           self.grib2Plotter.plotSnowFall(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv, self.modelClass.getDefaultHours()[0])
@@ -72,6 +74,8 @@ class Gempak:
           # Do Snowfall plotting in Matplotlib...
           # Only plot snowfall if the run has completed.
           if self.modelClass.getLastForecastHour() in self.modelClass.modelTimes:
+            # LOAD ALL THE DATA.
+            self.grib2Plotter.preloadData(self.modelClass.getDefaultHours())
             # Plot Accum Precipitation.
             self.grib2Plotter.plotPrecip(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv)
             self.grib2Plotter.plotSnowFall(model,self.modelClass.getDefaultHours(), self.modelClass.runTime, self.constants.dataDirEnv, self.modelClass.getDefaultHours()[0])

@@ -15,6 +15,7 @@ import concurrent.futures
 import os
 import gc
 import multiprocessing as mp
+from objects.asyncPool import AsyncPool
 
 # See: /home/vagrant/GEMPAK7/gempak/tables/stns/geog.tbl 
 # !------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ class Grib2Plot:
 
   @return void
   '''''
-  def __init__(self, constants):
+  def __init__(self, constants, model):
 
     self.regionMaps = {
       #                              CENLAT  CENLON   LLLAT   LLLON   URLAT   URLON PROJ
@@ -110,15 +111,97 @@ class Grib2Plot:
     self.snowSum24 = None
     self.snowSum72 = None
     self.snowSum120 = None
+
+    # Run state
+    self.runTime = model.runTime
+    self.times = model.modelTimes
+    self.modelDataPath = constants.dataDirEnv
+    self.model = model.getName()
+    self.gribVars = ['swem','500mbT', '2mT','precip','850mbT']
+    # Cache for all loaded grib data.
+    self.cache = {}
+    self.preloadData()
+
+    return
+
+  # Preloads all data.
+  # times to preload can be overridden.
+  def preloadData(self, times = None):
+
+    if not times:
+      times = self.times
+
+    for time in times:
+      skip = False
+
+      if time not in self.cache:
+        self.cache[time] = {}
+
+      g2file = self.getGrib2File(self.modelDataPath, self.runTime, self.model, time)
+
+      for var in self.gribVars:
+        if var not in self.cache[time]:
+          self.cache[time][var] = None
+        else:
+          skip = True
+      # Skip preloading if already loaded.
+
+
+      print "LOADING TIME: " + time
+
+      try:
+        grbs=pygrib.open(g2file)
+        grbs.seek(0)
+      except Exception, e:
+        print "Failure on loading grib file = " + g2file
+        continue
+        pass
+
+      if skip:
+        print "Skipping: " + time + " -> Already loaded or not found."
+        continue
+
+      try:
+        self.cache[time]['swem'] = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
+      except Exception, e:
+        print e
+        pass
+
+      try:
+        self.cache[time]['500mbT'] = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)[0]
+      except Exception, e:
+        print e
+        pass
+
+      try:
+        self.cache[time]['850mbT'] = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
+      except Exception, e:
+        print e
+        pass
+
+      try:
+        self.cache[time]['2mT'] = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
+      except Exception, e:
+        print e
+        pass
+
+      try:
+        self.cache[time]['precip'] = grbs.select(name='Total Precipitation', level=0)[0]
+      except Exception, e:
+        print e
+        pass
+
+      if grbs is not None:
+        grbs.close()
+        
     return
 
   # Wraps plot2mTemp in it's own process. Isolates any possible memory leaks.
   def plot2mMPTemp(self, model, times, runTime, modelDataPath):
-    for region, gribmap in self.regionMaps.items():
-      args = (region, gribmap, model, times, runTime, modelDataPath)
-      p = mp.Process(target=self.plot2mTempMP, args=args)
-      p.start()
-      p.join()
+    ap = AsyncPool(6)
+    for time in times:
+      ap.doJob(self.plot2mTempMP,(model, time, runTime, modelDataPath))
+    ap.join()
     return
 
   # Wraps doSnowPlot in it's own process. Isolates any possible memory leaks.
@@ -178,7 +261,8 @@ class Grib2Plot:
     p.join()
     return
 
-  def plot2mTempMP(self, region, gribmap, model, times, runTime, modelDataPath):
+  def plot2mTempMP(self, zargs):
+    (model, time, runTime, modelDataPath) = zargs
 
     level = "sfc"
     variable = "tmpf"
@@ -187,30 +271,27 @@ class Grib2Plot:
     call("mkdir -p " + imgDir, shell=True)
 
     borderBottomCmd = '' # Reset any bottom border.
-    fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
-    m = gribmap.getBaseMap()
 
-    for time in times:
+    #g2File = self.getGrib2File(modelDataPath, runTime, model, time)
+
+    # Get grib2 data.
+    gTemp2m = self.cache[time]['2mT']
+
+    if gTemp2m is None:
+      return
+
+
+    for region, gribmap in self.regionMaps.items():
+      fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
+      m = gribmap.getBaseMap()
       print time
 
-      g2File = self.getGrib2File(modelDataPath, runTime, model, time)
-
-      
       convertExtension = ".gif"
       if region in self.isPng:
         convertExtension = ".png"
 
-
       tempFileName = "init_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
       saveFileName = imgDir + "/" + region +"_f" + time + convertExtension
-      try:
-        grbs=pygrib.open(g2File)
-        grbs.seek(0)
-        gTemp2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
-        grbs.close()
-      except Exception, e:
-        print e
-        pass
 
       temp2m = gTemp2m.values
       grbs = None
@@ -297,10 +378,16 @@ class Grib2Plot:
     return ""
 
   def plotSnowFall(self, model, times, runTime, modelDataPath, previousTime):
-    argList = []
-    # nam.t18z.awip3281.tm00.grib2
+    accumArgList = []
+    hourArgList = []
+    snowPrevTime = previousTime
+    # args for accumulations.
     for region,gribmap in self.regionMaps.items():
-      argList.append((runTime, region, model, times, gribmap, modelDataPath ,previousTime))
+      accumArgList.append((runTime, region, model, times, gribmap, modelDataPath ,previousTime))
+
+    for time in times:
+      hourArgList.append((runTime, model, time, modelDataPath ,snowPrevTime))
+      snowPrevTime = time
 
     maxWorkers = 2
     
@@ -309,16 +396,22 @@ class Grib2Plot:
     if model == 'gfs':
       maxWorkers = 1
 
+    ap = AsyncPool(6)
+
     try:
       # Do multiprocessing -> snow plots.
-      self.doPlotMP(self.doSnowPlot, argList, maxWorkers)
+      #self.doPlotMP(self.doSnowPlot, hourArgList, maxWorkers)
+      for time in times:
+        ap.doJob(self.doSnowPlot,(runTime, model, time, modelDataPath ,snowPrevTime))
+        snowPrevTime = time
+      ap.join()
     except Exception, e:
       print e
       pass
 
     try:
       # Do multiprocessing -> snowfall accumulations.
-      self.doPlotMP(self.doSnowAccumulations, argList, maxWorkers)
+      self.doPlotMP(self.doSnowAccumulations, accumArgList, maxWorkers)
     except Exception, e:
       print e
       pass
@@ -347,7 +440,8 @@ class Grib2Plot:
 
     return
 
-  def doSnowPlot(self, runTime, region, model, times, gribmap, modelDataPath ,previousTime):
+  def doSnowPlot(self, zargs):
+    (runTime, model, time, modelDataPath ,previousTime) = zargs
     previous = previousTime
     level = "sfc"
     variable = "snow"
@@ -358,24 +452,27 @@ class Grib2Plot:
     call("mkdir -p " + imgDirAccumTotal, shell=True)
     
     # If the inital timestep (0th hour) is in the times set.
-    self.hasInitialTime = 0 in map(int, times)
-    # dont do anything on the 0th hour (if it's the only time being processed)
-    if self.hasInitialTime and len(times) <= 1:
-      print "Passed 0th Hour only... skipping snowfall stuff"
-      return
-    fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
-    for time in times:
+    # self.hasInitialTime = 0 in map(int, times)
 
-      # skip the 0th hour.
-      if int(time) == 0:
-        continue
+    # # dont do anything on the 0th hour (if it's the only time being processed)
+    # if self.hasInitialTime and len(times) <= 1:
+    #   print "Passed 0th Hour only... skipping snowfall stuff"
+    #   return
+      
+    # skip the 0th hour.
+    if int(time) == 0:
+      return
+
+    #for time in times:
+    for region,gribmap in self.regionMaps.items():
+
+      fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
+
 
 
       startFile = self.getGrib2File(modelDataPath, runTime, model, previous)
       endFile = self.getGrib2File(modelDataPath, runTime, model, time)
 
-
-      variableAccum = variable + "_accum"
       tempFileName = "init_" + region + "_" + model + "_" + level + "_" + variable + "_f" + time + ".png"
       saveFileName = imgDir + "/" + region +"_f" + time + ".gif"
       borderBottomCmd = "" # Reset bottom border.
@@ -390,41 +487,56 @@ class Grib2Plot:
       #   return
 
       skip = False
-      try:
-        grbs=pygrib.open(startFile)
-        grbs.seek(0)
-        grbSwemPrevious = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
-        grbs.close()
-      except Exception, e:
-        print "Failure on loading grib [START] file = " + startFile
-        print "Region" + region
-        print "Model" + model
-        print e
-        previous = time
-        # DO Increment previous time in the case where previous time has missing data.
-        # So if previous=33h and time = 36hr, and 33h has missing data:
-        # The next step would be previous=36hr and time=39hr: total = 39h - 36hr
-        skip = True
-        pass
 
-      try:
-        grbs=pygrib.open(endFile)
-        grbs.seek(0)
-        grbSwemCurrent = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
-        grbT500 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)[0]
-        grbT850 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
-        grbT2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
-        grbs.close()
-      except Exception, e:
-        print "Failure on loading grib [END] file = " + endFile
-        print "Region" + region
-        print "Model" + model
-        print e
+      grbSwemPrevious = self.cache[previous]['swem']
+      grbSwemCurrent = self.cache[time]['swem']
+      grbT500 = self.cache[time]['500mbT']
+      grbT850 = self.cache[time]['850mbT']
+      grbT2m = self.cache[time]['2mT']
+
+      # Check to make sure data is set.
+      if grbSwemPrevious is None:
+        previous = time
         skip = True
-        # DONT Increment previous time in the case of missing data.
-        # ie. if 33h and 36 have missing data, the next increment
-        # will try 39h - 33h = difference.
-        pass
+
+      if grbSwemCurrent is None or grbT500 is None or grbT850 is None or grbT2m is None:
+        skip = True
+
+      # try:
+      #   grbs=pygrib.open(startFile)
+      #   grbs.seek(0)
+      #   grbSwemPrevious = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
+      #   grbs.close()
+      # except Exception, e:
+      #   print "Failure on loading grib [START] file = " + startFile
+      #   print "Region" + region
+      #   print "Model" + model
+      #   print e
+      #   previous = time
+      #   # DO Increment previous time in the case where previous time has missing data.
+      #   # So if previous=33h and time = 36hr, and 33h has missing data:
+      #   # The next step would be previous=36hr and time=39hr: total = 39h - 36hr
+      #   skip = True
+      #   pass
+
+      # try:
+      #   grbs=pygrib.open(endFile)
+      #   grbs.seek(0)
+      #   grbSwemCurrent = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
+      #   grbT500 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)[0]
+      #   grbT850 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
+      #   grbT2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
+      #   grbs.close()
+      # except Exception, e:
+      #   print "Failure on loading grib [END] file = " + endFile
+      #   print "Region" + region
+      #   print "Model" + model
+      #   print e
+      #   skip = True
+      #   # DONT Increment previous time in the case of missing data.
+      #   # ie. if 33h and 36 have missing data, the next increment
+      #   # will try 39h - 33h = difference.
+      #   pass
 
       if skip == True:
         print "Skipping Hour: " + time
@@ -568,7 +680,6 @@ class Grib2Plot:
       call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -transparent '#000000' -matte -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
       call("rm " + tempFileName, shell=True)
       fig.clf()
-      previous = time
     plt.close()
     plt.close(fig.number)
     fig = None
@@ -631,29 +742,22 @@ class Grib2Plot:
       borderBottomCmd = "" # Reset bottom border.
 
       skip = False
-      try:
-        grbs=pygrib.open(g2File)
-        grbs.seek(0)
-        precipgrb = grbs.select(name='Total Precipitation', level=0)[0]
-        # Subset data for global grids...
-        # Very strange bug.
-        if model in self.globalModelGrids:   #  and region in self.nonLAEAprojections
-          precip,lat, lon = precipgrb.data(lat1=20,lat2=75,lon1=220,lon2=320)
-        else:
-          precip = precipgrb.values
-          lat, lon = precipgrb.latlons()
-        grbs.close()
-      except Exception, e:
-        print "Failure on loading grib file = " + g2File
-        print "Region" + region
-        print "Model" + model
-        print e
+
+      precipgrb = self.cache[time]['precip']
+      if precipgrb is None:
         skip = True
-        pass
 
       if skip == True:
         print "Skipping Hour: " + time
         continue
+
+      # Subset data for global grids...
+      # Very strange bug.
+      if model in self.globalModelGrids:   #  and region in self.nonLAEAprojections
+        precip,lat, lon = precipgrb.data(lat1=20,lat2=75,lon1=220,lon2=320)
+      else:
+        precip = precipgrb.values
+        lat, lon = precipgrb.latlons()
 
       precip = precip/25.4
 
@@ -858,41 +962,56 @@ class Grib2Plot:
       #   # skip third hour.
       #   return
       skip = False
-      try:
-        grbs=pygrib.open(startFile)
-        grbs.seek(0)
-        grbSwemPrevious = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
-        grbs.close()
-      except Exception, e:
-        print "Failure on loading grib [START] file = " + startFile
-        print "Region" + region
-        print "Model" + model
-        print e
-        skip = True
-        previous = time
-        # DO Increment previous time in the case where previous time has missing data.
-        # So if previous=33h and time = 36hr, and 33h has missing data:
-        # The next step would be previous=36hr and time=39hr: total = 39h - 36hr
-        pass
 
-      try:
-        grbs=pygrib.open(endFile)
-        grbs.seek(0)
-        grbSwemCurrent = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
-        grbT500 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)[0]
-        grbT850 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
-        grbT2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
-        grbs.close()
-      except Exception, e:
-        print "Failure on loading grib [END] file = " + endFile
-        print "Region" + region
-        print "Model" + model
-        print e
+      grbSwemPrevious = self.cache[previous]['swem']
+      grbSwemCurrent = self.cache[time]['swem']
+      grbT500 = self.cache[time]['500mbT']
+      grbT850 = self.cache[time]['850mbT']
+      grbT2m = self.cache[time]['2mT']
+
+      # Check to make sure data is set.
+      if grbSwemPrevious is None:
+        previous = time
         skip = True
-        # DONT Increment previous time in the case of missing data.
-        # ie. if 33h and 36 have missing data, the next increment
-        # will try 39h - 33h = difference.
-        pass
+
+      if grbSwemCurrent is None or grbT500 is None or grbT850 is None or grbT2m is None:
+        skip = True
+
+      # try:
+      #   grbs=pygrib.open(startFile)
+      #   grbs.seek(0)
+      #   grbSwemPrevious = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
+      #   grbs.close()
+      # except Exception, e:
+      #   print "Failure on loading grib [START] file = " + startFile
+      #   print "Region" + region
+      #   print "Model" + model
+      #   print e
+      #   skip = True
+      #   previous = time
+      #   # DO Increment previous time in the case where previous time has missing data.
+      #   # So if previous=33h and time = 36hr, and 33h has missing data:
+      #   # The next step would be previous=36hr and time=39hr: total = 39h - 36hr
+      #   pass
+
+      # try:
+      #   grbs=pygrib.open(endFile)
+      #   grbs.seek(0)
+      #   grbSwemCurrent = grbs.select(name='Water equivalent of accumulated snow depth', typeOfLevel='surface', level=0)[0]
+      #   grbT500 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)[0]
+      #   grbT850 = grbs.select(name='Temperature', typeOfLevel='isobaricInhPa', level=850)[0]
+      #   grbT2m = grbs.select(name='2 metre temperature', typeOfLevel='heightAboveGround', level=2)[0]
+      #   grbs.close()
+      # except Exception, e:
+      #   print "Failure on loading grib [END] file = " + endFile
+      #   print "Region" + region
+      #   print "Model" + model
+      #   print e
+      #   skip = True
+      #   # DONT Increment previous time in the case of missing data.
+      #   # ie. if 33h and 36 have missing data, the next increment
+      #   # will try 39h - 33h = difference.
+      #   pass
 
       if skip == True:
         print "Skipping Hour: " + time
@@ -1120,6 +1239,11 @@ class Grib2Plot:
       time = time[-2:]
       # nam.t00z.conusnest.hiresf03.tm00.grib2
       g2file = modelDataPath + model + "/" + "nam.t" + runHour + "z.conusnest.hiresf"+ time +".tm00.grib2"
+    elif model == 'hrrr':
+      runHour = runTime[-2:]
+      time = time[-2:]
+      # hrrr.t00z.wrfnatf03.grib2
+      g2file = modelDataPath + model + "/" + "hrrr.t" + runHour + "z.wrfnatf"+ time +".grib2"
     return g2file
 
   def getRegionFigure(self, gribmap):
@@ -1140,6 +1264,4 @@ class Grib2Plot:
       frameWidth = frameWidth - ((borderWidth*2.)/200.)
 
     fig = plt.figure(figsize=(frameWidth, frameHieght), dpi = 200)
-
-
     return (fig, borderWidth, borderBottom)

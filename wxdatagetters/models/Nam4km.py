@@ -14,13 +14,13 @@ class Nam4km(NCEPModel):
     self.modelAlias = "nam"
     self.gribVars = ["PRMSL:mean sea level", "PRES:surface", "TMP:2 m above ground", "DPT:2 m above ground", "RH:2 m above ground", \
                "UGRD:10 m above ground","VGRD:10 m above ground", "APCP:surface","ACPCP:surface","WEASD:surface", \
-               "CSNOW:surface","CICEP:surface","CFRZR:surface","CRAIN:surface","PWAT:entire atmosphere (considered as a single layer)"\
-               "HLCY:3000-0 m above ground", "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", \
+               "PWAT:entire atmosphere (considered as a single layer)", \
+               "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", \
                "TMP:surface", "REFC:entire atmosphere (considered as a single layer)", \
-               "TMP:850 mb", "TMP:500 mb", \
+               "TMP:850 mb", "TMP:500 mb", "TMP:30-0 mb above ground", \
                "MAXUW:10 m above ground","MAXVW:10 m above ground", \
                "HLCY:3000-0 m above ground", "HLCY:1000-0 m above ground"]
-               # ,"RH:850 mb","DPT:850 mb"
+               # ,"RH:850 mb","DPT:850 mb", "CSNOW:surface","CICEP:surface","CFRZR:surface", "CRAIN:surface"
     return
 
   '''''

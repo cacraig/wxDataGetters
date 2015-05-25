@@ -15,13 +15,14 @@ class NCEPModel:
     self.gribVars = ["PRMSL:mean sea level", "ABSV:250 mb", "ABSV:500 mb", "ABSV:850 mb","ABSV:700 mb", \
                    "PRES:surface","HGT:surface","TMP:2 m above ground","DPT:2 m above ground","RH:2 m above ground", \
                    "UGRD:10 m above ground","VGRD:10 m above ground", "APCP:surface","ACPCP:surface","WEASD:surface", \
-                   "CSNOW:surface","CICEP:surface","CFRZR:surface","CRAIN:surface","PWAT:entire atmosphere (considered as a single layer)"\
-                   "HLCY:3000-0 m above ground", "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", "TMP:850 mb", \
+                   "PWAT:entire atmosphere (considered as a single layer)", \
+                   "CAPE:180-0 mb above ground", "CIN:180-0 mb above ground", "TMP:850 mb", \
                    "TMP:750 mb","TMP:surface", "REFC:entire atmosphere (considered as a single layer)", "HGT:500 mb", "HGT:850 mb","HGT:700 mb", \
-                   "HGT:1000 mb","TMP:500 mb","RH:500 mb","DPT:500 mb","TMP:700 mb","RH:700 mb","DPT:700 mb","TMP:850 mb","RH:850 mb","DPT:850 mb", \
-                   "RH:1000 mb","DPT:1000 mb","UGRD:500 mb","VGRD:500 mb","UGRD:850 mb","VGRD:850 mb","UGRD:1000 mb","VGRD:1000 mb", \
+                   "HGT:1000 mb","TMP:500 mb","TMP:700 mb","RH:700 mb","DPT:700 mb","TMP:850 mb","RH:850 mb","DPT:850 mb", \
+                   "RH:1000 mb","UGRD:500 mb","VGRD:500 mb","UGRD:850 mb","VGRD:850 mb","UGRD:1000 mb","VGRD:1000 mb", \
                    "UGRD:700 mb","VGRD:700 mb", "UGRD:250 mb","VGRD:250 mb","MAXUW:10 m above ground","MAXVW:10 m above ground", "HGT:250 mb", \
                    "HLCY:3000-0 m above ground", "HLCY:1000-0 m above ground"]
+                   # "CSNOW:surface","CICEP:surface","CFRZR:surface","CRAIN:surface",
 
     # Default times.
     self.modelTimes = []
@@ -75,7 +76,7 @@ class NCEPModel:
         latestRunDir = dir
 
     #latestRunDir  = "gfs.2015032612/" # TEST
-    #latestRunDir  = "nam.20150520/" # TEST
+    latestRunDir  = "nam.20150520/" # TEST
     # if model == 'nam':
     #   latestRunDir  = "nam.20150328/" # TEST
 
