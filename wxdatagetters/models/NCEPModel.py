@@ -117,7 +117,7 @@ class NCEPModel:
 
     self.runTime = latestRunDir.split('/')[0].split('.')[1] + latestHour
     # if model == 'nam':
-    #   runFileList = runFileList[0:1]
+    #runFileList = runFileList[1:5]
     #runFileList = runFileList[-5:] # test!
     #print runFileList
 

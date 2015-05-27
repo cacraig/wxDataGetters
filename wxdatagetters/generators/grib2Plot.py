@@ -270,8 +270,6 @@ class Grib2Plot:
     imgDir = baseDir+"/"+ model+"/"+runTime+"/"+level+"/"+variable
     call("mkdir -p " + imgDir, shell=True)
 
-    borderBottomCmd = '' # Reset any bottom border.
-
     #g2File = self.getGrib2File(modelDataPath, runTime, model, time)
 
     # Get grib2 data.
@@ -286,7 +284,7 @@ class Grib2Plot:
       borderBottom = 0.
       fig, borderWidth, borderBottom = self.getRegionFigure(gribmap)
       m = gribmap.getBaseMap()
-      print time
+      borderBottomCmd = "" # Reset bottom border.
 
       convertExtension = ".gif"
       if region in self.isPng:
@@ -302,7 +300,7 @@ class Grib2Plot:
       temp2m = ((temp2m- 273.15)* 1.8000) + 32.00
 
       lat, lon = gTemp2m.latlons()
-
+      borderBottomCmd = ""
       if borderBottom > 1.0:
         if gribmap.hasDoubleYBorder:
           borderBottomCmd = " -bordercolor none -border 0x" + str(int(borderBottom))
@@ -368,6 +366,7 @@ class Grib2Plot:
 
       call("pngquant -o "+ tempFileName + " --force --quality=50-65 "+ tempFileName, shell=True)
       #call("optipng -o2 -strip all -out " + tempFileName + " -clobber " + tempFileName, shell=True)
+      print "convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName
       call("convert -background none "+ tempFileName + " " + borderBottomCmd + " -bordercolor none -border " + str(int(borderWidth)) + "x0 " + saveFileName, shell=True)
       call("rm " + tempFileName, shell=True)
       cc = None
@@ -375,8 +374,13 @@ class Grib2Plot:
       fig.clf()
       plt.clf()
       gc.collect()
-
-
+    # Try everything. lol.
+    fig.clf()
+    plt.close()
+    plt.close(fig.number)
+    fig = None
+    cs = None
+    gc.collect()
     return ""
 
   def plotSnowFall(self, model, times, runTime, modelDataPath, previousTime):
